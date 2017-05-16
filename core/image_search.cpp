@@ -9,6 +9,8 @@ image_search::image_search(QWebEnginePage &page, QObject *parent) :
     web_page_(page)
 {
     connect(&web_page_, &QWebEnginePage::loadFinished, this, &image_search::load_web_page_finished);
+    connect(&web_page_, &QWebEnginePage::scrollPositionChanged,
+            this, &image_search::web_page_scroll_position_changed);
 }
 
 void image_search::set_color_filter(image_search::color_option) noexcept

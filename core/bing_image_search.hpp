@@ -25,8 +25,15 @@ public:
     void set_suffix_filter(QStringList const &type) override;
 
 private:
-    void find_image_page();
+    enum class state{
+       load_first_page,
+       scroll_page,
+       parse_page_link,
+       parse_image_link
+    };
+
     void load_web_page_finished(bool ok) override;
+    void web_page_scroll_position_changed(QPointF const &point) override;
 
     QColor color_;
     color_option color_option_;
@@ -37,6 +44,7 @@ private:
     QSize min_size_;
     people people_;
     safe_search safe_search_;
+    state state_;
     QStringList suffix_;
 };
 

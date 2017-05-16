@@ -11,6 +11,7 @@ bing_image_search::bing_image_search(QWebEnginePage &page, QObject *parent) :
     max_search_size_(0),
     people_(people::all),
     safe_search_(safe_search::moderate),
+    state_(state::load_first_page),
     suffix_({"jpg", "jpeg", "png"})
 {
 
@@ -68,6 +69,11 @@ void bing_image_search::set_suffix_filter(const QStringList &type)
 }
 
 void bing_image_search::load_web_page_finished(bool ok)
+{
+
+}
+
+void bing_image_search::web_page_scroll_position_changed(const QPointF &point)
 {
 
 }
