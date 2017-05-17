@@ -2,6 +2,8 @@
 
 #include <QDebug>
 #include <QSize>
+#include <QRegularExpression>
+#include <QRegularExpressionMatch>
 #include <QWebEnginePage>
 
 bing_image_search::bing_image_search(QWebEnginePage &page, QObject *parent) :
@@ -75,29 +77,50 @@ void bing_image_search::set_suffix_filter(const QStringList &type)
 void bing_image_search::load_web_page_finished(bool ok)
 {
     qDebug()<<"load web page finished:"<<ok;
-
-    switch(state_){
-    case state::load_first_page:{
-        ypos_ = 0;
-        scroll_pos_changed_ = true;
-        scroll_web_page();
-        break;
-    }
-    case state::parse_image_link:{
-        break;
-    }
-    case state::scroll_page:{
-        scroll_web_page();
-        break;
-    }
-    default:
-        break;
+    if(ok){
+        switch(state_){
+        case state::load_first_page:{
+            ypos_ = 0;
+            scroll_pos_changed_ = true;
+            scroll_web_page();
+            break;
+        }
+        case state::parse_image_link:{
+            break;
+        }
+        case state::scroll_page:{
+            scroll_web_page();
+            break;
+        }
+        default:
+            break;
+        }
     }
 }
 
 void bing_image_search::parse_page_link()
 {
-
+    get_web_page().toHtml([this](QString const &contents)
+    {
+        qDebug()<<"get image link contents";
+        //qDebug()<<contents;
+        qDebug()<<"contents size:"<<contents.size();
+        QRegularExpression reg("(search\\?view=detailV2[^\"]*)");
+        auto iter = reg.globalMatch(contents);
+        size_t total = 0;
+        img_page_links_.clear();
+        while(iter.hasNext()){
+            QRegularExpressionMatch match = iter.next();
+            if(match.captured(1).right(20) != "ipm=vs#enterinsights"){
+                ++total;
+                QString url = QUrl("https://www.bing.com/images/" + match.captured(1)).toString();
+                url.replace("&amp;", "&");
+                img_page_links_.push_back(url);
+            }
+        }
+        qDebug()<<"total match link:"<<total;
+        state_ = state::parse_image_link;
+    });
 }
 
 void bing_image_search::scroll_web_page()

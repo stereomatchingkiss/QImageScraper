@@ -39,6 +39,7 @@ private:
 
     QColor color_;
     color_option color_option_;
+    QStringList img_page_links_;
     image_type image_type_;
     layout layout_;
     size_t max_search_size_;
