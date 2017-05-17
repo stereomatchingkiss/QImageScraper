@@ -8,7 +8,7 @@
 
 class bing_image_search : public image_search
 {
-    Q_OBJECT
+    Q_OBJECT    
 public:
     explicit bing_image_search(QWebEnginePage &page, QObject *parent = nullptr);
 
@@ -33,6 +33,8 @@ private:
     };
 
     void load_web_page_finished(bool ok) override;
+    void parse_page_link();
+    void scroll_web_page();
     void web_page_scroll_position_changed(QPointF const &point) override;
 
     QColor color_;
@@ -44,8 +46,10 @@ private:
     QSize min_size_;
     people people_;
     safe_search safe_search_;
+    bool scroll_pos_changed_;
     state state_;
     QStringList suffix_;
+    qreal ypos_;
 };
 
 #endif // BING_IMAGE_SEARCH_HPP

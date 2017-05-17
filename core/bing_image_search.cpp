@@ -1,5 +1,6 @@
 #include "bing_image_search.hpp"
 
+#include <QDebug>
 #include <QSize>
 #include <QWebEnginePage>
 
@@ -11,14 +12,17 @@ bing_image_search::bing_image_search(QWebEnginePage &page, QObject *parent) :
     max_search_size_(0),
     people_(people::all),
     safe_search_(safe_search::moderate),
+    scroll_pos_changed_(true),
     state_(state::load_first_page),
-    suffix_({"jpg", "jpeg", "png"})
+    suffix_({"jpg", "jpeg", "png"}),
+    ypos_(0)
 {
 
 }
 
 void bing_image_search::find_image_links(const QString &target, size_t max_search_size)
 {
+    state_ = state::load_first_page;
     max_search_size_ = max_search_size;
     get_web_page().load("https://www.bing.com/images/search?q=" + target);
 }
@@ -70,10 +74,51 @@ void bing_image_search::set_suffix_filter(const QStringList &type)
 
 void bing_image_search::load_web_page_finished(bool ok)
 {
+    qDebug()<<"load web page finished:"<<ok;
+
+    switch(state_){
+    case state::load_first_page:{
+        ypos_ = 0;
+        scroll_pos_changed_ = true;
+        scroll_web_page();
+        break;
+    }
+    case state::parse_image_link:{
+        break;
+    }
+    case state::scroll_page:{
+        scroll_web_page();
+        break;
+    }
+    default:
+        break;
+    }
+}
+
+void bing_image_search::parse_page_link()
+{
 
 }
 
-void bing_image_search::web_page_scroll_position_changed(const QPointF &point)
+void bing_image_search::scroll_web_page()
 {
+    state_ = state::scroll_page;
+    auto const ypos = get_web_page().scrollPosition().ry();
+    if(ypos == 0 || !qFuzzyCompare(ypos_,ypos)){
+        scroll_pos_changed_ = true;
+        ypos_ = get_web_page().scrollPosition().ry();
+        get_web_page().runJavaScript(QString("window.scrollTo(0, %1)").arg(ypos + 10000));
+    }else{
+        if(scroll_pos_changed_ == true){
+            scroll_pos_changed_ = false;
+            get_web_page().runJavaScript("document.getElementsByClassName(\"btn_seemore\")[0].click()");
+        }else{
+            state_ = state::parse_image_link;
+        }
+    }
+}
 
+void bing_image_search::web_page_scroll_position_changed(const QPointF&)
+{
+    scroll_web_page();
 }
