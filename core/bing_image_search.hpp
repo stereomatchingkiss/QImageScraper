@@ -33,7 +33,7 @@ private:
     };
 
     void load_web_page_finished(bool ok) override;
-    void parse_page_link();
+    void parse_page_link(QPointF const &point);
     void scroll_web_page(QPointF const &point);
     void web_page_scroll_position_changed(QPointF const &point);
 
