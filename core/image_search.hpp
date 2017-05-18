@@ -85,8 +85,7 @@ protected:
     QWebEnginePage& get_web_page();
 
 private:
-    virtual void load_web_page_finished(bool ok) = 0;
-    virtual void web_page_scroll_position_changed(QPointF const &point) = 0;
+    virtual void load_web_page_finished(bool ok) = 0;    
 
     QWebEnginePage &web_page_;
 };
