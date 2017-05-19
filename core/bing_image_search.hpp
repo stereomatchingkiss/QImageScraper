@@ -29,7 +29,7 @@ private:
        load_first_page,
        scroll_page,
        parse_page_link,
-       parse_image_link
+       download_image
     };
 
     void load_web_page_finished(bool ok) override;
@@ -50,6 +50,7 @@ private:
     bool scroll_pos_changed_;
     state state_;
     QStringList suffix_;
+    size_t threshold_;
     qreal ypos_;
 };
 

@@ -28,10 +28,12 @@ INCLUDEPATH += ..
 SOURCES += main.cpp\
         mainwindow.cpp \
     core/bing_image_search.cpp \
-    core/image_search.cpp
+    core/image_search.cpp \
+    core/js_function.cpp
 
 HEADERS  += mainwindow.hpp \
     core/bing_image_search.hpp \
-    core/image_search.hpp
+    core/image_search.hpp \
+    core/js_function.hpp
 
 FORMS    += mainwindow.ui

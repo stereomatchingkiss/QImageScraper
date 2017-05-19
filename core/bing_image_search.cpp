@@ -18,6 +18,7 @@ bing_image_search::bing_image_search(QWebEnginePage &page, QObject *parent) :
     scroll_pos_changed_(true),
     state_(state::load_first_page),
     suffix_({"jpg", "jpeg", "png"}),
+    threshold_(0),
     ypos_(0)
 {
     connect(&get_web_page(), &QWebEnginePage::scrollPositionChanged,
@@ -25,9 +26,10 @@ bing_image_search::bing_image_search(QWebEnginePage &page, QObject *parent) :
 }
 
 void bing_image_search::find_image_links(const QString &target, size_t max_search_size)
-{
-    state_ = state::load_first_page;
+{    
     max_search_size_ = max_search_size;
+    state_ = state::load_first_page;
+    threshold_ = 0;
     get_web_page().load("https://www.bing.com/images/search?q=" + target);
 }
 
@@ -91,7 +93,7 @@ void bing_image_search::load_web_page_finished(bool ok)
             qDebug()<<"parse page link";
             break;
         }
-        case state::parse_image_link:{
+        case state::download_image:{
             qDebug()<<"parse image link";
             break;
         }
@@ -114,7 +116,7 @@ void bing_image_search::parse_page_link(QPointF const &point)
         qDebug()<<"get image link contents";
         QRegularExpression reg("(search\\?view=detailV2[^\"]*)");
         auto iter = reg.globalMatch(contents);
-        //auto const last_img_link_size = img_page_links_.size();
+        auto const last_img_link_size = img_page_links_.size();
         QStringList links;
         while(iter.hasNext()){
             QRegularExpressionMatch match = iter.next();
@@ -129,12 +131,18 @@ void bing_image_search::parse_page_link(QPointF const &point)
         if(links.size() > img_page_links_.size()){
             links.swap(img_page_links_);
         }
-        if((size_t)img_page_links_.size() >= max_search_size_){
-            qDebug()<<"change to parse image link";
-            state_ = state::parse_image_link;
+        static int threshold = 0;
+        if(img_page_links_.size() - last_img_link_size <= 10 || (size_t)img_page_links_.size() >= max_search_size_){
+            if(++threshold == 3){
+                qDebug()<<"change to parse image link";
+                state_ = state::download_image;
+            }else{
+                get_web_page().runJavaScript("document.getElementsByClassName(\"btn_seemore\")[0].click()");
+                get_web_page().runJavaScript("window.scrollTo(0, document.body.scrollHeight)");
+            }
         }else{
+            threshold = 0;
             get_web_page().runJavaScript("document.getElementsByClassName(\"btn_seemore\")[0].click()");
-            //get_web_page().runJavaScript(QString("window.scrollTo(0, %1)").arg(point.y() + 10000));
             get_web_page().runJavaScript("window.scrollTo(0, document.body.scrollHeight)");
         }
     });
