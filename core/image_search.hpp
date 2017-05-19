@@ -79,7 +79,8 @@ public:
     virtual void set_suffix_filter(QStringList const &type);
 
 signals:
-    void found_image_link(QString const &link, QSize const &size);
+    void found_image_link(QString const &link);
+    void parse_all_image_link();
 
 protected:
     QWebEnginePage& get_web_page();
