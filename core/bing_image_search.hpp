@@ -49,8 +49,7 @@ private:
     safe_search safe_search_;
     bool scroll_pos_changed_;
     state state_;
-    QStringList suffix_;
-    size_t threshold_;
+    QStringList suffix_;    
     qreal ypos_;
 };
 
