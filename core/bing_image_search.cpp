@@ -21,8 +21,11 @@ bing_image_search::bing_image_search(QWebEnginePage &page, QObject *parent) :
     suffix_({"jpg", "jpeg", "png"}),
     ypos_(0)
 {
-    connect(&get_web_page(), &QWebEnginePage::scrollPositionChanged,
+    auto *web_page = &get_web_page();
+    connect(web_page, &QWebEnginePage::scrollPositionChanged,
             this, &bing_image_search::web_page_scroll_position_changed);
+    connect(web_page, &QWebEnginePage::loadProgress, [](int progress){ qDebug()<<"load progress:"<<progress;});
+    connect(web_page, &QWebEnginePage::loadStarted, [](){ qDebug()<<"load started";});
 }
 
 void bing_image_search::find_image_links(const QString &target, size_t max_search_size)
@@ -92,8 +95,9 @@ void bing_image_search::load_web_page_finished(bool ok)
             qDebug()<<"parse page link";
             break;
         }
-        case state::download_image:{
+        case state::parse_img_link:{
             qDebug()<<"parse image link";
+            parse_imgs_link_content();
             break;
         }
         case state::scroll_page:{
@@ -106,6 +110,36 @@ void bing_image_search::load_web_page_finished(bool ok)
             break;
         }
     }
+}
+
+void bing_image_search::parse_imgs_link()
+{
+    if(!img_page_links_.empty()){
+        get_web_page().load(img_page_links_[0]);
+    }
+}
+
+void bing_image_search::parse_imgs_link_content()
+{
+    get_web_page().toHtml([this](QString const &contents)
+    {
+        QRegularExpression reg("src2=\"([^\"]*)");
+        auto match = reg.match(contents);
+        if(match.hasMatch()){
+            qDebug()<<"img link:"<<match.captured(1);
+
+        }else{
+            qDebug()<<"cannot capture img link";
+        }
+        if(!img_page_links_.isEmpty()){
+            img_page_links_.pop_front();
+            emit found_image_link(match.captured(1));
+            parse_imgs_link();
+        }else{
+            qDebug()<<"bing image search parse all imgs link";
+            emit parse_all_image_link();
+        }
+    });
 }
 
 void bing_image_search::parse_page_link(QPointF const &point)
@@ -134,7 +168,8 @@ void bing_image_search::parse_page_link(QPointF const &point)
             links.swap(img_page_links_);
         }
         if((size_t)img_page_links_.size() >= max_search_size_){
-            state_ = state::download_image;
+            state_ = state::parse_img_link;
+            parse_imgs_link();
         }else{
             get_web_page().findText("See more images", QWebEnginePage::FindFlag(), [this](bool found)
             {
@@ -144,11 +179,13 @@ void bing_image_search::parse_page_link(QPointF const &point)
                                                  "window.scrollTo(0, document.body.scrollHeight);");
                 }else{
                     qDebug()<<"cannot found See more images";
-                    get_web_page().runJavaScript(js_scroll_to_window_height(1000), [this](QVariant const &result)
+                    get_web_page().runJavaScript(js_scroll_to_window_height_2(100), [this](QVariant const &result)
                     {
                         qDebug()<<"scroll page result:"<<result;
                         if(!result.toList()[0].toBool()){
-                            state_ = state::download_image;
+                            state_ = state::parse_img_link;
+                            qDebug()<<"parse imgs link start";
+                            parse_imgs_link();
                         }
                     });
                 }
@@ -162,7 +199,7 @@ void bing_image_search::scroll_web_page(QPointF const &point)
     //we need to setup timer if the web view are shown on the screen.
     //Because web view may not able to update in time, this may cause the signal scrollPositionChanged
     //never emit, because the web page do not have enough of space to scroll down
-    QTimer::singleShot(500, [=]()
+    QTimer::singleShot(2000, [=]()
     {
         if(state_ == state::parse_page_link){
             parse_page_link(point);
