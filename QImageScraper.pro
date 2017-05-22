@@ -33,14 +33,16 @@ SOURCES += main.cpp\
     core/image_search.cpp \
     core/js_function.cpp \    
     ui/web_view.cpp \
-    ../qt_enhance/network/download_supervisor.cpp
+    ../qt_enhance/network/download_supervisor.cpp \
+    core/utility.cpp
 
 HEADERS  += mainwindow.hpp \
     core/bing_image_search.hpp \
     core/image_search.hpp \
     core/js_function.hpp \    
     ui/web_view.hpp \
-    ../qt_enhance/network/download_supervisor.hpp
+    ../qt_enhance/network/download_supervisor.hpp \
+    core/utility.hpp
 
 FORMS    += mainwindow.ui
 
