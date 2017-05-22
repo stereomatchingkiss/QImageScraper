@@ -32,12 +32,17 @@ SOURCES += main.cpp\
     core/bing_image_search.cpp \
     core/image_search.cpp \
     core/js_function.cpp \    
-    ui/web_view.cpp
+    ui/web_view.cpp \
+    ../qt_enhance/network/download_supervisor.cpp
 
 HEADERS  += mainwindow.hpp \
     core/bing_image_search.hpp \
     core/image_search.hpp \
     core/js_function.hpp \    
-    ui/web_view.hpp
+    ui/web_view.hpp \
+    ../qt_enhance/network/download_supervisor.hpp
 
 FORMS    += mainwindow.ui
+
+RESOURCES += \
+    icons.qrc
