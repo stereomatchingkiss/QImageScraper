@@ -132,8 +132,9 @@ void bing_image_search::parse_imgs_link_content()
             qDebug()<<"cannot capture img link";
         }
         if(!img_page_links_.isEmpty()){
-            img_page_links_.pop_front();
-            emit found_image_link(match.captured(2), match.captured(1));
+            img_page_links_.pop_front();            
+            emit found_image_link(match.captured(2).replace("&amp;", "&"),
+                                  match.captured(1).replace("&amp;", "&"));
             parse_imgs_link();
         }else{
             qDebug()<<"bing image search parse all imgs link";
