@@ -1,7 +1,11 @@
 #include "mainwindow.hpp"
 #include "ui_mainwindow.h"
 
+#include "core/utility.hpp"
+
 #include <QDebug>
+#include <QImage>
+#include <QNetworkRequest>
 #include <QSizeGrip>
 
 #include <qt_enhance/network/download_supervisor.hpp>
@@ -11,6 +15,7 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
+    default_max_size_(maximumSize()),
     downloader_(new qte::net::download_supervisor(this)),
     img_search_(nullptr)
 {
@@ -20,6 +25,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->labelProgress->setVisible(false);
     ui->progressBar->setVisible(false);
+
+    ui->lineEditSaveAt->setText("/home/ramsus/Qt/img_pages");
+
+    setMinimumSize(size());
 
     using namespace qte::net;
 
@@ -49,12 +58,36 @@ void MainWindow::on_comboBoxSearchBy_activated(const QString &arg1)
 
 void MainWindow::found_img_link(const QString &big_img_link, const QString &small_img_link)
 {
-    img_links_.emplace_back(big_img_link, small_img_link);
+    if(ui->comboBoxSearchBy->currentText() == "Bing"){
+        QNetworkRequest const request = create_img_download_request(big_img_link,
+                                                                    ui->comboBoxSearchBy->currentText());
+        auto const unique_id = downloader_->append(request, ui->lineEditSaveAt->text());
+        img_links_.emplace(unique_id, std::make_tuple(big_img_link, small_img_link, link_choice::big));
+    }
 }
 
-void MainWindow::download_finished(size_t unique_id, QNetworkReply::NetworkError code, QByteArray data)
+void MainWindow::download_finished(size_t unique_id, QNetworkReply::NetworkError code, QByteArray, QString const &save_as)
 {
     qDebug()<<__func__<<":"<<unique_id<<":"<<code;
+    qDebug()<<"save as:"<<save_as;
+    auto it = img_links_.find(unique_id);
+    if(code == QNetworkReply::NoError && it != std::end(img_links_)){
+        QImage img(save_as);
+        if(!img.isNull()){
+            qDebug()<<"can save image choice:"<<(int)std::get<2>(it->second);
+        }else{
+            qDebug()<<"cannot save image choice:"<<(int)std::get<2>(it->second);
+            QFile::remove(save_as);
+            if(std::get<0>(it->second) != std::get<1>(it->second) && std::get<2>(it->second) == link_choice::big){
+                QNetworkRequest const request = create_img_download_request(std::get<1>(it->second),
+                                                                            ui->comboBoxSearchBy->currentText());
+                auto const uid = downloader_->append(request, ui->lineEditSaveAt->text(), true);
+                img_links_.emplace(uid, std::make_tuple(std::get<0>(it->second),
+                                                        std::get<1>(it->second), link_choice::small));
+            }
+        }
+        img_links_.erase(it);
+    }
 }
 
 void MainWindow::download_image()
@@ -62,6 +95,9 @@ void MainWindow::download_image()
     if(!img_links_.empty()){
         //downloader_->append()
     }
+
+    setMaximumSize(default_max_size_);
+    setEnabled(true);
 }
 
 void MainWindow::download_progress(size_t unique_id, qint64 bytesReceived, qint64 bytesTotal)
@@ -77,6 +113,7 @@ void MainWindow::on_actionGo_triggered()
         {
             setEnabled(false);
             img_search_->find_image_links(contents.toString(), 1000);
+            setMaximumSize(size());
             qDebug()<<contents;
         });
     }
