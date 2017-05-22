@@ -123,17 +123,17 @@ void bing_image_search::parse_imgs_link_content()
 {
     get_web_page().toHtml([this](QString const &contents)
     {
-        QRegularExpression reg("src2=\"([^\"]*)");
+        QRegularExpression reg("<img class=\"mainImage\" src=\"([^\"]*)\" src2=\"([^\"]*)");
         auto match = reg.match(contents);
         if(match.hasMatch()){
-            qDebug()<<"img link:"<<match.captured(1);
+            qDebug()<<"img link:"<<match.captured(1)<<"\n"<<match.captured(2);
 
         }else{
             qDebug()<<"cannot capture img link";
         }
         if(!img_page_links_.isEmpty()){
             img_page_links_.pop_front();
-            emit found_image_link(match.captured(1));
+            emit found_image_link(match.captured(2), match.captured(1));
             parse_imgs_link();
         }else{
             qDebug()<<"bing image search parse all imgs link";
