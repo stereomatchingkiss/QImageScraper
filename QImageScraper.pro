@@ -18,6 +18,8 @@ TEMPLATE = app
 DEFINES += QT_DEPRECATED_WARNINGS
 
 INCLUDEPATH += ..
+#Without this include path, Qt cannot find web_view.hpp
+INCLUDEPATH += ui
 
 # You can also make your code fail to compile if you use deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -29,11 +31,13 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     core/bing_image_search.cpp \
     core/image_search.cpp \
-    core/js_function.cpp
+    core/js_function.cpp \    
+    ui/web_view.cpp
 
 HEADERS  += mainwindow.hpp \
     core/bing_image_search.hpp \
     core/image_search.hpp \
-    core/js_function.hpp
+    core/js_function.hpp \    
+    ui/web_view.hpp
 
 FORMS    += mainwindow.ui
