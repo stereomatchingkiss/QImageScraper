@@ -79,6 +79,7 @@ public:
     virtual void set_suffix_filter(QStringList const &type);
 
 signals:
+    void found_page_link(QString const &link);
     void found_image_link(QString const &big_img_link, QString const &small_img_link);
     void parse_all_image_link();
 
