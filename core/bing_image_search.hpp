@@ -34,8 +34,9 @@ private:
 
     void load_web_page_finished(bool ok) override;
     void parse_imgs_link();
-    void parse_imgs_link_content();
+    void parse_imgs_link_content();    
     void parse_page_link(QPointF const &point);
+    void parse_page_link_by_regex(QString const &contents);
     void scroll_web_page(QPointF const &point);
     void web_page_scroll_position_changed(QPointF const &point);
 

@@ -151,22 +151,7 @@ void bing_image_search::parse_page_link(QPointF const &point)
     get_web_page().toHtml([this, point](QString const &contents)
     {
         qDebug()<<"get image link contents";
-        QRegularExpression reg("(search\\?view=detailV2[^\"]*)");
-        auto iter = reg.globalMatch(contents);
-        QStringList links;
-        while(iter.hasNext()){
-            QRegularExpressionMatch match = iter.next();
-            if(match.captured(1).right(20) != "ipm=vs#enterinsights"){
-                QString url = QUrl("https://www.bing.com/images/" + match.captured(1)).toString();
-                url.replace("&amp;", "&");
-                links.push_back(url);
-            }
-        }
-        links.removeDuplicates();
-        qDebug()<<"total match link:"<<links.size();
-        if(links.size() > img_page_links_.size()){
-            links.swap(img_page_links_);
-        }
+        parse_page_link_by_regex(contents);
         if((size_t)img_page_links_.size() >= max_search_size_){
             state_ = state::parse_img_link;
             parse_imgs_link();
@@ -192,6 +177,26 @@ void bing_image_search::parse_page_link(QPointF const &point)
             });
         }
     });
+}
+
+void bing_image_search::parse_page_link_by_regex(const QString &contents)
+{
+    QRegularExpression reg("(search\\?view=detailV2[^\"]*)");
+    auto iter = reg.globalMatch(contents);
+    QStringList links;
+    while(iter.hasNext()){
+        QRegularExpressionMatch match = iter.next();
+        if(match.captured(1).right(20) != "ipm=vs#enterinsights"){
+            QString url = QUrl("https://www.bing.com/images/" + match.captured(1)).toString();
+            url.replace("&amp;", "&");
+            links.push_back(url);
+        }
+    }
+    links.removeDuplicates();
+    qDebug()<<"total match link:"<<links.size();
+    if(links.size() > img_page_links_.size()){
+        links.swap(img_page_links_);
+    }
 }
 
 void bing_image_search::scroll_web_page(QPointF const &point)
