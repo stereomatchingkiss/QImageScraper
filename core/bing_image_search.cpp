@@ -155,12 +155,11 @@ void bing_image_search::scroll_web_page_impl()
     }
 
     get_web_page().toHtml([this](QString const &contents)
-    {
-        qDebug()<<"get image link contents";
+    {        
         second_page_contents_ = contents;
-        get_web_page().findText("See more images", QWebEnginePage::FindFlag(), [this](bool found)
+        get_web_page().toPlainText([this](QString const &contents)
         {
-            if(found){
+            if(contents.contains("See more images")){
                 qDebug()<<"found See more images";
                 get_web_page().runJavaScript("document.getElementsByClassName(\"btn_seemore\")[0].click();"
                                              "window.scrollTo(0, document.body.scrollHeight);");
