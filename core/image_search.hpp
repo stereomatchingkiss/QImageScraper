@@ -51,7 +51,9 @@ public:
 
     /**
      * @brief scroll second page of the search engine. This function
-     * will emit signal "scroll_second_page_done" after scroll action done
+     * will emit signal "scroll_second_page_done" after scroll action
+     * are all done; Will emit signal "second_page_scrolled" everytime
+     * the page scroll(if oage scrolling action is trigger by scroll_second_page)
      * @param max_search_size size of the images want to scrape
      */
     virtual void scroll_second_page(size_t max_search_size) = 0;
@@ -64,6 +66,7 @@ signals:
     void go_to_second_page_done();
     void parse_all_image_link();
     void scroll_second_page_done();
+    void second_page_scrolled();
 
 protected:
     QWebEnginePage& get_web_page();

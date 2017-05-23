@@ -162,6 +162,7 @@ void bing_image_search::scroll_web_page_impl()
                 qDebug()<<"cannot found See more images";
                 get_web_page().runJavaScript("window.scrollTo(0, document.body.scrollHeight)");
             }
+            emit second_page_scrolled();
         });
     });
 }
