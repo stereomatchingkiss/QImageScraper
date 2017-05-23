@@ -31,11 +31,8 @@ private:
     void parse_page_link_by_regex(QString const &contents);
     void scroll_web_page();
 
-    QColor color_;    
     QStringList img_page_links_;        
     size_t max_search_size_;
-    QSize max_size_;
-    QSize min_size_;
     size_t scroll_count_;
     state state_;    
     QTimer *timer_;    
