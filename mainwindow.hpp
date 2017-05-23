@@ -5,20 +5,15 @@
 #include <QNetworkReply>
 
 #include <map>
+#include <memory>
+
+#include <qt_enhance/network/download_supervisor.hpp>
 
 class image_search;
 
 namespace Ui {
 class MainWindow;
 }
-
-namespace qte{
-
-namespace net{
-
-class download_supervisor;
-
-}}
 
 class MainWindow : public QMainWindow
 {
@@ -41,8 +36,7 @@ private:
     };
 
     void found_img_link(QString const &big_img_link, QString const &small_img_link);
-    void download_finished(size_t unique_id, QNetworkReply::NetworkError code, QByteArray data,
-                           QString const &save_as);
+    void download_finished(std::shared_ptr<qte::net::download_supervisor::download_task> task);
     void download_image();
     void download_progress(size_t unique_id, qint64 bytesReceived, qint64 bytesTotal);
 

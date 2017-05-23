@@ -8,8 +8,6 @@
 #include <QNetworkRequest>
 #include <QSizeGrip>
 
-#include <qt_enhance/network/download_supervisor.hpp>
-
 #include "core/bing_image_search.hpp"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -66,18 +64,18 @@ void MainWindow::found_img_link(const QString &big_img_link, const QString &smal
     }
 }
 
-void MainWindow::download_finished(size_t unique_id, QNetworkReply::NetworkError code, QByteArray, QString const &save_as)
+void MainWindow::download_finished(std::shared_ptr<qte::net::download_supervisor::download_task> task)
 {
-    qDebug()<<__func__<<":"<<unique_id<<":"<<code;
-    qDebug()<<"save as:"<<save_as;
-    auto it = img_links_.find(unique_id);
-    if(code == QNetworkReply::NoError && it != std::end(img_links_)){
-        QImage img(save_as);
+    qDebug()<<__func__<<":"<<task->get_unique_id()<<":"<<task->get_network_error_code();
+    qDebug()<<"save as:"<<task->get_save_as();
+    auto it = img_links_.find(task->get_unique_id());
+    if(task->get_network_error_code() == QNetworkReply::NoError && it != std::end(img_links_)){
+        QImage img(task->get_save_as());
         if(!img.isNull()){
             qDebug()<<"can save image choice:"<<(int)std::get<2>(it->second);
         }else{
             qDebug()<<"cannot save image choice:"<<(int)std::get<2>(it->second);
-            QFile::remove(save_as);
+            QFile::remove(task->get_save_as());
             if(std::get<0>(it->second) != std::get<1>(it->second) && std::get<2>(it->second) == link_choice::big){
                 QNetworkRequest const request = create_img_download_request(std::get<1>(it->second),
                                                                             ui->comboBoxSearchBy->currentText());
