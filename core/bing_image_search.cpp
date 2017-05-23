@@ -63,9 +63,9 @@ void bing_image_search::scroll_second_page(size_t max_search_size)
 
 void bing_image_search::load_web_page_finished(bool ok)
 {
-    qDebug()<<"load web page finished:"<<ok;
+    qDebug()<<"load web page finished:"<<ok<<", url:"<<get_web_page().url().toString();
     if(ok){
-        if(get_web_page().url().path().contains("https://www.bing.com/images/search?q=")){
+        if(get_web_page().url().toString().contains("https://www.bing.com/images/search?q=")){
             state_ = state::to_second_page;
             emit go_to_second_page_done();
             return;
