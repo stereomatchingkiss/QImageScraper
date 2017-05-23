@@ -6,6 +6,8 @@
 #include <QColor>
 #include <QSize>
 
+class QTimer;
+
 class bing_image_search : public image_search
 {
     Q_OBJECT    
@@ -35,10 +37,9 @@ private:
     void load_web_page_finished(bool ok) override;
     void parse_imgs_link();
     void parse_imgs_link_content();    
-    void parse_page_link(QPointF const &point);
+    void parse_page_link();
     void parse_page_link_by_regex(QString const &contents);
-    void scroll_web_page(QPointF const &point);
-    void web_page_scroll_position_changed(QPointF const &point);
+    void scroll_web_page();
 
     QColor color_;
     color_option color_option_;
@@ -50,9 +51,10 @@ private:
     QSize min_size_;
     people people_;
     safe_search safe_search_;
-    bool scroll_pos_changed_;
+    size_t scroll_count_;
     state state_;
-    QStringList suffix_;    
+    QStringList suffix_;
+    QTimer *timer_;
     qreal ypos_;
 };
 
