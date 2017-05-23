@@ -67,7 +67,6 @@ public:
 
 signals:
     void error_msg(QString const &msg);
-    void found_page_link(QString const &link);
     void go_to_first_page_done();
     void go_to_second_page_done();
     void parse_all_image_link();

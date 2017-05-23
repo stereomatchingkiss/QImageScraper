@@ -183,8 +183,7 @@ void bing_image_search::parse_page_link(const QString &contents)
         if(match.captured(1).right(20) != "ipm=vs#enterinsights"){
             QString url = QUrl("https://www.bing.com/images/" + match.captured(1)).toString();
             url.replace("&amp;", "&");
-            links.push_back(url);
-            emit found_page_link(url);
+            links.push_back(url);            
         }
     }
     links.removeDuplicates();
