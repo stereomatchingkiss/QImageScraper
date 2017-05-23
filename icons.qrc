@@ -4,5 +4,6 @@
         <file>icons/info.png</file>
         <file>icons/go.png</file>
         <file>icons/scroll.png</file>
+        <file>icons/download.png</file>
     </qresource>
 </RCC>

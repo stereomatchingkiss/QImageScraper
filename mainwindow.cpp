@@ -20,6 +20,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     ui->comboBoxSearchBy->addItem("Bing");
     on_comboBoxSearchBy_activated("Bing");
+    //ui->actionGo->setEnabled(false);
+    //ui->actionScroll->setEnabled(false);
 
     ui->labelProgress->setVisible(false);
     ui->progressBar->setVisible(false);
@@ -45,13 +47,15 @@ void MainWindow::on_comboBoxSearchBy_activated(const QString &arg1)
         img_search_->deleteLater();
     }
 
-    if(arg1 == "Bing"){
-        ui->webView->load(QUrl("https://www.bing.com/?scope=images&nr=1&FORM=NOFORM"));
+    if(arg1 == "Bing"){        
         img_search_ = new bing_image_search(*ui->webView->page(), this);
+        img_search_->go_to_first_page();
     }
 
-    connect(img_search_, &bing_image_search::found_image_link, this, &MainWindow::found_img_link);
-    connect(img_search_, &bing_image_search::parse_all_image_link, this, &MainWindow::download_image);
+    connect(img_search_, &image_search::found_image_link, this, &MainWindow::found_img_link);
+    connect(img_search_, &image_search::go_to_first_page_done, this, &MainWindow::process_go_to_first_page);
+    connect(img_search_, &image_search::go_to_second_page_done, this, &MainWindow::process_go_to_second_page);
+    //connect(img_search_, &image_search::go_to_second_page_done, this, &MainWindow::download_image);
 }
 
 void MainWindow::found_img_link(const QString &big_img_link, const QString &small_img_link)
@@ -62,6 +66,17 @@ void MainWindow::found_img_link(const QString &big_img_link, const QString &smal
         auto const unique_id = downloader_->append(request, ui->lineEditSaveAt->text());
         img_links_.emplace(unique_id, std::make_tuple(big_img_link, small_img_link, link_choice::big));
     }
+}
+
+void MainWindow::process_go_to_first_page()
+{
+   //ui->actionScroll->setEnabled(false);
+   //ui->actionGo->setEnabled(false);
+}
+
+void MainWindow::process_go_to_second_page()
+{
+   ui->actionScroll->setEnabled(true);
 }
 
 void MainWindow::download_finished(std::shared_ptr<qte::net::download_supervisor::download_task> task)
@@ -88,31 +103,24 @@ void MainWindow::download_finished(std::shared_ptr<qte::net::download_supervisor
     }
 }
 
-void MainWindow::download_image()
-{
-    if(!img_links_.empty()){
-        //downloader_->append()
-    }
-
-    setMaximumSize(default_max_size_);
-    setEnabled(true);
-}
-
 void MainWindow::download_progress(size_t unique_id, qint64 bytesReceived, qint64 bytesTotal)
 {
     qDebug()<<__func__<<":"<<unique_id<<":"<<bytesReceived<<":"<<bytesTotal;
 }
 
-void MainWindow::on_actionGo_triggered()
+void MainWindow::on_actionScroll_triggered()
 {
-    if(img_search_){
-        ui->webView->page()->runJavaScript("function jscmd(){return document.getElementById(\"sb_form_q\").value} jscmd()",
-                                           [this](QVariant const &contents)
-        {
-            setEnabled(false);
-            img_search_->find_image_links(contents.toString(), 1000);
-            setMaximumSize(size());
-            qDebug()<<contents;
-        });
-    }
+    img_search_->scroll_second_page(1000);
+}
+
+void MainWindow::on_actionDownload_triggered()
+{
+    ui->webView->page()->runJavaScript("function jscmd(){return document.getElementById(\"sb_form_q\").value} jscmd()",
+                                       [this](QVariant const &contents)
+    {
+        setEnabled(false);
+        img_search_->parse_imgs_link();
+        setMaximumSize(size());
+        qDebug()<<contents;
+    });
 }

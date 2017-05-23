@@ -84,7 +84,8 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionGo"/>
+   <addaction name="actionScroll"/>
+   <addaction name="actionDownload"/>
    <addaction name="actionSettings"/>
    <addaction name="actionInfo"/>
   </widget>
@@ -114,6 +115,24 @@
    </property>
    <property name="text">
     <string>Info</string>
+   </property>
+  </action>
+  <action name="actionScroll">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/scroll.png</normaloff>:/icons/scroll.png</iconset>
+   </property>
+   <property name="text">
+    <string>scroll</string>
+   </property>
+  </action>
+  <action name="actionDownload">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/download.png</normaloff>:/icons/download.png</iconset>
+   </property>
+   <property name="text">
+    <string>Download</string>
    </property>
   </action>
  </widget>
