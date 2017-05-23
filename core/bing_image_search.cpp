@@ -24,7 +24,7 @@ bing_image_search::bing_image_search(QWebEnginePage &page, QObject *parent) :
 void bing_image_search::find_image_links(const QString &target, size_t max_search_size)
 {    
     max_search_size_ = max_search_size;
-    scroll_limit_ = max_search_size_ / 35 + 1;
+    scroll_limit_ = max_search_size_ * 2 / 35 + 1;
     state_ = state::load_first_page;
     get_web_page().load("https://www.bing.com/images/search?q=" + target);
 }
