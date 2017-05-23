@@ -95,6 +95,8 @@ void bing_image_search::load_web_page_finished(bool ok)
             qDebug()<<"default state";
             break;
         }
+    }else{
+        emit error_msg(tr("Failed to load the web page"));
     }
 }
 
