@@ -20,8 +20,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     ui->comboBoxSearchBy->addItem("Bing");
     on_comboBoxSearchBy_activated("Bing");
-    //ui->actionGo->setEnabled(false);
-    //ui->actionScroll->setEnabled(false);
+    ui->actionDownload->setEnabled(false);
+    ui->actionScroll->setEnabled(false);
 
     ui->labelProgress->setVisible(false);
     ui->progressBar->setVisible(false);
@@ -55,7 +55,6 @@ void MainWindow::on_comboBoxSearchBy_activated(const QString &arg1)
     connect(img_search_, &image_search::found_image_link, this, &MainWindow::found_img_link);
     connect(img_search_, &image_search::go_to_first_page_done, this, &MainWindow::process_go_to_first_page);
     connect(img_search_, &image_search::go_to_second_page_done, this, &MainWindow::process_go_to_second_page);
-    //connect(img_search_, &image_search::go_to_second_page_done, this, &MainWindow::download_image);
 }
 
 void MainWindow::found_img_link(const QString &big_img_link, const QString &small_img_link)
@@ -70,13 +69,14 @@ void MainWindow::found_img_link(const QString &big_img_link, const QString &smal
 
 void MainWindow::process_go_to_first_page()
 {
-   //ui->actionScroll->setEnabled(false);
-   //ui->actionGo->setEnabled(false);
+   ui->actionScroll->setEnabled(false);
+   ui->actionDownload->setEnabled(false);
 }
 
 void MainWindow::process_go_to_second_page()
 {
    ui->actionScroll->setEnabled(true);
+   ui->actionDownload->setEnabled(true);
 }
 
 void MainWindow::download_finished(std::shared_ptr<qte::net::download_supervisor::download_task> task)
