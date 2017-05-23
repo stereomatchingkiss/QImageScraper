@@ -104,8 +104,10 @@ void bing_image_search::load_web_page_finished(bool ok)
     }
 }
 
-void bing_image_search::parse_imgs_link(const QStringList &page_links)
+void bing_image_search::parse_imgs_link(const QStringList &page_links,
+                                        std::function<void (const QString &, const QString &)> callback)
 {
+    parse_img_link_callback_ = callback;
     state_ = state::parse_img_link;
     img_page_links_ = page_links;
     if(!img_page_links_.isEmpty()){
@@ -127,8 +129,8 @@ void bing_image_search::parse_imgs_link_content()
         }
         if(!img_page_links_.isEmpty()){
             img_page_links_.pop_front();
-            emit found_image_link(match.captured(2).replace("&amp;", "&"),
-                                  match.captured(1).replace("&amp;", "&"));
+            parse_img_link_callback_(match.captured(2).replace("&amp;", "&"),
+                                     match.captured(1).replace("&amp;", "&"));
             if(!img_page_links_.empty()){
                 get_web_page().load(img_page_links_[0]);
             }

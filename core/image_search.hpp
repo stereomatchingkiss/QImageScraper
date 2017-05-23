@@ -47,11 +47,14 @@ public:
     virtual void get_page_link(std::function<void(QStringList const&)> callback) = 0;
 
     /**
-     * @brief Asynchronous method to parse img links, upon completion, will emit
-     * signal found_image_link when any page are parsed
-     * @param page_links links of the pages contain image links
+     * @brief Asynchronous method to get page links of second page(these pages
+     * contain image links). Upon completion, result callback is called with the
+     * image links.
+     * @param callback Upon completion, result callback is called with the
+     * image links(big image link, small image link).
      */
-    virtual void parse_imgs_link(QStringList const &page_links) = 0;
+    virtual void parse_imgs_link(QStringList const &page_links,
+                                 std::function<void(QString const&, QString const&)> callback) = 0;
 
     /**
      * @brief scroll second page of the search engine. This function
@@ -65,7 +68,6 @@ public:
 signals:
     void error_msg(QString const &msg);
     void found_page_link(QString const &link);
-    void found_image_link(QString const &big_img_link, QString const &small_img_link);
     void go_to_first_page_done();
     void go_to_second_page_done();
     void parse_all_image_link();
@@ -76,7 +78,7 @@ protected:
     QWebEnginePage& get_web_page();
 
 private:
-    virtual void load_web_page_finished(bool ok) = 0;    
+    virtual void load_web_page_finished(bool ok) = 0;
 
     QWebEnginePage &web_page_;
 };

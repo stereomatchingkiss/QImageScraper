@@ -17,7 +17,8 @@ public:
     void get_page_link(std::function<void(QStringList const&)> callback) override;
     void go_to_first_page() override;
     void go_to_second_page() override;
-    void parse_imgs_link(QStringList const &page_links) override;
+    void parse_imgs_link(QStringList const &page_links,
+                         std::function<void(QString const&, QString const&)> callback) override;
     void scroll_second_page(size_t max_search_size) override;
 
 private:
@@ -36,6 +37,7 @@ private:
 
     QStringList img_page_links_;
     size_t max_search_size_;
+    std::function<void(QString const&, QString const&)> parse_img_link_callback_;
     QString second_page_contents_;
     size_t scroll_count_;
     size_t scroll_limit_;
