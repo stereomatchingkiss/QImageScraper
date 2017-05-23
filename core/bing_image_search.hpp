@@ -16,16 +16,6 @@ public:
 
     void find_image_links(QString const &target, size_t max_search_size = 0) override;
 
-    void set_color_filter(color_option option) noexcept override;
-    void set_color_filter(QColor const &option) noexcept override;
-    void set_image_type_filter(image_type option) noexcept override;
-    void set_layout_filter(layout option) noexcept override;
-    void set_maximum_size_filter(QSize const &size) noexcept override;
-    void set_minimum_size_filter(QSize const &size) noexcept override;
-    void set_people_filter(people option) noexcept override;
-    void set_safe_search(safe_search option) noexcept override;
-    void set_suffix_filter(QStringList const &type) override;
-
 private:
     enum class state{
        load_first_page,
@@ -41,16 +31,11 @@ private:
     void parse_page_link_by_regex(QString const &contents);
     void scroll_web_page();
 
-    QColor color_;
-    color_option color_option_;
-    QStringList img_page_links_;
-    image_type image_type_;
-    layout layout_;
+    QColor color_;    
+    QStringList img_page_links_;        
     size_t max_search_size_;
     QSize max_size_;
     QSize min_size_;
-    people people_;
-    safe_search safe_search_;
     size_t scroll_count_;
     state state_;
     QStringList suffix_;
