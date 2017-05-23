@@ -38,7 +38,7 @@ QString js_scroll_to_window_height_2(qreal threshold)
                 "var dheight = doc_height();"
                 "function scrollPage(){"
                 "  var cur_height = window.innerHeight + window.pageYOffset;"
-                "  if(dheight < cur_height || Math.abs(dheight - window.pageYOffset) < %1){"
+                "  if(dheight <= cur_height || Math.abs(dheight - window.pageYOffset) < %1){"
                 "    return [false, cur_height, dheight];"
                 "  }else{"
                 "    window.scrollTo(0, window.pageYOffset + Math.abs((dheight - window.pageYOffset)/2.0));"
