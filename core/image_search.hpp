@@ -3,6 +3,8 @@
 
 #include <QObject>
 
+#include <functional>
+
 class QColor;
 class QWebEnginePage;
 
@@ -36,18 +38,20 @@ public:
     virtual void go_to_second_page() = 0;
 
     /**
-     * @brief get page link of second page, this page
-     * contain the image link
-     * @return page link
+     * @brief Asynchronous method to get page links of second page(these pages
+     * contain image links). Upon completion, result callback is called with the
+     * page links.
+     * @param callback Upon completion, result callback is called with the
+     * page links.
      */
-    virtual QStringList get_page_link() = 0;
+    virtual void get_page_link(std::function<void(QStringList const&)> callback) = 0;
 
     /**
-     * @brief parse image link in page link,this function will
-     * try to obtain the page link before parsing image link.
-     * Will emit signal "found_image_link" after each page is parsed.
+     * @brief Asynchronous method to parse img links, upon completion, will emit
+     * signal found_image_link when any page are parsed
+     * @param page_links links of the pages contain image links
      */
-    virtual void parse_imgs_link() = 0;
+    virtual void parse_imgs_link(QStringList const &page_links) = 0;
 
     /**
      * @brief scroll second page of the search engine. This function
