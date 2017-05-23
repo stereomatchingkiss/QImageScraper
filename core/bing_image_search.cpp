@@ -12,6 +12,7 @@ bing_image_search::bing_image_search(QWebEnginePage &page, QObject *parent) :
     image_search(page, parent),            
     max_search_size_(0),        
     scroll_count_(0),
+    scroll_limit_(2),
     state_(state::load_first_page),    
     timer_(new QTimer(this))
 {
@@ -23,6 +24,7 @@ bing_image_search::bing_image_search(QWebEnginePage &page, QObject *parent) :
 void bing_image_search::find_image_links(const QString &target, size_t max_search_size)
 {    
     max_search_size_ = max_search_size;
+    scroll_limit_ = max_search_size_ / 35 + 1;
     state_ = state::load_first_page;
     get_web_page().load("https://www.bing.com/images/search?q=" + target);
 }
@@ -98,7 +100,7 @@ void bing_image_search::parse_page_link()
         return;
     }
 
-    if(scroll_count_ == 40){
+    if(scroll_count_ == scroll_limit_){
         timer_->stop();
         state_ = state::parse_img_link;
         parse_imgs_link();

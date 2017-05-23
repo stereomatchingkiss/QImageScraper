@@ -34,6 +34,7 @@ private:
     QStringList img_page_links_;        
     size_t max_search_size_;
     size_t scroll_count_;
+    size_t scroll_limit_;
     state state_;    
     QTimer *timer_;    
 };
