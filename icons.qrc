@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icons/settings.png</file>
+        <file>icons/info.png</file>
+        <file>icons/go.png</file>
+        <file>icons/scroll.png</file>
+    </qresource>
+</RCC>
