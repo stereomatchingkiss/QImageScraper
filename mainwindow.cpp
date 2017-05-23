@@ -140,7 +140,7 @@ void MainWindow::download_progress(size_t unique_id, qint64 bytesReceived, qint6
 void MainWindow::on_actionScroll_triggered()
 {
     setEnabled(false);
-    setMaximumSize(minimumSize());
+    setMaximumSize(size());
     img_search_->scroll_second_page(1000);
 }
 
