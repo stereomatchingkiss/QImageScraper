@@ -5,6 +5,7 @@
 
 #include <QDebug>
 #include <QImage>
+#include <QMessageBox>
 #include <QNetworkRequest>
 #include <QSizeGrip>
 
@@ -54,6 +55,7 @@ void MainWindow::on_comboBoxSearchBy_activated(const QString &arg1)
 
     connect(img_search_, &image_search::go_to_first_page_done, this, &MainWindow::process_go_to_first_page);
     connect(img_search_, &image_search::go_to_second_page_done, this, &MainWindow::process_go_to_second_page);
+    connect(img_search_, &image_search::scroll_second_page_done, this, &MainWindow::process_scroll_second_page_done);
 }
 
 void MainWindow::found_img_link(const QString &big_img_link, const QString &small_img_link)
@@ -78,6 +80,21 @@ void MainWindow::process_go_to_second_page()
 {
     ui->actionScroll->setEnabled(true);
     ui->actionDownload->setEnabled(true);
+}
+
+void MainWindow::process_scroll_second_page_done()
+{
+    img_search_->get_page_link([this](QStringList const &links)
+    {
+        setEnabled(true);
+        setMaximumSize(default_max_size_);
+        QMessageBox::information(this, tr("Auto scroll end"),
+                                 tr("Found %1 images."
+                                    "<p>Press <img src = ':/icons/scroll.png' style='vertical-align:middle' /> "
+                                    "or scroll manually if you want to scroll further,"
+                                    "press <img src = ':/icons/download.png' style='vertical-align:middle' /> "
+                                    "if you want to download the images</p>").arg(links.size()));
+    });
 }
 
 void MainWindow::download_finished(std::shared_ptr<qte::net::download_supervisor::download_task> task)
@@ -108,7 +125,6 @@ void MainWindow::download_finished(std::shared_ptr<qte::net::download_supervisor
             ui->labelProgress->setVisible(false);
             ui->progressBar->setVisible(false);
             setEnabled(true);
-            setMaximumSize(default_max_size_);
             img_search_->go_to_first_page();
         }
     }else{
@@ -123,6 +139,8 @@ void MainWindow::download_progress(size_t unique_id, qint64 bytesReceived, qint6
 
 void MainWindow::on_actionScroll_triggered()
 {
+    setEnabled(false);
+    setMaximumSize(minimumSize());
     img_search_->scroll_second_page(1000);
 }
 
@@ -144,7 +162,6 @@ void MainWindow::on_actionDownload_triggered()
                 found_img_link(big_img_link, small_img_link);
             });
         });
-        setMaximumSize(size());
         qDebug()<<"download target is:"<<contents;
     });
 }

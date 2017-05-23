@@ -40,6 +40,7 @@ private:
     void found_img_link(QString const &big_img_link, QString const &small_img_link);
     void process_go_to_first_page();
     void process_go_to_second_page();
+    void process_scroll_second_page_done();
 
     Ui::MainWindow *ui;
 
