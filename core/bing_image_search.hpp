@@ -10,33 +10,37 @@ class QTimer;
 
 class bing_image_search : public image_search
 {
-    Q_OBJECT    
+    Q_OBJECT
 public:
     explicit bing_image_search(QWebEnginePage &page, QObject *parent = nullptr);
 
-    void find_image_links(QString const &target, size_t max_search_size = 0) override;
+    QStringList get_page_link() override;
+    void go_to_first_page() override;
+    void go_to_second_page() override;
+    void parse_imgs_link() override;
+    void scroll_second_page(size_t max_search_size) override;
 
 private:
     enum class state{
-       load_first_page,
-       scroll_page,
-       parse_page_link,
-       parse_img_link
+        parse_img_link,
+        to_first_page,
+        to_second_page,
+        scroll_page
     };
 
     void load_web_page_finished(bool ok) override;
-    void parse_imgs_link();
-    void parse_imgs_link_content();    
-    void parse_page_link();
-    void parse_page_link_by_regex(QString const &contents);
+    void parse_imgs_link_content();
+    void parse_page_link(QString const &contents);
     void scroll_web_page();
+    void scroll_web_page_impl();
 
-    QStringList img_page_links_;        
+    QStringList img_page_links_;
     size_t max_search_size_;
+    QString second_page_contents_;
     size_t scroll_count_;
     size_t scroll_limit_;
-    state state_;    
-    QTimer *timer_;    
+    state state_;
+    QTimer *timer_;
 };
 
 #endif // BING_IMAGE_SEARCH_HPP
