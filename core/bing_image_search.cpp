@@ -12,10 +12,8 @@ bing_image_search::bing_image_search(QWebEnginePage &page, QObject *parent) :
     image_search(page, parent),            
     max_search_size_(0),        
     scroll_count_(0),
-    state_(state::load_first_page),
-    suffix_({"jpg", "jpeg", "png"}),
-    timer_(new QTimer(this)),
-    ypos_(0)
+    state_(state::load_first_page),    
+    timer_(new QTimer(this))
 {
     auto *web_page = &get_web_page();
     connect(web_page, &QWebEnginePage::loadProgress, [](int progress){ qDebug()<<"load progress:"<<progress;});

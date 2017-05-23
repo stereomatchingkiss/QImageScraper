@@ -37,10 +37,8 @@ private:
     QSize max_size_;
     QSize min_size_;
     size_t scroll_count_;
-    state state_;
-    QStringList suffix_;
-    QTimer *timer_;
-    qreal ypos_;
+    state state_;    
+    QTimer *timer_;    
 };
 
 #endif // BING_IMAGE_SEARCH_HPP
