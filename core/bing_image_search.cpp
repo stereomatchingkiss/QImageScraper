@@ -24,8 +24,7 @@ bing_image_search::bing_image_search(QWebEnginePage &page, QObject *parent) :
 void bing_image_search::get_page_link(std::function<void (const QStringList &)> callback)
 {
     get_web_page().toHtml([this, callback](QString const &contents)
-    {
-        second_page_contents_ = contents;
+    {        
         parse_page_link(contents);
         callback(img_page_links_);
     });
@@ -34,8 +33,7 @@ void bing_image_search::get_page_link(std::function<void (const QStringList &)> 
 void bing_image_search::go_to_first_page()
 {
     state_ = state::to_first_page;
-    img_page_links_.clear();
-    second_page_contents_.clear();
+    img_page_links_.clear();    
     get_web_page().load(QUrl("https://www.bing.com/?scope=images&nr=1&FORM=NOFORM"));
 }
 
@@ -142,8 +140,7 @@ void bing_image_search::scroll_web_page_impl()
     }
 
     get_web_page().toHtml([this](QString const &contents)
-    {        
-        second_page_contents_ = contents;
+    {                
         get_web_page().toPlainText([this](QString const &contents)
         {
             if(contents.contains("See more images")){

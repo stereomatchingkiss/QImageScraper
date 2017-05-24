@@ -38,7 +38,6 @@ private:
     QStringList img_page_links_;
     size_t max_search_size_;
     std::function<void(QString const&, QString const&)> parse_img_link_callback_;
-    QString second_page_contents_;
     size_t scroll_count_;
     size_t scroll_limit_;
     state state_;
