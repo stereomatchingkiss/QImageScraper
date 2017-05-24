@@ -34,7 +34,9 @@ SOURCES += main.cpp\
     core/js_function.cpp \    
     ui/web_view.cpp \
     ../qt_enhance/network/download_supervisor.cpp \
-    core/utility.cpp
+    core/utility.cpp \
+    ui/general_settings.cpp \
+    core/global_constant.cpp
 
 HEADERS  += mainwindow.hpp \
     core/bing_image_search.hpp \
@@ -42,9 +44,12 @@ HEADERS  += mainwindow.hpp \
     core/js_function.hpp \    
     ui/web_view.hpp \
     ../qt_enhance/network/download_supervisor.hpp \
-    core/utility.hpp
+    core/utility.hpp \
+    ui/general_settings.hpp \
+    core/global_constant.hpp
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    ui/general_settings.ui
 
 RESOURCES += \
     icons.qrc
