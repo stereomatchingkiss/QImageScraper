@@ -104,15 +104,12 @@ void bing_image_search::load_web_page_finished(bool ok)
     }
 }
 
-void bing_image_search::parse_imgs_link(const QStringList &page_links,
+void bing_image_search::parse_imgs_link(const QString &page_link,
                                         std::function<void (const QString &, const QString &)> callback)
 {
     parse_img_link_callback_ = callback;
     state_ = state::parse_img_link;
-    img_page_links_ = page_links;
-    if(!img_page_links_.isEmpty()){
-        get_web_page().load(img_page_links_[0]);
-    }
+    get_web_page().load(page_link);
 }
 
 void bing_image_search::parse_imgs_link_content()
@@ -122,22 +119,12 @@ void bing_image_search::parse_imgs_link_content()
         QRegularExpression reg("<img class=\"mainImage\" src=\"([^\"]*)\" src2=\"([^\"]*)");
         auto match = reg.match(contents);
         if(match.hasMatch()){
-            qDebug()<<"img link:"<<match.captured(1)<<"\n"<<match.captured(2);
-
+            qDebug()<<"img link:"<<match.captured(1)<<"\n"<<match.captured(2);            
         }else{
             qDebug()<<"cannot capture img link";
         }
-        if(!img_page_links_.isEmpty()){
-            img_page_links_.pop_front();
-            parse_img_link_callback_(match.captured(2).replace("&amp;", "&"),
-                                     match.captured(1).replace("&amp;", "&"));
-            if(!img_page_links_.empty()){
-                get_web_page().load(img_page_links_[0]);
-            }
-        }else{
-            qDebug()<<"bing image search parse all imgs link";
-            emit parse_all_image_link();
-        }
+        parse_img_link_callback_(match.captured(2).replace("&amp;", "&"),
+                                 match.captured(1).replace("&amp;", "&"));
     });
 }
 

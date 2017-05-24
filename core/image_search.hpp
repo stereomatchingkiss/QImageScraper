@@ -44,16 +44,17 @@ public:
      * @param callback Upon completion, result callback is called with the
      * page links.
      */
-    virtual void get_page_link(std::function<void(QStringList const&)> callback) = 0;
+    virtual void get_page_link(std::function<void(QStringList const&)> callback) = 0;        
 
     /**
      * @brief Asynchronous method to get page links of second page(these pages
      * contain image links). Upon completion, result callback is called with the
      * image links.
+     * @param page_link links of pages which contain image links
      * @param callback Upon completion, result callback is called with the
      * image links(big image link, small image link).
      */
-    virtual void parse_imgs_link(QStringList const &page_links,
+    virtual void parse_imgs_link(QString const &page_link,
                                  std::function<void(QString const&, QString const&)> callback) = 0;
 
     /**
@@ -68,8 +69,7 @@ public:
 signals:
     void error_msg(QString const &msg);
     void go_to_first_page_done();
-    void go_to_second_page_done();
-    void parse_all_image_link();
+    void go_to_second_page_done();    
     void scroll_second_page_done();
     void second_page_scrolled();
 
