@@ -111,6 +111,7 @@ void MainWindow::download_finished(std::shared_ptr<qte::net::download_supervisor
         if(!img.isNull()){
             qDebug()<<"can save image choice:"<<(int)std::get<2>(it->second);
             ui->progressBar->setValue(ui->progressBar->value() + 1);
+            download_next_image();
         }else{
             qDebug()<<"cannot save image choice:"<<(int)std::get<2>(it->second);
             QFile::remove(task->get_save_as());
@@ -122,10 +123,11 @@ void MainWindow::download_finished(std::shared_ptr<qte::net::download_supervisor
                                                         std::get<1>(it->second), link_choice::small));
             }else{
                 ui->progressBar->setValue(ui->progressBar->value() + 1);
+                download_next_image();
             }
         }
         img_links_.erase(it);
-        if(img_links_.empty()){
+        if(img_links_.empty() && img_page_links_.empty()){
             ui->labelProgress->setVisible(false);
             ui->progressBar->setVisible(false);
             setEnabled(true);
@@ -134,6 +136,7 @@ void MainWindow::download_finished(std::shared_ptr<qte::net::download_supervisor
         }
     }else{
         ui->progressBar->setValue(ui->progressBar->value() + 1);
+        download_next_image();
     }
 }
 
@@ -152,6 +155,18 @@ void MainWindow::on_actionScroll_triggered()
     img_search_->scroll_second_page(1000);
 }
 
+void MainWindow::download_next_image()
+{
+    if(!img_page_links_.empty()){
+        img_search_->parse_imgs_link(img_page_links_[0],
+                [this](QString const &big_img_link, QString const &small_img_link)
+        {
+            img_page_links_.pop_front();
+            found_img_link(big_img_link, small_img_link);
+        });
+    }
+}
+
 void MainWindow::on_actionDownload_triggered()
 {
     ui->webView->page()->runJavaScript("function jscmd(){return document.getElementById(\"sb_form_q\").value} jscmd()",
@@ -164,11 +179,9 @@ void MainWindow::on_actionDownload_triggered()
             ui->progressBar->setVisible(true);
             ui->progressBar->setRange(0, page_links.size());
             ui->progressBar->setValue(0);
+            img_page_links_ = page_links;
             qDebug()<<"progress bar min:"<<ui->progressBar->minimum()<<",max:"<<ui->progressBar->maximum();
-            img_search_->parse_imgs_link(page_links, [this](QString const &big_img_link, QString const &small_img_link)
-            {
-                found_img_link(big_img_link, small_img_link);
-            });
+            download_next_image();
         });
         qDebug()<<"download target is:"<<contents;
     });

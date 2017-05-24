@@ -36,6 +36,7 @@ private:
     };
 
     void download_finished(std::shared_ptr<qte::net::download_supervisor::download_task> task);
+    void download_next_image();
     void download_progress(std::shared_ptr<qte::net::download_supervisor::download_task> task,
                            qint64 bytesReceived, qint64 bytesTotal);
     void found_img_link(QString const &big_img_link, QString const &small_img_link);
@@ -47,9 +48,10 @@ private:
 
     QSize default_max_size_;
     QSize default_min_size_;
-    qte::net::download_supervisor *downloader_;
+    qte::net::download_supervisor *downloader_;    
     std::map<size_t, std::tuple<QString, QString, link_choice>> img_links_;
-    image_search *img_search_;
+    QStringList img_page_links_;
+    image_search *img_search_;        
 };
 
 #endif // MAINWINDOW_HPP
