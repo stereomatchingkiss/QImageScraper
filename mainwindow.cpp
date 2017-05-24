@@ -115,6 +115,17 @@ void MainWindow::process_scroll_second_page_done()
     });
 }
 
+void MainWindow::refresh_window()
+{
+    if(img_links_.empty() && img_page_links_.empty()){
+        ui->labelProgress->setVisible(false);
+        ui->progressBar->setVisible(false);
+        setEnabled(true);
+        img_search_->go_to_first_page();
+        statusBar()->showMessage("");
+    }
+}
+
 void MainWindow::download_finished(std::shared_ptr<qte::net::download_supervisor::download_task> task)
 {
     qDebug()<<__func__<<":"<<task->get_unique_id()<<":"<<task->get_network_error_code();
@@ -141,13 +152,7 @@ void MainWindow::download_finished(std::shared_ptr<qte::net::download_supervisor
             }
         }
         img_links_.erase(it);
-        if(img_links_.empty() && img_page_links_.empty()){
-            ui->labelProgress->setVisible(false);
-            ui->progressBar->setVisible(false);
-            setEnabled(true);
-            img_search_->go_to_first_page();
-            statusBar()->showMessage("");
-        }
+        refresh_window();
     }else{
         ui->progressBar->setValue(ui->progressBar->value() + 1);
         download_next_image();

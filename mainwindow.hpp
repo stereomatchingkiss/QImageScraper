@@ -52,6 +52,7 @@ private:
     void process_go_to_first_page();
     void process_go_to_second_page();
     void process_scroll_second_page_done();
+    void refresh_window();
 
     Ui::MainWindow *ui;
 
@@ -61,7 +62,7 @@ private:
     general_settings *general_settings_;
     std::map<size_t, std::tuple<QString, QString, link_choice>> img_links_;
     QStringList img_page_links_;
-    image_search *img_search_;        
+    image_search *img_search_;
 };
 
 #endif // MAINWINDOW_HPP
