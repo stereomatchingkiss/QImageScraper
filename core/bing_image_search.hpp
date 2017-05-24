@@ -3,11 +3,6 @@
 
 #include "image_search.hpp"
 
-#include <QColor>
-#include <QSize>
-
-class QTimer;
-
 class bing_image_search : public image_search
 {
     Q_OBJECT
