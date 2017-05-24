@@ -212,7 +212,5 @@ void MainWindow::on_actionRefresh_triggered()
 
 void MainWindow::on_actionHome_triggered()
 {
-    if(general_settings_->get_search_by() == global_constant::bing_search_name()){
-        img_search_->go_to_first_page();
-    }
+    img_search_->go_to_first_page();
 }
