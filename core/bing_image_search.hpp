@@ -41,7 +41,6 @@ private:
     size_t scroll_count_;
     size_t scroll_limit_;
     state state_;
-    QTimer *timer_;
 };
 
 #endif // BING_IMAGE_SEARCH_HPP

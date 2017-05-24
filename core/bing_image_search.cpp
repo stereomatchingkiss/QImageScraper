@@ -8,13 +8,18 @@
 #include <QTimer>
 #include <QWebEnginePage>
 
+namespace{
+
+constexpr int scroll_page_duration = 1500;
+
+}
+
 bing_image_search::bing_image_search(QWebEnginePage &page, QObject *parent) :
     image_search(page, parent),
     max_search_size_(0),
     scroll_count_(0),
     scroll_limit_(2),
-    state_(state::to_first_page),
-    timer_(new QTimer(this))
+    state_(state::to_first_page)
 {
     auto *web_page = &get_web_page();
     connect(web_page, &QWebEnginePage::loadProgress, [](int progress){ qDebug()<<"load progress:"<<progress;});
@@ -24,7 +29,7 @@ bing_image_search::bing_image_search(QWebEnginePage &page, QObject *parent) :
 void bing_image_search::get_page_link(std::function<void (const QStringList &)> callback)
 {
     get_web_page().toHtml([this, callback](QString const &contents)
-    {        
+    {
         parse_page_link(contents);
         callback(img_page_links_);
     });
@@ -33,7 +38,7 @@ void bing_image_search::get_page_link(std::function<void (const QStringList &)> 
 void bing_image_search::go_to_first_page()
 {
     state_ = state::to_first_page;
-    img_page_links_.clear();    
+    img_page_links_.clear();
     get_web_page().load(QUrl("https://www.bing.com/?scope=images&nr=1&FORM=NOFORM"));
 }
 
@@ -117,7 +122,7 @@ void bing_image_search::parse_imgs_link_content()
         QRegularExpression reg("<img class=\"mainImage\" src=\"([^\"]*)\" src2=\"([^\"]*)");
         auto match = reg.match(contents);
         if(match.hasMatch()){
-            qDebug()<<"img link:"<<match.captured(1)<<"\n"<<match.captured(2);            
+            qDebug()<<"img link:"<<match.captured(1)<<"\n"<<match.captured(2);
         }else{
             qDebug()<<"cannot capture img link";
         }
@@ -135,24 +140,22 @@ void bing_image_search::scroll_web_page_impl()
     }
 
     if(scroll_count_ == scroll_limit_){
-        timer_->stop();
         emit scroll_second_page_done();
+        return;
     }
 
-    get_web_page().toHtml([this](QString const &contents)
-    {                
-        get_web_page().toPlainText([this](QString const &contents)
-        {
-            if(contents.contains("See more images")){
-                qDebug()<<"found See more images";
-                get_web_page().runJavaScript("document.getElementsByClassName(\"btn_seemore\")[0].click();"
-                                             "window.scrollTo(0, document.body.scrollHeight);");
-            }else{
-                qDebug()<<"cannot found See more images";
-                get_web_page().runJavaScript("window.scrollTo(0, document.body.scrollHeight)");
-            }
-            emit second_page_scrolled();
-        });
+    get_web_page().toPlainText([this](QString const &contents)
+    {
+        if(contents.contains("See more images")){
+            qDebug()<<"found See more images";
+            get_web_page().runJavaScript("document.getElementsByClassName(\"btn_seemore\")[0].click();"
+                                         "window.scrollTo(0, document.body.scrollHeight);");
+        }else{
+            qDebug()<<"cannot found See more images";
+            get_web_page().runJavaScript("window.scrollTo(0, document.body.scrollHeight)");
+        }
+        emit second_page_scrolled();
+        QTimer::singleShot(scroll_page_duration, [this](){scroll_web_page_impl();});
     });
 }
 
@@ -166,7 +169,7 @@ void bing_image_search::parse_page_link(const QString &contents)
         if(match.captured(1).right(20) != "ipm=vs#enterinsights"){
             QString url = QUrl("https://www.bing.com/images/" + match.captured(1)).toString();
             url.replace("&amp;", "&");
-            links.push_back(url);            
+            links.push_back(url);
         }
     }
     links.removeDuplicates();
@@ -182,7 +185,6 @@ void bing_image_search::scroll_web_page()
     //this may cause the page stop scrolling too early
     if(state_ == state::scroll_page){
         scroll_count_ = 0;
-        connect(timer_, &QTimer::timeout, this, &bing_image_search::scroll_web_page_impl);
-        timer_->start(2000);
+        QTimer::singleShot(scroll_page_duration, [this](){scroll_web_page_impl();});
     }
 }
