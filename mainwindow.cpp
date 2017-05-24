@@ -221,7 +221,8 @@ void MainWindow::on_actionHome_triggered()
     img_search_->go_to_first_page();
 }
 
-void MainWindow::download_img_error(size_t unique_id, const QString &error_msg)
+void MainWindow::download_img_error(std::shared_ptr<qte::net::download_supervisor::download_task> task,
+                                    const QString &error_msg)
 {
-    qDebug()<<__func__<<":"<<unique_id<<":"<<error_msg;
+    qDebug()<<__func__<<":"<<task->get_unique_id()<<":"<<error_msg;
 }
