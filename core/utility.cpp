@@ -1,6 +1,7 @@
 #include "utility.hpp"
 
 #include <QFileInfo>
+#include <QNetworkInterface>
 #include <QNetworkRequest>
 
 QString convert_url_to_filename(QString const &url, QString const &save_at)
@@ -37,4 +38,32 @@ QNetworkRequest create_img_download_request(const QString &url, const QString &e
     }
 
     return QNetworkRequest(url);
+}
+
+bool is_connected_to_network()
+{
+    QList<QNetworkInterface> ifaces = QNetworkInterface::allInterfaces();
+    bool result = false;
+
+    for (int i = 0; i < ifaces.count(); ++i){
+        if(result){
+            break;
+        }
+        QNetworkInterface iface = ifaces.at(i);
+        if(iface.flags().testFlag(QNetworkInterface::IsUp)
+             && !iface.flags().testFlag(QNetworkInterface::IsLoopBack)){
+
+            // we have an interface that is up, and has an ip address
+            // therefore the link is present
+            // we will only enable this check on first positive,
+            // all later results are incorrect
+            if(!iface.addressEntries().empty()){
+                if(!result){
+                    result = true;
+                }
+            }
+        }
+    }
+
+    return result;
 }
