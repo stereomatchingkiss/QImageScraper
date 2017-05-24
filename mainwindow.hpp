@@ -43,6 +43,7 @@ private:
         small
     };
 
+    void download_img_error(size_t unique_id, QString const &error_msg);
     void download_finished(std::shared_ptr<qte::net::download_supervisor::download_task> task);
     void download_next_image();
     void download_progress(std::shared_ptr<qte::net::download_supervisor::download_task> task,

@@ -40,6 +40,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     using namespace qte::net;
 
+    connect(downloader_, &download_supervisor::error, this, &MainWindow::download_img_error);
     connect(downloader_, &download_supervisor::download_finished, this, &MainWindow::download_finished);
     connect(downloader_, &download_supervisor::download_progress, this, &MainWindow::download_progress);
 
@@ -121,7 +122,7 @@ void MainWindow::download_finished(std::shared_ptr<qte::net::download_supervisor
     auto it = img_links_.find(task->get_unique_id());
     if(it != std::end(img_links_)){
         QImage img(task->get_save_as());
-        if(!img.isNull()){
+        if(task->get_network_error_code() == QNetworkReply::NoError && !img.isNull()){
             qDebug()<<"can save image choice:"<<(int)std::get<2>(it->second);
             ui->progressBar->setValue(ui->progressBar->value() + 1);
             download_next_image();
@@ -213,4 +214,9 @@ void MainWindow::on_actionRefresh_triggered()
 void MainWindow::on_actionHome_triggered()
 {
     img_search_->go_to_first_page();
+}
+
+void MainWindow::download_img_error(size_t unique_id, const QString &error_msg)
+{
+    qDebug()<<__func__<<":"<<unique_id<<":"<<error_msg;
 }
