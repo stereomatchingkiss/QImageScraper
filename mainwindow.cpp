@@ -4,6 +4,7 @@
 #include "core/utility.hpp"
 
 #include <QDebug>
+#include <QFileInfo>
 #include <QImage>
 #include <QMessageBox>
 #include <QNetworkRequest>
@@ -28,7 +29,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->labelProgress->setVisible(false);
     ui->progressBar->setVisible(false);
 
-    ui->lineEditSaveAt->setText("/home/ramsus/Qt/img_pages");
+    //ui->lineEditSaveAt->setText("/home/ramsus/Qt/img_pages");
+    ui->lineEditSaveAt->setText("c:/Users/yyyy/Qt/img_pages");
 
     setMinimumSize(size());
 
@@ -128,15 +130,19 @@ void MainWindow::download_finished(std::shared_ptr<qte::net::download_supervisor
             ui->progressBar->setVisible(false);
             setEnabled(true);
             img_search_->go_to_first_page();
+            statusBar()->showMessage("");
         }
     }else{
         ui->progressBar->setValue(ui->progressBar->value() + 1);
     }
 }
 
-void MainWindow::download_progress(size_t unique_id, qint64 bytesReceived, qint64 bytesTotal)
+void MainWindow::download_progress(std::shared_ptr<qte::net::download_supervisor::download_task> task,
+                                   qint64 bytesReceived, qint64 bytesTotal)
 {
-    qDebug()<<__func__<<":"<<unique_id<<":"<<bytesReceived<<":"<<bytesTotal;
+    qDebug()<<__func__<<":"<<task->get_unique_id()<<":"<<bytesReceived<<":"<<bytesTotal;
+    statusBar()->showMessage(tr("%1 : %2/%3").arg(QFileInfo(task->get_save_as()).fileName()).
+                             arg(bytesReceived).arg(bytesTotal));
 }
 
 void MainWindow::on_actionScroll_triggered()
