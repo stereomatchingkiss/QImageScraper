@@ -15,6 +15,8 @@ namespace Ui {
 class MainWindow;
 }
 
+class general_settings;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -27,6 +29,8 @@ private slots:
     void on_comboBoxSearchBy_activated(const QString &arg1);    
     void on_actionScroll_triggered();
     void on_actionDownload_triggered();
+
+    void on_actionSettings_triggered();
 
 private:
     enum class link_choice
@@ -48,7 +52,8 @@ private:
 
     QSize default_max_size_;
     QSize default_min_size_;
-    qte::net::download_supervisor *downloader_;    
+    qte::net::download_supervisor *downloader_;
+    general_settings *general_settings_;
     std::map<size_t, std::tuple<QString, QString, link_choice>> img_links_;
     QStringList img_page_links_;
     image_search *img_search_;        

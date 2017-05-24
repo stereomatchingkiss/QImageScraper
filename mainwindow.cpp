@@ -1,6 +1,9 @@
 #include "mainwindow.hpp"
 #include "ui_mainwindow.h"
 
+#include "general_settings.hpp"
+
+#include "core/global_constant.hpp"
 #include "core/utility.hpp"
 
 #include <QDebug>
@@ -18,11 +21,11 @@ MainWindow::MainWindow(QWidget *parent) :
     default_max_size_(maximumSize()),
     default_min_size_(minimumSize()),
     downloader_(new qte::net::download_supervisor(this)),
+    general_settings_(new general_settings(this)),
     img_search_(nullptr)
 {
     ui->setupUi(this);
-    ui->comboBoxSearchBy->addItem("Bing");
-    on_comboBoxSearchBy_activated("Bing");
+    on_comboBoxSearchBy_activated(global_constant::bing_search_name());
     ui->actionDownload->setEnabled(false);
     ui->actionScroll->setEnabled(false);
 
@@ -30,7 +33,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->progressBar->setVisible(false);
 
     //ui->lineEditSaveAt->setText("/home/ramsus/Qt/img_pages");
-    ui->lineEditSaveAt->setText("c:/Users/yyyy/Qt/img_pages");
+    //ui->lineEditSaveAt->setText("c:/Users/yyyy/Qt/img_pages");
 
     setMinimumSize(size());
 
@@ -38,6 +41,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(downloader_, &download_supervisor::download_finished, this, &MainWindow::download_finished);
     connect(downloader_, &download_supervisor::download_progress, this, &MainWindow::download_progress);
+
+    connect(general_settings_, &general_settings::cannot_create_save_dir,
+            [this](QString const &dir, QString const &write_able_path)
+    {
+        QMessageBox::warning(this, tr("Error"), tr("Cannot create save at dir %1, please choose a new dir, "
+                                                   "if not the images will save at %2").arg(dir).arg(write_able_path));
+    });
 }
 
 MainWindow::~MainWindow()
@@ -51,7 +61,7 @@ void MainWindow::on_comboBoxSearchBy_activated(const QString &arg1)
         img_search_->deleteLater();
     }
 
-    if(arg1 == "Bing"){
+    if(arg1 == global_constant::bing_search_name()){
         img_search_ = new bing_image_search(*ui->webView->page(), this);
         img_search_->go_to_first_page();
     }
@@ -63,12 +73,12 @@ void MainWindow::on_comboBoxSearchBy_activated(const QString &arg1)
 
 void MainWindow::found_img_link(const QString &big_img_link, const QString &small_img_link)
 {
-    if(ui->comboBoxSearchBy->currentText() == "Bing"){
+    if(general_settings_->get_search_by() == global_constant::bing_search_name()){
         static size_t img_link_count = 0;
         qDebug()<<"found image link count:"<<img_link_count++;
         QNetworkRequest const request = create_img_download_request(big_img_link,
-                                                                    ui->comboBoxSearchBy->currentText());
-        auto const unique_id = downloader_->append(request, ui->lineEditSaveAt->text());
+                                                                    general_settings_->get_search_by());
+        auto const unique_id = downloader_->append(request, general_settings_->get_save_at());
         img_links_.emplace(unique_id, std::make_tuple(big_img_link, small_img_link, link_choice::big));
     }
 }
@@ -97,7 +107,9 @@ void MainWindow::process_scroll_second_page_done()
                                     "<p>Press <img src = ':/icons/scroll.png' style='vertical-align:middle' /> "
                                     "or scroll manually if you want to scroll further,"
                                     "press <img src = ':/icons/download.png' style='vertical-align:middle' /> "
-                                    "if you want to download the images</p>").arg(links.size()));
+                                    "if you want to download the images</p>, press "
+                                    "<img src = ':/icons/settings.png' style='vertical-align:middle' /> if "
+                                    "you want to configure your options").arg(links.size()));
     });
 }
 
@@ -117,8 +129,8 @@ void MainWindow::download_finished(std::shared_ptr<qte::net::download_supervisor
             QFile::remove(task->get_save_as());
             if(std::get<2>(it->second) == link_choice::big && std::get<0>(it->second) != std::get<1>(it->second)){
                 QNetworkRequest const request = create_img_download_request(std::get<1>(it->second),
-                                                                            ui->comboBoxSearchBy->currentText());
-                auto const uid = downloader_->append(request, ui->lineEditSaveAt->text(), true);
+                                                                            general_settings_->get_search_by());
+                auto const uid = downloader_->append(request, general_settings_->get_save_at(), true);
                 img_links_.emplace(uid, std::make_tuple(std::get<0>(it->second),
                                                         std::get<1>(it->second), link_choice::small));
             }else{
@@ -185,4 +197,9 @@ void MainWindow::on_actionDownload_triggered()
         });
         qDebug()<<"download target is:"<<contents;
     });
+}
+
+void MainWindow::on_actionSettings_triggered()
+{
+    general_settings_->exec();
 }
