@@ -28,6 +28,7 @@ MainWindow::MainWindow(QWidget *parent) :
     on_comboBoxSearchBy_activated(global_constant::bing_search_name());
     ui->actionDownload->setEnabled(false);
     ui->actionScroll->setEnabled(false);
+    ui->actionNew->setVisible(false);
 
     ui->labelProgress->setVisible(false);
     ui->progressBar->setVisible(false);
@@ -202,4 +203,16 @@ void MainWindow::on_actionDownload_triggered()
 void MainWindow::on_actionSettings_triggered()
 {
     general_settings_->exec();
+}
+
+void MainWindow::on_actionRefresh_triggered()
+{
+    ui->webView->page()->load(ui->webView->page()->url());
+}
+
+void MainWindow::on_actionHome_triggered()
+{
+    if(general_settings_->get_search_by() == global_constant::bing_search_name()){
+        img_search_->go_to_first_page();
+    }
 }

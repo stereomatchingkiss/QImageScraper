@@ -77,7 +77,12 @@
    </attribute>
    <addaction name="actionScroll"/>
    <addaction name="actionDownload"/>
+   <addaction name="actionStop"/>
+   <addaction name="actionRefresh"/>
+   <addaction name="actionHome"/>
+   <addaction name="separator"/>
    <addaction name="actionSettings"/>
+   <addaction name="actionNew"/>
    <addaction name="actionInfo"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
@@ -98,6 +103,9 @@
    <property name="text">
     <string>Settings</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
   </action>
   <action name="actionInfo">
    <property name="icon">
@@ -106,6 +114,9 @@
    </property>
    <property name="text">
     <string>Info</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+2</string>
    </property>
   </action>
   <action name="actionScroll">
@@ -116,6 +127,9 @@
    <property name="text">
     <string>scroll</string>
    </property>
+   <property name="shortcut">
+    <string>Alt+S</string>
+   </property>
   </action>
   <action name="actionDownload">
    <property name="icon">
@@ -124,6 +138,57 @@
    </property>
    <property name="text">
     <string>Download</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
+   </property>
+  </action>
+  <action name="actionRefresh">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/refresh.png</normaloff>:/icons/refresh.png</iconset>
+   </property>
+   <property name="text">
+    <string>Refresh</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
+   </property>
+  </action>
+  <action name="actionHome">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/home.png</normaloff>:/icons/home.png</iconset>
+   </property>
+   <property name="text">
+    <string>Home</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+H</string>
+   </property>
+  </action>
+  <action name="actionNew">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/new.png</normaloff>:/icons/new.png</iconset>
+   </property>
+   <property name="text">
+    <string>New</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
+  </action>
+  <action name="actionStop">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/stop.png</normaloff>:/icons/stop.png</iconset>
+   </property>
+   <property name="text">
+    <string>Stop</string>
+   </property>
+   <property name="shortcut">
+    <string>F1</string>
    </property>
   </action>
  </widget>

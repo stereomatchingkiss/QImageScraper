@@ -32,6 +32,10 @@ private slots:
 
     void on_actionSettings_triggered();
 
+    void on_actionRefresh_triggered();
+
+    void on_actionHome_triggered();
+
 private:
     enum class link_choice
     {
