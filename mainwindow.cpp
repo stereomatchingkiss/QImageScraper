@@ -15,6 +15,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     default_max_size_(maximumSize()),
+    default_min_size_(minimumSize()),
     downloader_(new qte::net::download_supervisor(this)),
     img_search_(nullptr)
 {
@@ -88,6 +89,7 @@ void MainWindow::process_scroll_second_page_done()
     {
         setEnabled(true);
         setMaximumSize(default_max_size_);
+        setMinimumSize(default_min_size_);
         QMessageBox::information(this, tr("Auto scroll end"),
                                  tr("Found %1 images."
                                     "<p>Press <img src = ':/icons/scroll.png' style='vertical-align:middle' /> "
