@@ -181,9 +181,8 @@ void bing_image_search::parse_page_link(const QString &contents)
 
 void bing_image_search::scroll_web_page()
 {
-    //we need to setup timer if the web view are shown on the screen.
-    //Because web view may not able to update in time, this may cause the signal scrollPositionChanged
-    //never emit, because the web page do not have enough of space to scroll down
+    //we need to setup timer because web view may not able to update in time,
+    //this may cause the page stop scrolling too early
     if(state_ == state::scroll_page){
         scroll_count_ = 0;
         connect(timer_, &QTimer::timeout, this, &bing_image_search::scroll_web_page_impl);
