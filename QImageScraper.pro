@@ -36,7 +36,8 @@ SOURCES += main.cpp\
     ../qt_enhance/network/download_supervisor.cpp \
     core/utility.cpp \
     ui/general_settings.cpp \
-    core/global_constant.cpp
+    core/global_constant.cpp \
+    ui/info_dialog.cpp
 
 HEADERS  += mainwindow.hpp \
     core/bing_image_search.hpp \
@@ -46,10 +47,12 @@ HEADERS  += mainwindow.hpp \
     ../qt_enhance/network/download_supervisor.hpp \
     core/utility.hpp \
     ui/general_settings.hpp \
-    core/global_constant.hpp
+    core/global_constant.hpp \
+    ui/info_dialog.hpp
 
 FORMS    += mainwindow.ui \
-    ui/general_settings.ui
+    ui/general_settings.ui \
+    ui/info_dialog.ui
 
 RESOURCES += \
     icons.qrc

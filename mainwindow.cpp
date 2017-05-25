@@ -6,6 +6,8 @@
 #include "core/global_constant.hpp"
 #include "core/utility.hpp"
 
+#include "ui/info_dialog.hpp"
+
 #include <QDebug>
 #include <QFileInfo>
 #include <QImage>
@@ -225,4 +227,9 @@ void MainWindow::download_img_error(std::shared_ptr<qte::net::download_superviso
                                     const QString &error_msg)
 {
     qDebug()<<__func__<<":"<<task->get_unique_id()<<":"<<error_msg;
+}
+
+void MainWindow::on_actionInfo_triggered()
+{
+    info_dialog().exec();
 }
