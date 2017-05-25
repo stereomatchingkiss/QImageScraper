@@ -197,6 +197,7 @@ void bing_image_search::scroll_web_page()
     //this may cause the page stop scrolling too early
     if(state_ == state::scroll_page){
         scroll_count_ = 0;
+        stop_scroll_page_ = false;
         QTimer::singleShot(scroll_page_duration, [this](){scroll_web_page_impl();});
     }
 }
