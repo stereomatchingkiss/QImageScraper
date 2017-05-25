@@ -10,7 +10,7 @@
 
 #include <QDebug>
 #include <QFileInfo>
-#include <QImage>
+#include <QImageReader>
 #include <QMessageBox>
 #include <QNetworkRequest>
 #include <QSizeGrip>
@@ -152,8 +152,13 @@ void MainWindow::download_finished(std::shared_ptr<qte::net::download_supervisor
     qDebug()<<"save as:"<<task->get_save_as();
     auto it = img_links_.find(task->get_unique_id());
     if(it != std::end(img_links_)){
-        QImage img(task->get_save_as());
-        if(task->get_network_error_code() == QNetworkReply::NoError && !img.isNull()){
+        QImageReader img(task->get_save_as());
+        img.setDecideFormatFromContent(true);
+        if(task->get_network_error_code() == QNetworkReply::NoError && img.canRead()){
+            QFileInfo img_info(task->get_save_as());
+            QFile::rename(task->get_save_as(),
+                          img_info.absolutePath() + "/" + img_info.completeBaseName() +
+                          "." + img.format());
             qDebug()<<"can save image choice:"<<(int)std::get<2>(it->second);
             ui->progressBar->setValue(ui->progressBar->value() + 1);
             download_next_image();
@@ -184,8 +189,13 @@ void MainWindow::download_progress(std::shared_ptr<qte::net::download_supervisor
                                    qint64 bytesReceived, qint64 bytesTotal)
 {
     qDebug()<<__func__<<":"<<task->get_unique_id()<<":"<<bytesReceived<<":"<<bytesTotal;
-    statusBar()->showMessage(tr("%1 : %2/%3").arg(QFileInfo(task->get_save_as()).fileName()).
-                             arg(bytesReceived).arg(bytesTotal));
+    if(bytesTotal > 0){
+        statusBar()->showMessage(tr("%1 : %2/%3").arg(QFileInfo(task->get_save_as()).fileName()).
+                                 arg(bytesReceived).arg(bytesTotal));
+    }else{
+        statusBar()->showMessage(tr("%1 : %2").arg(QFileInfo(task->get_save_as()).fileName()).
+                                 arg(bytesReceived));
+    }
 }
 
 void MainWindow::on_actionScroll_triggered()
