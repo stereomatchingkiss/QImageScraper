@@ -66,6 +66,11 @@ public:
      */
     virtual void scroll_second_page(size_t max_search_size) = 0;
 
+    /**
+     * @brief stop scrolling second page
+     */
+    virtual void stop_scroll_second_page() = 0;
+
 signals:
     void error_msg(QString const &msg);
     /**

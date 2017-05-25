@@ -15,6 +15,7 @@ public:
     void parse_imgs_link(QString const &page_link,
                          std::function<void(QString const&, QString const&)> callback) override;
     void scroll_second_page(size_t max_search_size) override;
+    void stop_scroll_second_page() override;
 
 private:
     enum class state{
@@ -36,6 +37,7 @@ private:
     size_t scroll_count_;
     size_t scroll_limit_;
     state state_;
+    bool stop_scroll_page_;
 };
 
 #endif // BING_IMAGE_SEARCH_HPP

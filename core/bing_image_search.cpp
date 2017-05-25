@@ -15,11 +15,12 @@ constexpr int scroll_page_duration = 1500;
 }
 
 bing_image_search::bing_image_search(QWebEnginePage &page, QObject *parent) :
-    image_search(page, parent),
-    max_search_size_(0),
-    scroll_count_(0),
-    scroll_limit_(2),
-    state_(state::to_first_page)
+    image_search{page, parent},
+    max_search_size_{0},
+    scroll_count_{0},
+    scroll_limit_{2},
+    state_{state::to_first_page},
+    stop_scroll_page_{false}
 {
     auto *web_page = &get_web_page();
     connect(web_page, &QWebEnginePage::loadProgress, [](int progress){ qDebug()<<"load progress:"<<progress;});
@@ -66,6 +67,11 @@ void bing_image_search::scroll_second_page(size_t max_search_size)
     }
     state_ = state::scroll_page;
     scroll_web_page();
+}
+
+void bing_image_search::stop_scroll_second_page()
+{
+    stop_scroll_page_ = true;
 }
 
 void bing_image_search::load_web_page_finished(bool ok)
@@ -135,6 +141,12 @@ void bing_image_search::scroll_web_page_impl()
 {    
     qDebug()<<__func__<<":scroll_count:"<<scroll_count_;
     if(state_ != state::scroll_page){
+        return;
+    }
+
+    if(stop_scroll_page_){
+        stop_scroll_page_ = false;
+        emit scroll_second_page_done();
         return;
     }
 
