@@ -132,8 +132,7 @@ void bing_image_search::parse_imgs_link_content()
 }
 
 void bing_image_search::scroll_web_page_impl()
-{
-    ++scroll_count_;
+{    
     qDebug()<<__func__<<":scroll_count:"<<scroll_count_;
     if(state_ != state::scroll_page){
         return;
@@ -154,6 +153,7 @@ void bing_image_search::scroll_web_page_impl()
             qDebug()<<"cannot found See more images";
             get_web_page().runJavaScript("window.scrollTo(0, document.body.scrollHeight)");
         }
+        ++scroll_count_;
         emit second_page_scrolled();
         QTimer::singleShot(scroll_page_duration, [this](){scroll_web_page_impl();});
     });
