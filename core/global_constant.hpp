@@ -7,6 +7,7 @@ class global_constant
 {
 public:
     static QString bing_search_name();
+    static QString google_search_name();
 };
 
 #endif // GLOBAL_CONSTANT_HPP
