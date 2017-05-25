@@ -57,6 +57,7 @@ private:
     void process_go_to_first_page();
     void process_go_to_second_page();
     void process_scroll_second_page_done();
+    void set_enabled_main_window_except_stop(bool value);
     void refresh_window();
 
     Ui::MainWindow *ui;

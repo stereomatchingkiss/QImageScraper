@@ -30,6 +30,7 @@ MainWindow::MainWindow(QWidget *parent) :
     on_comboBoxSearchBy_activated(global_constant::bing_search_name());
     ui->actionDownload->setEnabled(false);
     ui->actionScroll->setEnabled(false);
+    ui->actionStop->setEnabled(false);
     ui->actionNew->setVisible(false);
 
     ui->labelProgress->setVisible(false);
@@ -88,30 +89,46 @@ void MainWindow::process_go_to_first_page()
 {
     ui->actionScroll->setEnabled(false);
     ui->actionDownload->setEnabled(false);
+    ui->actionStop->setEnabled(false);
 }
 
 void MainWindow::process_go_to_second_page()
 {
     ui->actionScroll->setEnabled(true);
     ui->actionDownload->setEnabled(true);
+    ui->actionStop->setEnabled(true);
 }
 
 void MainWindow::process_scroll_second_page_done()
 {
-    img_search_->get_page_link([this](QStringList const &links)
-    {
-        setEnabled(true);
-        setMaximumSize(default_max_size_);
-        setMinimumSize(default_min_size_);
-        QMessageBox::information(this, tr("Auto scroll end"),
-                                 tr("Found %1 images."
-                                    "<p>Press <img src = ':/icons/scroll.png' style='vertical-align:middle' /> "
-                                    "or scroll manually if you want to scroll further,"
-                                    "press <img src = ':/icons/download.png' style='vertical-align:middle' /> "
-                                    "if you want to download the images</p>, press "
-                                    "<img src = ':/icons/settings.png' style='vertical-align:middle' /> if "
-                                    "you want to configure your options").arg(links.size()));
-    });
+    if(img_search_){
+        img_search_->get_page_link([this](QStringList const &links)
+        {
+            set_enabled_main_window_except_stop(true);
+            setMaximumSize(default_max_size_);
+            setMinimumSize(default_min_size_);
+            QMessageBox::information(this, tr("Auto scroll end"),
+                                     tr("Found %1 images."
+                                        "<p>Press <img src = ':/icons/scroll.png' style='vertical-align:middle' /> "
+                                        "or scroll manually if you want to scroll further,"
+                                        "press <img src = ':/icons/download.png' style='vertical-align:middle' /> "
+                                        "if you want to download the images</p>, press "
+                                        "<img src = ':/icons/settings.png' style='vertical-align:middle' /> if "
+                                        "you want to configure your options").arg(links.size()));
+        });
+    }
+}
+
+void MainWindow::set_enabled_main_window_except_stop(bool value)
+{
+    centralWidget()->setEnabled(value);
+    ui->actionDownload->setEnabled(value);
+    ui->actionHome->setEnabled(value);
+    ui->actionInfo->setEnabled(value);
+    ui->actionNew->setEnabled(value);
+    ui->actionRefresh->setEnabled(value);
+    ui->actionScroll->setEnabled(value);
+    ui->actionSettings->setEnabled(value);
 }
 
 void MainWindow::refresh_window()
@@ -119,7 +136,7 @@ void MainWindow::refresh_window()
     if(img_links_.empty() && img_page_links_.empty()){
         ui->labelProgress->setVisible(false);
         ui->progressBar->setVisible(false);
-        setEnabled(true);
+        set_enabled_main_window_except_stop(true);
         img_search_->go_to_first_page();
         statusBar()->showMessage("");
     }
@@ -168,7 +185,7 @@ void MainWindow::download_progress(std::shared_ptr<qte::net::download_supervisor
 
 void MainWindow::on_actionScroll_triggered()
 {
-    setEnabled(false);
+    set_enabled_main_window_except_stop(false);
     setMaximumSize(size());
     img_search_->scroll_second_page(1000);
 }
@@ -190,7 +207,7 @@ void MainWindow::on_actionDownload_triggered()
     ui->webView->page()->runJavaScript("function jscmd(){return document.getElementById(\"sb_form_q\").value} jscmd()",
                                        [this](QVariant const &contents)
     {
-        setEnabled(false);
+        set_enabled_main_window_except_stop(false);
         img_search_->get_page_link([this](QStringList const &page_links)
         {
             ui->labelProgress->setVisible(true);
