@@ -1,5 +1,7 @@
 #include "utility.hpp"
 
+#include "global_constant.hpp"
+
 #include <QFileInfo>
 #include <QNetworkInterface>
 #include <QNetworkRequest>
@@ -27,14 +29,20 @@ QString convert_url_to_filename(QString const &url, QString const &save_at)
 
 QNetworkRequest create_img_download_request(const QString &url, const QString &engine)
 {
-    if(engine == "Bing"){
+    if(engine == global_constant::bing_search_name()){
         QNetworkRequest request(url);
-        QString const header = "msnbot/2.0b (+http://search.msn.com/msnbot.htm)";
-        //QString const header = "msnbot-media/1.1 (+http://search.msn.com/msnbot.htm)";
+        //QString const header = "msnbot/2.0b (+http://search.msn.com/msnbot.htm)";
+        QString const header = "msnbot-media/1.1 (+http://search.msn.com/msnbot.htm)";
         //QString const header = "Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)";
+        //QString const header = "Mozilla/5.0 (Windows Phone 8.1; ARM; Trident/7.0; Touch; rv:11.0; IEMobile/11.0; NOKIA; Lumia 530) like Gecko (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)";
         request.setHeader(QNetworkRequest::UserAgentHeader, header);
 
         return request;
+    }else if(engine == global_constant::google_search_name()){
+        QNetworkRequest request(url);
+        //QString const header = "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)";
+        QString const header = "Googlebot-Image/1.0";
+        request.setHeader(QNetworkRequest::UserAgentHeader, header);
     }
 
     return QNetworkRequest(url);
