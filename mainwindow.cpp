@@ -35,9 +35,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->labelProgress->setVisible(false);
     ui->progressBar->setVisible(false);
 
-    //ui->lineEditSaveAt->setText("/home/ramsus/Qt/img_pages");
-    //ui->lineEditSaveAt->setText("c:/Users/yyyy/Qt/img_pages");
-
     setMinimumSize(size());
 
     using namespace qte::net;
@@ -232,4 +229,9 @@ void MainWindow::download_img_error(std::shared_ptr<qte::net::download_superviso
 void MainWindow::on_actionInfo_triggered()
 {
     info_dialog().exec();
+}
+
+void MainWindow::on_actionStop_triggered()
+{
+    img_search_->stop_scroll_second_page();
 }

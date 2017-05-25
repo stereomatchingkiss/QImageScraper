@@ -38,6 +38,8 @@ private slots:
 
     void on_actionInfo_triggered();
 
+    void on_actionStop_triggered();
+
 private:
     enum class link_choice
     {
