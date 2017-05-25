@@ -25,8 +25,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-private slots:    
-    void on_comboBoxSearchBy_activated(const QString &arg1);    
+private slots:
     void on_actionScroll_triggered();
     void on_actionDownload_triggered();
 
@@ -54,6 +53,7 @@ private:
     void download_progress(std::shared_ptr<qte::net::download_supervisor::download_task> task,
                            qint64 bytesReceived, qint64 bytesTotal);
     void found_img_link(QString const &big_img_link, QString const &small_img_link);
+    void general_settings_ok_clicked();
     void process_go_to_first_page();
     void process_go_to_second_page();
     void process_scroll_second_page_done();

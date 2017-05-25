@@ -16,6 +16,7 @@
 #include <QSizeGrip>
 
 #include "core/bing_image_search.hpp"
+#include "core/google_image_search.hpp"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -27,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent) :
     img_search_(nullptr)
 {
     ui->setupUi(this);
-    on_comboBoxSearchBy_activated(global_constant::bing_search_name());
+    general_settings_ok_clicked();
     ui->actionDownload->setEnabled(false);
     ui->actionScroll->setEnabled(false);
     ui->actionStop->setEnabled(false);
@@ -43,6 +44,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(downloader_, &download_supervisor::error, this, &MainWindow::download_img_error);
     connect(downloader_, &download_supervisor::download_finished, this, &MainWindow::download_finished);
     connect(downloader_, &download_supervisor::download_progress, this, &MainWindow::download_progress);
+    connect(general_settings_, &general_settings::ok_clicked, this, &MainWindow::general_settings_ok_clicked);
 
     connect(general_settings_, &general_settings::cannot_create_save_dir,
             [this](QString const &dir, QString const &write_able_path)
@@ -57,32 +59,33 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_comboBoxSearchBy_activated(const QString &arg1)
+void MainWindow::found_img_link(const QString &big_img_link, const QString &small_img_link)
+{
+    static size_t img_link_count = 0;
+    qDebug()<<"found bing image link count:"<<img_link_count++;
+    QNetworkRequest const request = create_img_download_request(big_img_link,
+                                                                general_settings_->get_search_by());
+    auto const unique_id = downloader_->append(request, general_settings_->get_save_at());
+    img_links_.emplace(unique_id, std::make_tuple(big_img_link, small_img_link, link_choice::big));
+}
+
+void MainWindow::general_settings_ok_clicked()
 {
     if(img_search_){
         img_search_->deleteLater();
     }
 
-    if(arg1 == global_constant::bing_search_name()){
+    if(general_settings_->get_search_by() == global_constant::bing_search_name()){
         img_search_ = new bing_image_search(*ui->webView->page(), this);
-        img_search_->go_to_first_page();
+    }else{
+        img_search_ = new google_image_search(*ui->webView->page(), this);
     }
 
     connect(img_search_, &image_search::go_to_first_page_done, this, &MainWindow::process_go_to_first_page);
     connect(img_search_, &image_search::go_to_second_page_done, this, &MainWindow::process_go_to_second_page);
     connect(img_search_, &image_search::scroll_second_page_done, this, &MainWindow::process_scroll_second_page_done);
-}
 
-void MainWindow::found_img_link(const QString &big_img_link, const QString &small_img_link)
-{
-    if(general_settings_->get_search_by() == global_constant::bing_search_name()){
-        static size_t img_link_count = 0;
-        qDebug()<<"found image link count:"<<img_link_count++;
-        QNetworkRequest const request = create_img_download_request(big_img_link,
-                                                                    general_settings_->get_search_by());
-        auto const unique_id = downloader_->append(request, general_settings_->get_save_at());
-        img_links_.emplace(unique_id, std::make_tuple(big_img_link, small_img_link, link_choice::big));
-    }
+    img_search_->go_to_first_page();
 }
 
 void MainWindow::process_go_to_first_page()
@@ -102,6 +105,7 @@ void MainWindow::process_go_to_second_page()
 void MainWindow::process_scroll_second_page_done()
 {
     if(img_search_){
+        qDebug()<<__func__<<":get_page_link start";
         img_search_->get_page_link([this](QStringList const &links)
         {
             set_enabled_main_window_except_stop(true);
@@ -156,7 +160,8 @@ void MainWindow::download_finished(std::shared_ptr<qte::net::download_supervisor
         }else{
             qDebug()<<"cannot save image choice:"<<(int)std::get<2>(it->second);
             QFile::remove(task->get_save_as());
-            if(std::get<2>(it->second) == link_choice::big && std::get<0>(it->second) != std::get<1>(it->second)){
+            if(std::get<2>(it->second) == link_choice::big && std::get<0>(it->second) != std::get<1>(it->second) &&
+                    !std::get<1>(it->second).isEmpty()){
                 QNetworkRequest const request = create_img_download_request(std::get<1>(it->second),
                                                                             general_settings_->get_search_by());
                 auto const uid = downloader_->append(request, general_settings_->get_save_at(), true);
@@ -197,6 +202,7 @@ void MainWindow::download_next_image()
                 [this](QString const &big_img_link, QString const &small_img_link)
         {
             img_page_links_.pop_front();
+            qDebug()<<"download next image got image links\n"<<big_img_link<<"\n"<<small_img_link;
             found_img_link(big_img_link, small_img_link);
         });
     }
@@ -204,7 +210,13 @@ void MainWindow::download_next_image()
 
 void MainWindow::on_actionDownload_triggered()
 {
-    ui->webView->page()->runJavaScript("function jscmd(){return document.getElementById(\"sb_form_q\").value} jscmd()",
+    QString command;
+    if(general_settings_->get_search_by() == global_constant::bing_search_name()){
+        command = "function jscmd(){return document.getElementById(\"sb_form_q\").value} jscmd()";
+    }else{
+        command = "function jscmd(){return document.getElementById(\"lst-ib\").value} jscmd()";
+    }
+    ui->webView->page()->runJavaScript(command,
                                        [this](QVariant const &contents)
     {
         set_enabled_main_window_except_stop(false);
