@@ -21,6 +21,7 @@ public:
 
 signals:
     void cannot_create_save_dir(QString const &dir, QString const &write_able_path);
+    void ok_clicked();
 
 private slots:
     void on_buttonBox_accepted();
