@@ -67,6 +67,7 @@ void MainWindow::found_img_link(const QString &big_img_link, const QString &smal
                                                                 general_settings_->get_search_by());
     auto const unique_id = downloader_->append(request, general_settings_->get_save_at());
     img_links_.emplace(unique_id, std::make_tuple(big_img_link, small_img_link, link_choice::big));
+    downloader_->start_download_task(unique_id);
 }
 
 void MainWindow::general_settings_ok_clicked()
@@ -137,6 +138,7 @@ void MainWindow::set_enabled_main_window_except_stop(bool value)
 
 void MainWindow::refresh_window()
 {
+    qDebug()<<__func__<<":"<<img_links_.size()<<","<<img_page_links_.size();
     if(img_links_.empty() && img_page_links_.empty()){
         ui->labelProgress->setVisible(false);
         ui->progressBar->setVisible(false);
@@ -146,41 +148,50 @@ void MainWindow::refresh_window()
     }
 }
 
+void MainWindow::download_small_img(QString const &save_as,
+                                    std::tuple<QString, QString, link_choice> const &img_info)
+{
+    QFile::remove(save_as);
+    if(std::get<2>(img_info) == link_choice::big && std::get<0>(img_info) != std::get<1>(img_info) &&
+            !std::get<1>(img_info).isEmpty()){
+        QNetworkRequest const request = create_img_download_request(std::get<1>(img_info),
+                                                                    general_settings_->get_search_by());
+        auto const uid = downloader_->append(request, general_settings_->get_save_at(), true);
+        img_links_.emplace(uid, std::make_tuple(std::get<0>(img_info),
+                                                std::get<1>(img_info), link_choice::small));
+        downloader_->start_download_task(uid);
+    }else{
+        ui->progressBar->setValue(ui->progressBar->value() + 1);
+        download_next_image();
+    }
+}
+
 void MainWindow::download_finished(std::shared_ptr<qte::net::download_supervisor::download_task> task)
 {
     qDebug()<<__func__<<":"<<task->get_unique_id()<<":"<<task->get_network_error_code();
     qDebug()<<"save as:"<<task->get_save_as();
     auto it = img_links_.find(task->get_unique_id());
     if(it != std::end(img_links_)){
+        auto const img_info = it->second;
+        img_links_.erase(it);
         QImageReader img(task->get_save_as());
         img.setDecideFormatFromContent(true);
         if(task->get_network_error_code() == QNetworkReply::NoError && img.canRead()){
-            QFileInfo img_info(task->get_save_as());
+            QFileInfo file_info(task->get_save_as());
             QFile::rename(task->get_save_as(),
-                          img_info.absolutePath() + "/" + img_info.completeBaseName() +
+                          file_info.absolutePath() + "/" + file_info.completeBaseName() +
                           "." + img.format());
-            qDebug()<<"can save image choice:"<<(int)std::get<2>(it->second);
+            qDebug()<<"can save image choice:"<<(int)std::get<2>(img_info);
             ui->progressBar->setValue(ui->progressBar->value() + 1);
             download_next_image();
         }else{
-            qDebug()<<"cannot save image choice:"<<(int)std::get<2>(it->second);
-            QFile::remove(task->get_save_as());
-            if(std::get<2>(it->second) == link_choice::big && std::get<0>(it->second) != std::get<1>(it->second) &&
-                    !std::get<1>(it->second).isEmpty()){
-                QNetworkRequest const request = create_img_download_request(std::get<1>(it->second),
-                                                                            general_settings_->get_search_by());
-                auto const uid = downloader_->append(request, general_settings_->get_save_at(), true);
-                img_links_.emplace(uid, std::make_tuple(std::get<0>(it->second),
-                                                        std::get<1>(it->second), link_choice::small));
-            }else{
-                ui->progressBar->setValue(ui->progressBar->value() + 1);
-                download_next_image();
-            }
+            qDebug()<<"cannot save image choice:"<<(int)std::get<2>(img_info);
+            download_small_img(task->get_save_as(), img_info);
         }
-        img_links_.erase(it);
         refresh_window();
     }else{
         ui->progressBar->setValue(ui->progressBar->value() + 1);
+        QFile::remove(task->get_save_as());
         download_next_image();
     }
 }

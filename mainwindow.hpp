@@ -52,6 +52,8 @@ private:
     void download_next_image();
     void download_progress(std::shared_ptr<qte::net::download_supervisor::download_task> task,
                            qint64 bytesReceived, qint64 bytesTotal);
+    void download_small_img(QString const &save_as,
+                            std::tuple<QString, QString, link_choice> const &img_info);
     void found_img_link(QString const &big_img_link, QString const &small_img_link);
     void general_settings_ok_clicked();
     void process_go_to_first_page();
