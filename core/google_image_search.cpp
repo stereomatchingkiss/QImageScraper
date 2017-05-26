@@ -86,7 +86,7 @@ void google_image_search::stop_scroll_second_page()
 
 void google_image_search::load_web_page_finished(bool ok)
 {
-    qDebug()<<"load web page finished:"<<ok<<", url:"<<get_web_page().url().toString();
+    qDebug()<<"load web page finished:"<<ok<<", url:"<<get_web_page().url();
     if(ok){
         QRegularExpression const re("https://www.google.[^/]*/search?");
         if(get_web_page().url().toString().contains(re)){
@@ -122,19 +122,6 @@ void google_image_search::load_web_page_finished(bool ok)
     }else{
         emit error_msg(tr("Failed to load the web page"));
     }
-}
-
-QString google_image_search::match_small_img(const QString &contents)
-{
-    QRegularExpression reg("");
-    auto match = reg.match(contents);
-    if(match.hasMatch()){
-        qDebug()<<"small img link:"<<match.captured(1)<<"\n";
-    }else{
-        qDebug()<<"cannot capture small img link";
-    }
-
-    return match.captured(1);
 }
 
 void google_image_search::parse_imgs_link_content()

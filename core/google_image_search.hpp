@@ -26,7 +26,6 @@ private:
     };
 
     void load_web_page_finished(bool ok) override;
-    QString match_small_img(QString const &contents);
     void parse_imgs_link_content();
     void parse_page_link(QString const &contents);
     void scroll_web_page();
