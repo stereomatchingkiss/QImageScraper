@@ -11,3 +11,8 @@ QString global_constant::google_search_name()
 {
     return QObject::tr("Google");
 }
+
+int global_constant::network_reply_timeout()
+{
+    return 5000;
+}
