@@ -231,27 +231,16 @@ void MainWindow::download_next_image()
 
 void MainWindow::on_actionDownload_triggered()
 {
-    QString command;
-    if(general_settings_->get_search_by() == global_constant::bing_search_name()){
-        command = "function jscmd(){return document.getElementById(\"sb_form_q\").value} jscmd()";
-    }else{
-        command = "function jscmd(){return document.getElementById(\"lst-ib\").value} jscmd()";
-    }
-    ui->webView->page()->runJavaScript(command,
-                                       [this](QVariant const &contents)
+    set_enabled_main_window_except_stop(false);
+    img_search_->get_page_link([this](QStringList const &page_links)
     {
-        set_enabled_main_window_except_stop(false);
-        img_search_->get_page_link([this](QStringList const &page_links)
-        {
-            ui->labelProgress->setVisible(true);
-            ui->progressBar->setVisible(true);
-            ui->progressBar->setRange(0, page_links.size());
-            ui->progressBar->setValue(0);
-            img_page_links_ = page_links;
-            qDebug()<<"progress bar min:"<<ui->progressBar->minimum()<<",max:"<<ui->progressBar->maximum();
-            download_next_image();
-        });
-        qDebug()<<"download target is:"<<contents;
+        ui->labelProgress->setVisible(true);
+        ui->progressBar->setVisible(true);
+        ui->progressBar->setRange(0, page_links.size());
+        ui->progressBar->setValue(0);
+        img_page_links_ = page_links;
+        qDebug()<<"progress bar min:"<<ui->progressBar->minimum()<<",max:"<<ui->progressBar->maximum();
+        download_next_image();
     });
 }
 
