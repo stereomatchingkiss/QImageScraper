@@ -14,6 +14,7 @@ public:
     void go_to_second_page() override;
     void parse_imgs_link(QString const &page_link,
                          std::function<void(QString const&, QString const&)> callback) override;
+    void parse_imgs_link_from_second_page(std::function<void(QStringList const&, QStringList const&)> callback) override;
     void scroll_second_page(size_t max_search_size) override;
     void stop_scroll_second_page() override;
 

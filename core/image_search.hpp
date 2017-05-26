@@ -47,15 +47,23 @@ public:
     virtual void get_page_link(std::function<void(QStringList const&)> callback) = 0;        
 
     /**
-     * @brief Asynchronous method to get page links of second page(these pages
+     * @brief Asynchronous method to get image links by page link(this page
      * contain image links). Upon completion, result callback is called with the
      * image links.
-     * @param page_link links of pages which contain image links
+     * @param page_link link of page which contain image links
      * @param callback Upon completion, result callback is called with the
      * image links(big image link, small image link).
      */
     virtual void parse_imgs_link(QString const &page_link,
                                  std::function<void(QString const&, QString const&)> callback) = 0;
+
+    /**
+     * @brief Asynchronous method to parse all of the image links from second page. Upon
+     * completion, result callback is called with the image links
+     * @param callback callback Upon completion, result callback is called with the
+     * image links(big image links, small image links).
+     */
+    virtual void parse_imgs_link_from_second_page(std::function<void(QStringList const&, QStringList const&)> callback) = 0;
 
     /**
      * @brief Asynchronous method, scroll second page of the search engine. This function

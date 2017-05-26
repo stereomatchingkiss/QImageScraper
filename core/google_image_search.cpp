@@ -67,6 +67,26 @@ void google_image_search::parse_imgs_link(const QString &page_link,
     get_web_page().load(page_link);
 }
 
+void google_image_search::parse_imgs_link_from_second_page(std::function<void (const QStringList &, const QStringList &)> callback)
+{
+    get_web_page().toHtml([this, callback](QString const &contents)
+    {
+        QRegularExpression const reg("<div class=\"rg_meta\">{[^}]*}");
+        auto iter = reg.globalMatch(contents);
+        QStringList big_im, small_im;
+        while(iter.hasNext()){
+            auto const match = iter.next();
+            QRegularExpression const link_big("\"ou\":\"([^\"]*)");
+            QRegularExpression const link_small("\"tu\":\"([^\"]*)");
+            auto const bm = link_big.match(match.captured(0));
+            auto const sm = link_small.match(match.captured(0));
+            big_im.push_back(decode_link_char(bm.captured(1)));
+            small_im.push_back(sm.captured(1));
+        }
+        callback(big_im, small_im);
+    });
+}
+
 void google_image_search::scroll_second_page(size_t max_search_size)
 {
     max_search_size_ = max_search_size;
@@ -82,6 +102,15 @@ void google_image_search::scroll_second_page(size_t max_search_size)
 void google_image_search::stop_scroll_second_page()
 {
     stop_scroll_page_ = true;
+}
+
+QString google_image_search::decode_link_char(QString link)
+{
+    link.replace("&amp;", "&");
+    link.replace("\\\\u003d", "=");
+    link.chop(1);
+
+    return link;
 }
 
 void google_image_search::load_web_page_finished(bool ok)
@@ -127,35 +156,29 @@ void google_image_search::load_web_page_finished(bool ok)
 void google_image_search::parse_imgs_link_content()
 {
     get_web_page().toHtml([this](QString const &contents){
-        QRegularExpression reg("\\[\"image_group\",(null,){4}\\[null,\"\\[{3}"
-                               "[^\"]*\"[^\"]*\",\\[\\\\\"([^\"]*)\""
-                               "[^\\[]*\\[\\\\\"([^\"]*)\"");
-        auto match = reg.match(contents);
-        auto replacer = [](QString str)
-        {
-            str.replace("&amp;", "&");
-            str.replace("\\\\u003d", "=");
-            str.chop(1);
-
-            return str;
-        };
+        QRegularExpression const reg("\\[\"image_group\",(null,){4}\\[null,\"\\[{3}"
+                                     "[^\"]*\"[^\"]*\",\\[\\\\\"([^\"]*)\""
+                                     "[^\\[]*\\[\\\\\"([^\"]*)\"");
+        auto const match = reg.match(contents);
         if(match.hasMatch()){
-            qDebug()<<"img link:"<<replacer(match.captured(2))<<"\n"<<replacer(match.captured(3));
+            qDebug()<<"img link:"<<decode_link_char(match.captured(2))<<"\n"
+                   <<decode_link_char(match.captured(3));
         }else{
             qDebug()<<"cannot capture img link";
         }
 
-        parse_img_link_callback_(replacer(match.captured(3)), replacer(match.captured(2)));
+        parse_img_link_callback_(decode_link_char(match.captured(3)),
+                                 decode_link_char(match.captured(2)));
     });
 }
 
 void google_image_search::parse_page_link(const QString &contents)
 {
-    QRegularExpression reg("<a href=\"(/imgres\\?imgurl[^\"]*)\"");
+    QRegularExpression const reg("<a href=\"(/imgres\\?imgurl[^\"]*)\"");
     auto iter = reg.globalMatch(contents);
     QStringList links;
     while(iter.hasNext()){
-        QRegularExpressionMatch match = iter.next();
+        QRegularExpressionMatch const match = iter.next();
         QString url = QUrl("https://www.google.com" + match.captured(1)).toString();
         url.replace("&amp;", "&");
         links.push_back(std::move(url));

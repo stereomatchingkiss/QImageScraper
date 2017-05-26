@@ -121,12 +121,30 @@ void bing_image_search::parse_imgs_link(const QString &page_link,
     get_web_page().load(page_link);
 }
 
+void bing_image_search::parse_imgs_link_from_second_page(std::function<void(const QStringList &, const QStringList &)> callback)
+{
+    get_web_page().toHtml([this, callback](QString const &contents)
+    {
+        QRegularExpression const reg("m=\"{[^,]*([^;]*;){7}([^&]*)[^\"]*\" "
+                                     "mad=\"{([^;]*;){3}([^;]*;)");
+        auto iter = reg.globalMatch(contents);
+        QStringList big_img, small_img;
+        while(iter.hasNext()){
+            QRegularExpressionMatch const match = iter.next();
+            qDebug()<<"parse_imgs_link_from_second_page:"<<match.captured(2)<<","<<match.captured(4);
+            big_img.push_back(match.captured(2).replace("&amp;", "&"));
+            small_img.push_back(match.captured(4).replace("&amp;", "&"));
+        }
+        callback(big_img, small_img);
+    });
+}
+
 void bing_image_search::parse_imgs_link_content()
 {
     get_web_page().toHtml([this](QString const &contents)
     {
-        QRegularExpression reg("<img class=\"mainImage\" src=\"([^\"]*)\" src2=\"([^\"]*)");
-        auto match = reg.match(contents);
+        QRegularExpression const reg("<img class=\"mainImage\" src=\"([^\"]*)\" src2=\"([^\"]*)");
+        auto const match = reg.match(contents);
         if(match.hasMatch()){
             qDebug()<<"img link:"<<match.captured(1)<<"\n"<<match.captured(2);
         }else{
@@ -173,11 +191,11 @@ void bing_image_search::scroll_web_page_impl()
 
 void bing_image_search::parse_page_link(const QString &contents)
 {
-    QRegularExpression reg("(search\\?view=detailV2[^\"]*)");
+    QRegularExpression const reg("(search\\?view=detailV2[^\"]*)");
     auto iter = reg.globalMatch(contents);
     QStringList links;
     while(iter.hasNext()){
-        QRegularExpressionMatch match = iter.next();
+        QRegularExpressionMatch const match = iter.next();
         if(match.captured(1).right(20) != "ipm=vs#enterinsights"){
             QString url = QUrl("https://www.bing.com/images/" + match.captured(1)).toString();
             url.replace("&amp;", "&");
