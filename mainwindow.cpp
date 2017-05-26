@@ -166,6 +166,8 @@ void MainWindow::download_finished(std::shared_ptr<qte::net::download_supervisor
         auto const img_info = it->second;
         img_links_.erase(it);
         if(task->get_is_timeout()){
+            qDebug()<<__func__<<":"<<task->get_save_as()<<","<<task->get_url()<<": timeout";
+            QFile::remove(task->get_save_as());
             download_img(img_info);
             return;
         }
