@@ -62,12 +62,8 @@ MainWindow::~MainWindow()
 void MainWindow::found_img_link(const QString &big_img_link, const QString &small_img_link)
 {
     static size_t img_link_count = 0;
-    qDebug()<<"found bing image link count:"<<img_link_count++;
-    QNetworkRequest const request = create_img_download_request(big_img_link,
-                                                                general_settings_->get_search_by());
-    auto const unique_id = downloader_->append(request, general_settings_->get_save_at());
-    img_links_.emplace(unique_id, std::make_tuple(big_img_link, small_img_link, link_choice::big));
-    downloader_->start_download_task(unique_id);
+    qDebug()<<"found image link count:"<<img_link_count++;
+    download_img(std::make_tuple(big_img_link, small_img_link, link_choice::big));
 }
 
 void MainWindow::general_settings_ok_clicked()
@@ -154,12 +150,7 @@ void MainWindow::download_small_img(QString const &save_as,
     QFile::remove(save_as);
     if(std::get<2>(img_info) == link_choice::big && std::get<0>(img_info) != std::get<1>(img_info) &&
             !std::get<1>(img_info).isEmpty()){
-        QNetworkRequest const request = create_img_download_request(std::get<1>(img_info),
-                                                                    general_settings_->get_search_by());
-        auto const uid = downloader_->append(request, general_settings_->get_save_at(), true);
-        img_links_.emplace(uid, std::make_tuple(std::get<0>(img_info),
-                                                std::get<1>(img_info), link_choice::small));
-        downloader_->start_download_task(uid);
+        download_img(std::make_tuple(std::get<0>(img_info), std::get<1>(img_info), link_choice::small));
     }else{
         ui->progressBar->setValue(ui->progressBar->value() + 1);
         download_next_image();
@@ -174,6 +165,11 @@ void MainWindow::download_finished(std::shared_ptr<qte::net::download_supervisor
     if(it != std::end(img_links_)){
         auto const img_info = it->second;
         img_links_.erase(it);
+        if(task->get_is_timeout()){
+            download_img(img_info);
+            return;
+        }
+
         QImageReader img(task->get_save_as());
         img.setDecideFormatFromContent(true);
         if(task->get_network_error_code() == QNetworkReply::NoError && img.canRead()){
@@ -194,6 +190,18 @@ void MainWindow::download_finished(std::shared_ptr<qte::net::download_supervisor
         QFile::remove(task->get_save_as());
         download_next_image();
     }
+}
+
+void MainWindow::download_img(std::tuple<QString, QString, link_choice> info)
+{
+    QString const &img_link = std::get<2>(info) == link_choice::big ?
+                std::get<0>(info) : std::get<1>(info);
+    QNetworkRequest const request = create_img_download_request(img_link,
+                                                                general_settings_->get_search_by());
+    auto const unique_id = downloader_->append(request, general_settings_->get_save_at(),
+                                               global_constant::network_reply_timeout());
+    img_links_.emplace(unique_id, std::move(info));
+    downloader_->start_download_task(unique_id);
 }
 
 void MainWindow::download_progress(std::shared_ptr<qte::net::download_supervisor::download_task> task,

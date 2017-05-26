@@ -49,6 +49,7 @@ private:
     void download_img_error(std::shared_ptr<qte::net::download_supervisor::download_task> task,
                             QString const &error_msg);
     void download_finished(std::shared_ptr<qte::net::download_supervisor::download_task> task);
+    void download_img(std::tuple<QString, QString, link_choice> info);
     void download_next_image();
     void download_progress(std::shared_ptr<qte::net::download_supervisor::download_task> task,
                            qint64 bytesReceived, qint64 bytesTotal);
