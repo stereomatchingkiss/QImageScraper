@@ -207,11 +207,12 @@ void MainWindow::download_finished(download_img_task task)
                           "." + img.format());
             qDebug()<<"can save image choice:"<<(int)std::get<2>(img_info);
             ui->progressBar->setValue(ui->progressBar->value() + 1);
+            qDebug()<<"set progressBar value:"<<ui->progressBar->value();
             if(std::get<2>(img_info) == link_choice::big){
                 ++statistic_.big_img_download_;
             }else{
                 ++statistic_.small_img_download_;
-            }
+            }            
             download_next_image();
         }else{
             qDebug()<<"cannot save image choice:"<<(int)std::get<2>(img_info);
@@ -265,7 +266,7 @@ void MainWindow::download_next_image()
         if(ui->progressBar->value() != ui->progressBar->maximum()){
             big_img_links_.pop_front();
             small_img_links_.pop_front();
-            ui->webView->page()->load(small_img_links_[0]);
+            ui->webView->page()->load(small_img);
             found_img_link(big_img, small_img);
         }else{
             big_img_links_.clear();
