@@ -58,9 +58,10 @@ private:
     void download_progress(download_img_task task,
                            qint64 bytesReceived, qint64 bytesTotal);
     void download_small_img(QString const &save_as,
-                            img_links_map_value const &img_info);
+                            img_links_map_value const &img_info);    
     void found_img_link(QString const &big_img_link, QString const &small_img_link);
     void general_settings_ok_clicked();
+    bool is_download_finished() const;
     void process_go_to_first_page();
     void process_go_to_second_page();
     void process_image_search_error(image_search_error::error error);

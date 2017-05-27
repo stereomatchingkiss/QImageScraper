@@ -95,6 +95,11 @@ void MainWindow::general_settings_ok_clicked()
     }
 }
 
+bool MainWindow::is_download_finished() const
+{
+    return ui->progressBar->value() == ui->progressBar->maximum();
+}
+
 void MainWindow::process_go_to_first_page()
 {
     ui->actionScroll->setEnabled(false);
@@ -111,9 +116,11 @@ void MainWindow::process_go_to_second_page()
 
 void MainWindow::process_image_search_error(image_search_error::error error)
 {
-   if(error == image_search_error::error::load_page_error){
-       ui->webView->page()->load(ui->webView->page()->url());
-   }
+    if(error == image_search_error::error::load_page_error){
+        if(!is_download_finished()){
+            ui->webView->page()->load(ui->webView->page()->url());
+        }
+    }
 }
 
 void MainWindow::process_scroll_second_page_done()
@@ -212,7 +219,7 @@ void MainWindow::download_finished(download_img_task task)
                 ++statistic_.big_img_download_;
             }else{
                 ++statistic_.small_img_download_;
-            }            
+            }
             download_next_image();
         }else{
             qDebug()<<"cannot save image choice:"<<(int)std::get<2>(img_info);
@@ -263,7 +270,7 @@ void MainWindow::download_next_image()
     if(!big_img_links_.empty()){
         auto const big_img = big_img_links_[0];
         auto const small_img = small_img_links_[0];
-        if(ui->progressBar->value() != ui->progressBar->maximum()){
+        if(!is_download_finished()){
             big_img_links_.pop_front();
             small_img_links_.pop_front();
             ui->webView->page()->load(small_img);
