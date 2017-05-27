@@ -290,7 +290,7 @@ void MainWindow::on_actionDownload_triggered()
 {
     set_enabled_main_window_except_stop(false);
     ui->actionStop->setEnabled(false);
-    img_search_->get_imgs_link_from_second_page([this](QStringList const &big_img_link, QStringList const &small_img_link)
+    img_search_->get_imgs_link_from_gallery_page([this](QStringList const &big_img_link, QStringList const &small_img_link)
     {
         statistic_.clear();
         img_links_map_.clear();
