@@ -1,6 +1,8 @@
 #ifndef IMAGE_SEARCH_HPP
 #define IMAGE_SEARCH_HPP
 
+#include "image_search_error.hpp"
+
 #include <QObject>
 
 #include <functional>
@@ -15,13 +17,7 @@ class QWebEnginePage;
 class image_search : public QObject
 {
     Q_OBJECT
-public:
-    enum class img_search_error
-    {
-        load_page_error,
-        invalid_search_target,
-    };
-
+public:    
     /**
      * @param page The webpage of the search engine
      * @param parent self explain
@@ -99,7 +95,7 @@ signals:
      */
     void scroll_second_page_done();
 
-    void search_error(img_search_error error);
+    void search_error(image_search_error::error error);
 
     /**
      * @brief emit whenever second page scrolled

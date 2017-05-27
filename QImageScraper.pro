@@ -53,7 +53,8 @@ HEADERS  += mainwindow.hpp \
     ui/general_settings.hpp \
     core/global_constant.hpp \
     ui/info_dialog.hpp \
-    core/google_image_search.hpp
+    core/google_image_search.hpp \
+    core/image_search_error.hpp
 
 FORMS    += mainwindow.ui \
     ui/general_settings.ui \
