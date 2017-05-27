@@ -258,16 +258,16 @@ void MainWindow::on_actionDownload_triggered()
     ui->actionStop->setEnabled(false);
     img_search_->get_imgs_link_from_second_page([this](QStringList const &big_img_link, QStringList const &small_img_link)
     {
-        //qDebug()<<big_img_link.size()<<","<<small_img_link.size();
+        statistic_.total_download_ = std::min(static_cast<size_t>(big_img_links_.size()),
+                                              static_cast<size_t>(general_settings_->get_max_download_img()));
         ui->labelProgress->setVisible(true);
         ui->progressBar->setVisible(true);
-        ui->progressBar->setRange(0, big_img_link.size());
+        ui->progressBar->setRange(0, statistic_.total_download_);
         ui->progressBar->setValue(0);
         qDebug()<<"progress bar min:"<<ui->progressBar->minimum()<<",max:"<<ui->progressBar->maximum();
         big_img_links_ = big_img_link;
         small_img_links_ = small_img_link;
         statistic_.clear();
-        statistic_.total_download_ = static_cast<size_t>(big_img_links_.size());
         img_links_map_.clear();
         download_next_image();
     });
