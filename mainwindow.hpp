@@ -46,22 +46,25 @@ private:
         small
     };
 
-    void download_img_error(std::shared_ptr<qte::net::download_supervisor::download_task> task,
-                            QString const &error_msg);
-    void download_finished(std::shared_ptr<qte::net::download_supervisor::download_task> task);
-    void download_img(std::tuple<QString, QString, link_choice> info);
+    using download_img_task = std::shared_ptr<qte::net::download_supervisor::download_task>;
+    using img_links_map_value = std::tuple<QString, QString, link_choice>;
+
+    void change_search_engine();
+    void download_img_error(download_img_task task, QString const &error_msg);
+    void download_finished(download_img_task task);
+    void download_img(img_links_map_value info);
     void download_next_image();
-    void download_progress(std::shared_ptr<qte::net::download_supervisor::download_task> task,
+    void download_progress(download_img_task task,
                            qint64 bytesReceived, qint64 bytesTotal);
     void download_small_img(QString const &save_as,
-                            std::tuple<QString, QString, link_choice> const &img_info);
+                            img_links_map_value const &img_info);
     void found_img_link(QString const &big_img_link, QString const &small_img_link);
     void general_settings_ok_clicked();
     void process_go_to_first_page();
     void process_go_to_second_page();
     void process_scroll_second_page_done();
-    void set_enabled_main_window_except_stop(bool value);
     void refresh_window();
+    void set_enabled_main_window_except_stop(bool value);    
 
     Ui::MainWindow *ui;
 
@@ -83,11 +86,10 @@ private:
     bool download_finished_;
     qte::net::download_supervisor *downloader_;    
     general_settings *general_settings_;
-    std::map<size_t, std::tuple<QString, QString, link_choice>> img_links_map_;
+    std::map<size_t, img_links_map_value> img_links_map_;
     image_search *img_search_;
     QStringList small_img_links_;
-    download_statistic statistic_;
-    void change_search_engine();
+    download_statistic statistic_;    
 };
 
 #endif // MAINWINDOW_HPP

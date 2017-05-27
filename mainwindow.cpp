@@ -175,7 +175,7 @@ void MainWindow::download_small_img(QString const &save_as,
     }
 }
 
-void MainWindow::download_finished(std::shared_ptr<qte::net::download_supervisor::download_task> task)
+void MainWindow::download_finished(download_img_task task)
 {
     qDebug()<<__func__<<":"<<task->get_unique_id()<<":"<<task->get_network_error_code();
     qDebug()<<"save as:"<<task->get_save_as();
@@ -218,7 +218,7 @@ void MainWindow::download_finished(std::shared_ptr<qte::net::download_supervisor
     }
 }
 
-void MainWindow::download_img(std::tuple<QString, QString, link_choice> info)
+void MainWindow::download_img(img_links_map_value info)
 {
     QString const &img_link = std::get<2>(info) == link_choice::big ?
                 std::get<0>(info) : std::get<1>(info);
@@ -230,8 +230,7 @@ void MainWindow::download_img(std::tuple<QString, QString, link_choice> info)
     downloader_->start_download_task(unique_id);
 }
 
-void MainWindow::download_progress(std::shared_ptr<qte::net::download_supervisor::download_task> task,
-                                   qint64 bytesReceived, qint64 bytesTotal)
+void MainWindow::download_progress(download_img_task task, qint64 bytesReceived, qint64 bytesTotal)
 {    
     qDebug()<<__func__<<":"<<task->get_unique_id()<<":"<<bytesReceived<<":"<<bytesTotal;
     if(bytesTotal > 0){
@@ -308,8 +307,7 @@ void MainWindow::on_actionHome_triggered()
     img_search_->go_to_first_page();
 }
 
-void MainWindow::download_img_error(std::shared_ptr<qte::net::download_supervisor::download_task> task,
-                                    const QString &error_msg)
+void MainWindow::download_img_error(download_img_task task, const QString &error_msg)
 {
     qDebug()<<__func__<<":"<<task->get_unique_id()<<":"<<error_msg;
 }
