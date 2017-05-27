@@ -23,7 +23,8 @@ private:
         parse_img_link,
         to_first_page,
         to_second_page,
-        scroll_page
+        scroll_page,
+        get_img_link_from_sec_page
     };
 
     QString decode_link_char(QString link);

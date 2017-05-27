@@ -104,6 +104,10 @@ void bing_image_search::load_web_page_finished(bool ok)
             parse_imgs_link_content();
             break;
         }
+        case state::get_img_link_from_sec_page:{
+            qDebug()<<"state get_img_link_from_sec_page";
+            return;
+        }
         default:
             qDebug()<<"default state";
             break;
@@ -123,6 +127,7 @@ void bing_image_search::get_imgs_link(const QString &page_link,
 
 void bing_image_search::get_imgs_link_from_second_page(std::function<void(const QStringList &, const QStringList &)> callback)
 {
+    state_ = state::get_img_link_from_sec_page;
     get_web_page().toHtml([this, callback](QString const &contents)
     {
         QRegularExpression const reg("m=\"{[^,]*([^;]*;){7}([^&]*)[^\"]*\" "

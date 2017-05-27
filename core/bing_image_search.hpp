@@ -23,7 +23,8 @@ private:
         parse_img_link,
         to_first_page,
         to_second_page,
-        scroll_page
+        scroll_page,
+        get_img_link_from_sec_page
     };
 
     void load_web_page_finished(bool ok) override;
