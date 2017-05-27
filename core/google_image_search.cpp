@@ -92,7 +92,7 @@ void google_image_search::scroll_second_page(size_t max_search_size)
 {
     max_search_size_ = max_search_size;
     if((int)max_search_size_ > img_page_links_.size()){
-        scroll_limit_ = (max_search_size_ - img_page_links_.size()) / 35 + 1;
+        scroll_limit_ = (max_search_size_ - img_page_links_.size()) / 100 + 1;
     }else{
         scroll_limit_ = 4;
     }
