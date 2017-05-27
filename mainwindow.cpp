@@ -23,6 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow),
     default_max_size_{maximumSize()},
     default_min_size_{minimumSize()},
+    download_finished_{false},
     downloader_{new qte::net::download_supervisor(this)},
     general_settings_{new general_settings(this)},
     img_search_{nullptr}
@@ -136,12 +137,13 @@ void MainWindow::set_enabled_main_window_except_stop(bool value)
 void MainWindow::refresh_window()
 {
     qDebug()<<__func__<<":"<<img_links_map_.size()<<","<<big_img_links_.size();
-    if((img_links_map_.empty() && big_img_links_.empty())){
+    if(!download_finished_ && img_links_map_.empty() && big_img_links_.empty()){
         ui->labelProgress->setVisible(false);
         ui->progressBar->setVisible(false);
         set_enabled_main_window_except_stop(true);
         img_search_->go_to_first_page();
         statusBar()->showMessage("");
+        download_finished_ = true;
 
         QMessageBox::information(this, tr("Download finished"),
                                  tr("Total download %1\n"
@@ -243,12 +245,19 @@ void MainWindow::on_actionScroll_triggered()
 void MainWindow::download_next_image()
 {
     if(!big_img_links_.empty()){
-        ui->webView->page()->load(small_img_links_[0]);
         auto const big_img = big_img_links_[0];
         auto const small_img = small_img_links_[0];
-        big_img_links_.pop_front();
-        small_img_links_.pop_front();
-        found_img_link(big_img, small_img);
+        if(ui->progressBar->value() != ui->progressBar->maximum()){
+            big_img_links_.pop_front();
+            small_img_links_.pop_front();
+            ui->webView->page()->load(small_img_links_[0]);
+            found_img_link(big_img, small_img);
+        }else{
+            big_img_links_.clear();
+            small_img_links_.clear();
+            img_links_map_.clear();
+            refresh_window();
+        }
     }
 }
 
@@ -258,17 +267,20 @@ void MainWindow::on_actionDownload_triggered()
     ui->actionStop->setEnabled(false);
     img_search_->get_imgs_link_from_second_page([this](QStringList const &big_img_link, QStringList const &small_img_link)
     {
-        statistic_.total_download_ = std::min(static_cast<size_t>(big_img_links_.size()),
+        statistic_.clear();
+        img_links_map_.clear();
+        download_finished_ = false;
+        statistic_.total_download_ = std::min(static_cast<size_t>(big_img_link.size()),
                                               static_cast<size_t>(general_settings_->get_max_download_img()));
+        qDebug()<<"big img links size:"<<big_img_links_.size()<<",max download size:"
+               <<general_settings_->get_max_download_img();
         ui->labelProgress->setVisible(true);
         ui->progressBar->setVisible(true);
-        ui->progressBar->setRange(0, statistic_.total_download_);
+        ui->progressBar->setRange(0, static_cast<int>(statistic_.total_download_));
         ui->progressBar->setValue(0);
         qDebug()<<"progress bar min:"<<ui->progressBar->minimum()<<",max:"<<ui->progressBar->maximum();
         big_img_links_ = big_img_link;
         small_img_links_ = small_img_link;
-        statistic_.clear();
-        img_links_map_.clear();
         download_next_image();
     });
 }

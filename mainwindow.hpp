@@ -80,7 +80,8 @@ private:
     QStringList big_img_links_;
     QSize default_max_size_;
     QSize default_min_size_;
-    qte::net::download_supervisor *downloader_;
+    bool download_finished_;
+    qte::net::download_supervisor *downloader_;    
     general_settings *general_settings_;
     std::map<size_t, std::tuple<QString, QString, link_choice>> img_links_map_;
     image_search *img_search_;
