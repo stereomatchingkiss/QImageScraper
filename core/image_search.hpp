@@ -60,12 +60,12 @@ public:
                                std::function<void(QString const&, QString const&)> callback) = 0;
 
     /**
-     * @brief Asynchronous method to parse all of the image links from second page. Upon
+     * @brief Asynchronous method to parse all of the image links from gallery page. Upon
      * completion, result callback is called with the image links
      * @param callback callback Upon completion, result callback is called with the
      * image links(big image links, small image links).
      */
-    virtual void get_imgs_link_from_second_page(std::function<void(QStringList const&, QStringList const&)> callback) = 0;
+    virtual void get_imgs_link_from_gallery_page(std::function<void(QStringList const&, QStringList const&)> callback) = 0;
 
     /**
      * @brief Asynchronous method, let second page of the search engine show more image.

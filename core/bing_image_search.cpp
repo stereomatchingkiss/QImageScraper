@@ -125,7 +125,7 @@ void bing_image_search::get_imgs_link(const QString &page_link,
     get_web_page().load(page_link);
 }
 
-void bing_image_search::get_imgs_link_from_second_page(std::function<void(const QStringList &, const QStringList &)> callback)
+void bing_image_search::get_imgs_link_from_gallery_page(std::function<void(const QStringList &, const QStringList &)> callback)
 {
     state_ = state::get_img_link_from_sec_page;
     get_web_page().toHtml([this, callback](QString const &contents)
