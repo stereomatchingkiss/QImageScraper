@@ -15,7 +15,13 @@ class QWebEnginePage;
 class image_search : public QObject
 {
     Q_OBJECT
-public:        
+public:
+    enum class img_search_error
+    {
+        load_page_error,
+        invalid_search_target,
+    };
+
     /**
      * @param page The webpage of the search engine
      * @param parent self explain
@@ -79,8 +85,7 @@ public:
      */
     virtual void stop_scroll_second_page() = 0;
 
-signals:
-    void error_msg(QString const &msg);
+signals:    
     /**
      * @brief emit when go_to_first_page done
      */
@@ -93,6 +98,9 @@ signals:
      * @brief emit when scroll_second_page done
      */
     void scroll_second_page_done();
+
+    void search_error(img_search_error error);
+
     /**
      * @brief emit whenever second page scrolled
      */

@@ -52,7 +52,7 @@ void bing_image_search::go_to_second_page()
         if(contents.isValid()){
             get_web_page().load("https://www.bing.com/images/search?q=" + contents.toString());
         }else{
-            emit error_msg(tr("Please enter the target you want to search"));
+            emit search_error(img_search_error::invalid_search_target);
         }
     });
 }
@@ -113,7 +113,7 @@ void bing_image_search::load_web_page_finished(bool ok)
             break;
         }
     }else{
-        emit error_msg(tr("Failed to load the web page"));
+        emit search_error(img_search_error::load_page_error);
     }
 }
 
