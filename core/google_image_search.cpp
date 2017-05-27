@@ -81,8 +81,8 @@ void google_image_search::get_imgs_link_from_second_page(std::function<void (con
             QRegularExpression const link_small("\"tu\":\"([^\"]*)");
             auto const bm = link_big.match(match.captured(0));
             auto const sm = link_small.match(match.captured(0));
-            big_im.push_back(decode_link_char(bm.captured(1)));
-            small_im.push_back(sm.captured(1));
+            big_im.push_back(bm.captured(1));
+            small_im.push_back(sm.captured(1).replace("\\u003d","="));
         }
         callback(big_im, small_im);
     });
