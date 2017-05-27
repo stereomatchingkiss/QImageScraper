@@ -1,6 +1,8 @@
 #ifndef MAINWINDOW_HPP
 #define MAINWINDOW_HPP
 
+#include "core/image_search_error.hpp"
+
 #include <QMainWindow>
 #include <QNetworkReply>
 
@@ -9,13 +11,12 @@
 
 #include <qt_enhance/network/download_supervisor.hpp>
 
-class image_search;
-
 namespace Ui {
 class MainWindow;
 }
 
 class general_settings;
+class image_search;
 
 class MainWindow : public QMainWindow
 {
@@ -62,9 +63,10 @@ private:
     void general_settings_ok_clicked();
     void process_go_to_first_page();
     void process_go_to_second_page();
+    void process_image_search_error(image_search_error::error error);
     void process_scroll_second_page_done();
     void refresh_window();
-    void set_enabled_main_window_except_stop(bool value);    
+    void set_enabled_main_window_except_stop(bool value);
 
     Ui::MainWindow *ui;
 

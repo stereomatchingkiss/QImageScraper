@@ -78,6 +78,7 @@ void MainWindow::change_search_engine()
     connect(img_search_, &image_search::go_to_first_page_done, this, &MainWindow::process_go_to_first_page);
     connect(img_search_, &image_search::go_to_second_page_done, this, &MainWindow::process_go_to_second_page);
     connect(img_search_, &image_search::scroll_second_page_done, this, &MainWindow::process_scroll_second_page_done);
+    connect(img_search_, &image_search::search_error, this, &MainWindow::process_image_search_error);
 
     img_search_->go_to_first_page();
 }
@@ -106,6 +107,13 @@ void MainWindow::process_go_to_second_page()
     ui->actionScroll->setEnabled(true);
     ui->actionDownload->setEnabled(true);
     ui->actionStop->setEnabled(false);
+}
+
+void MainWindow::process_image_search_error(image_search_error::error error)
+{
+   if(error == image_search_error::error::load_page_error){
+       ui->webView->page()->load(ui->webView->page()->url());
+   }
 }
 
 void MainWindow::process_scroll_second_page_done()
