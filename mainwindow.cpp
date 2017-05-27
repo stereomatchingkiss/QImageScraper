@@ -255,7 +255,7 @@ void MainWindow::download_next_image()
 void MainWindow::on_actionDownload_triggered()
 {
     set_enabled_main_window_except_stop(false);
-    ui->actionDownload->setEnabled(false);
+    ui->actionStop->setEnabled(false);
     img_search_->get_imgs_link_from_second_page([this](QStringList const &big_img_link, QStringList const &small_img_link)
     {
         //qDebug()<<big_img_link.size()<<","<<small_img_link.size();
