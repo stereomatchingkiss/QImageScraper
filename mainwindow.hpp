@@ -65,6 +65,18 @@ private:
 
     Ui::MainWindow *ui;
 
+    struct download_statistic
+    {
+        void clear();
+
+        size_t fail() const;
+        size_t success() const;
+
+        size_t big_img_download_ = 0;
+        size_t small_img_download_ = 0;
+        size_t total_download_ = 0;
+    };
+
     QStringList big_img_links_;
     QSize default_max_size_;
     QSize default_min_size_;
@@ -73,6 +85,7 @@ private:
     std::map<size_t, std::tuple<QString, QString, link_choice>> img_links_map_;
     image_search *img_search_;
     QStringList small_img_links_;
+    download_statistic statistic_;
 };
 
 #endif // MAINWINDOW_HPP

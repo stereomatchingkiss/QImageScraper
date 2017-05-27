@@ -21,11 +21,11 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    default_max_size_(maximumSize()),
-    default_min_size_(minimumSize()),
-    downloader_(new qte::net::download_supervisor(this)),
-    general_settings_(new general_settings(this)),
-    img_search_(nullptr)
+    default_max_size_{maximumSize()},
+    default_min_size_{minimumSize()},
+    downloader_{new qte::net::download_supervisor(this)},
+    general_settings_{new general_settings(this)},
+    img_search_{nullptr}
 {
     ui->setupUi(this);
     general_settings_ok_clicked();
@@ -96,7 +96,7 @@ void MainWindow::process_go_to_second_page()
 {
     ui->actionScroll->setEnabled(true);
     ui->actionDownload->setEnabled(true);
-    ui->actionStop->setEnabled(true);
+    ui->actionStop->setEnabled(false);
 }
 
 void MainWindow::process_scroll_second_page_done()
@@ -130,17 +130,25 @@ void MainWindow::set_enabled_main_window_except_stop(bool value)
     ui->actionRefresh->setEnabled(value);
     ui->actionScroll->setEnabled(value);
     ui->actionSettings->setEnabled(value);
+    ui->actionStop->setEnabled(!value);
 }
 
 void MainWindow::refresh_window()
 {
     qDebug()<<__func__<<":"<<img_links_map_.size()<<","<<big_img_links_.size();
-    if(img_links_map_.empty() && big_img_links_.empty()){
+    if((img_links_map_.empty() && big_img_links_.empty())){
         ui->labelProgress->setVisible(false);
         ui->progressBar->setVisible(false);
         set_enabled_main_window_except_stop(true);
         img_search_->go_to_first_page();
         statusBar()->showMessage("");
+
+        QMessageBox::information(this, tr("Download finished"),
+                                 tr("Total download %1\n"
+                                    "Success %2 , Fail %3\n"
+                                    "big images %4, small images %5").arg(statistic_.total_download_).
+                                 arg(statistic_.success()).arg(statistic_.fail()).
+                                 arg(statistic_.big_img_download_).arg(statistic_.small_img_download_));
     }
 }
 
@@ -181,11 +189,17 @@ void MainWindow::download_finished(std::shared_ptr<qte::net::download_supervisor
                           "." + img.format());
             qDebug()<<"can save image choice:"<<(int)std::get<2>(img_info);
             ui->progressBar->setValue(ui->progressBar->value() + 1);
+            if(std::get<2>(img_info) == link_choice::big){
+                ++statistic_.big_img_download_;
+            }else{
+                ++statistic_.small_img_download_;
+            }
             download_next_image();
         }else{
             qDebug()<<"cannot save image choice:"<<(int)std::get<2>(img_info);
             download_small_img(task->get_save_as(), std::move(img_info));
         }
+
         refresh_window();
     }else{
         ui->progressBar->setValue(ui->progressBar->value() + 1);
@@ -208,7 +222,7 @@ void MainWindow::download_img(std::tuple<QString, QString, link_choice> info)
 
 void MainWindow::download_progress(std::shared_ptr<qte::net::download_supervisor::download_task> task,
                                    qint64 bytesReceived, qint64 bytesTotal)
-{
+{    
     qDebug()<<__func__<<":"<<task->get_unique_id()<<":"<<bytesReceived<<":"<<bytesTotal;
     if(bytesTotal > 0){
         statusBar()->showMessage(tr("%1 : %2/%3").arg(QFileInfo(task->get_save_as()).fileName()).
@@ -241,6 +255,7 @@ void MainWindow::download_next_image()
 void MainWindow::on_actionDownload_triggered()
 {
     set_enabled_main_window_except_stop(false);
+    ui->actionDownload->setEnabled(false);
     img_search_->get_imgs_link_from_second_page([this](QStringList const &big_img_link, QStringList const &small_img_link)
     {
         //qDebug()<<big_img_link.size()<<","<<small_img_link.size();
@@ -251,6 +266,9 @@ void MainWindow::on_actionDownload_triggered()
         qDebug()<<"progress bar min:"<<ui->progressBar->minimum()<<",max:"<<ui->progressBar->maximum();
         big_img_links_ = big_img_link;
         small_img_links_ = small_img_link;
+        statistic_.clear();
+        statistic_.total_download_ = static_cast<size_t>(big_img_links_.size());
+        img_links_map_.clear();
         download_next_image();
     });
 }
@@ -284,4 +302,21 @@ void MainWindow::on_actionInfo_triggered()
 void MainWindow::on_actionStop_triggered()
 {
     img_search_->stop_scroll_second_page();
+}
+
+void MainWindow::download_statistic::clear()
+{
+    big_img_download_ = 0;
+    small_img_download_ = 0;
+    total_download_ = 0;
+}
+
+size_t MainWindow::download_statistic::fail() const
+{
+    return total_download_ - success();
+}
+
+size_t MainWindow::download_statistic::success() const
+{
+    return big_img_download_ + small_img_download_;
 }
