@@ -75,12 +75,12 @@ void MainWindow::change_search_engine()
         img_search_ = new google_image_search(*ui->webView->page(), this);
     }
 
-    connect(img_search_, &image_search::go_to_first_page_done, this, &MainWindow::process_go_to_first_page);
-    connect(img_search_, &image_search::go_to_second_page_done, this, &MainWindow::process_go_to_second_page);
-    connect(img_search_, &image_search::scroll_second_page_done, this, &MainWindow::process_scroll_second_page_done);
+    connect(img_search_, &image_search::go_to_search_page_done, this, &MainWindow::process_go_to_search_page);
+    connect(img_search_, &image_search::go_to_gallery_page_done, this, &MainWindow::process_go_to_gallery_page);
+    connect(img_search_, &image_search::show_more_images_done, this, &MainWindow::process_show_more_images_done);
     connect(img_search_, &image_search::search_error, this, &MainWindow::process_image_search_error);
 
-    img_search_->go_to_first_page();
+    img_search_->go_to_search_page();
 }
 
 void MainWindow::general_settings_ok_clicked()
@@ -100,14 +100,14 @@ bool MainWindow::is_download_finished() const
     return ui->progressBar->value() == ui->progressBar->maximum();
 }
 
-void MainWindow::process_go_to_first_page()
+void MainWindow::process_go_to_search_page()
 {
     ui->actionScroll->setEnabled(false);
     ui->actionDownload->setEnabled(false);
     ui->actionStop->setEnabled(false);
 }
 
-void MainWindow::process_go_to_second_page()
+void MainWindow::process_go_to_gallery_page()
 {
     ui->actionScroll->setEnabled(true);
     ui->actionDownload->setEnabled(true);
@@ -120,12 +120,12 @@ void MainWindow::process_image_search_error(image_search_error::error error)
         if(!is_download_finished()){
             ui->webView->page()->load(ui->webView->page()->url());
         }else{
-            img_search_->go_to_first_page();
+            img_search_->go_to_search_page();
         }
     }
 }
 
-void MainWindow::process_scroll_second_page_done()
+void MainWindow::process_show_more_images_done()
 {
     if(img_search_){
         qDebug()<<__func__<<":get_page_link start";
@@ -166,7 +166,7 @@ void MainWindow::refresh_window()
         ui->labelProgress->setVisible(false);
         ui->progressBar->setVisible(false);
         set_enabled_main_window_except_stop(true);
-        img_search_->go_to_first_page();
+        img_search_->go_to_search_page();
         statusBar()->showMessage("");
         download_finished_ = true;
 
@@ -264,7 +264,7 @@ void MainWindow::on_actionScroll_triggered()
 {
     set_enabled_main_window_except_stop(false);
     setMaximumSize(size());
-    img_search_->scroll_second_page(1000);
+    img_search_->show_more_images(1000);
 }
 
 void MainWindow::download_next_image()
@@ -297,7 +297,7 @@ void MainWindow::on_actionDownload_triggered()
         download_finished_ = false;
         statistic_.total_download_ = std::min(static_cast<size_t>(big_img_link.size()),
                                               static_cast<size_t>(general_settings_->get_max_download_img()));
-        qDebug()<<"big img links size:"<<big_img_links_.size()<<",max download size:"
+        qDebug()<<"big img links size:"<<big_img_link.size()<<",max download size:"
                <<general_settings_->get_max_download_img();
         ui->labelProgress->setVisible(true);
         ui->progressBar->setVisible(true);
@@ -322,7 +322,7 @@ void MainWindow::on_actionRefresh_triggered()
 
 void MainWindow::on_actionHome_triggered()
 {
-    img_search_->go_to_first_page();
+    img_search_->go_to_search_page();
 }
 
 void MainWindow::download_img_error(download_img_task task, const QString &error_msg)

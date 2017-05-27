@@ -37,14 +37,14 @@ void google_image_search::get_page_link(std::function<void (const QStringList&)>
     });
 }
 
-void google_image_search::go_to_first_page()
+void google_image_search::go_to_search_page()
 {
     state_ = state::to_first_page;
     img_page_links_.clear();
     get_web_page().load(QUrl("https://images.google.com/"));
 }
 
-void google_image_search::go_to_second_page()
+void google_image_search::go_to_gallery_page()
 {
     state_ = state::to_second_page;
     get_web_page().runJavaScript("function jscmd(){return document.getElementById(\"lst-ib\").value} jscmd()",
@@ -88,7 +88,7 @@ void google_image_search::get_imgs_link_from_second_page(std::function<void (con
     });
 }
 
-void google_image_search::scroll_second_page(size_t max_search_size)
+void google_image_search::show_more_images(size_t max_search_size)
 {
     max_search_size_ = max_search_size;
     if((int)max_search_size_ > img_page_links_.size()){
@@ -121,19 +121,19 @@ void google_image_search::load_web_page_finished(bool ok)
         QRegularExpression const re("https://www.google.[^/]*/search?");
         if(get_web_page().url().toString().contains(re)){
             state_ = state::to_second_page;
-            emit go_to_second_page_done();
+            emit go_to_gallery_page_done();
             return;
         }
 
         switch(state_){
         case state::to_first_page:{
             qDebug()<<"state to first page";
-            emit go_to_first_page_done();
+            emit go_to_search_page_done();
             break;
         }
         case state::to_second_page:{
             qDebug()<<"state to second page";
-            emit go_to_second_page_done();
+            emit go_to_gallery_page_done();
             break;
         }
         case state::scroll_page:{
@@ -215,12 +215,12 @@ void google_image_search::scroll_web_page_impl()
 
     if(stop_scroll_page_){
         stop_scroll_page_ = false;
-        emit scroll_second_page_done();
+        emit show_more_images_done();
         return;
     }
 
     if(scroll_count_ == scroll_limit_){
-        emit scroll_second_page_done();
+        emit show_more_images_done();
         return;
     }
 

@@ -25,19 +25,19 @@ public:
     explicit image_search(QWebEnginePage &page, QObject *parent = nullptr);
 
     /**
-     * @brief Asynchronous method, go to the first page of the search engine. Will
-     * emit signal "go_to_first_page_done" after fist page is loaded.
-     * Bing : https://www.bing.com/?scope=images&nr=1&FORM=NOFORM
-     * Google : https://images.google.com/
-     */
-    virtual void go_to_first_page() = 0;
-    /**
-     * @brief go to the second page of the search engine. Will
-     * emit signal "go_to_second_page_done" after second page is loaded.
-     * Bing : "https://www.bing.com/images/search?q=" + target
+     * @brief go to the gallery page of the search engine. Will
+     * emit signal "go_to_gallery_page_done" after second page is loaded.
+     * @example Bing : "https://www.bing.com/images/search?q=" + target
      * Google : "https://www.google.co.in/search?q=" + searchtext + "&source=lnms&tbm=isch"
      */
-    virtual void go_to_second_page() = 0;
+    virtual void go_to_gallery_page() = 0;
+    /**
+     * @brief Asynchronous method, go to the search page of the search engine. Will
+     * emit signal "go_to_search_page_done" after search page is loaded.
+     * @example Bing : https://www.bing.com/?scope=images&nr=1&FORM=NOFORM
+     * Google : https://images.google.com/
+     */
+    virtual void go_to_search_page() = 0;
 
     /**
      * @brief Asynchronous method to get page links of second page(these pages
@@ -68,13 +68,13 @@ public:
     virtual void get_imgs_link_from_second_page(std::function<void(QStringList const&, QStringList const&)> callback) = 0;
 
     /**
-     * @brief Asynchronous method, scroll second page of the search engine. This function
-     * will emit signal "scroll_second_page_done" after scroll action
+     * @brief Asynchronous method, let second page of the search engine show more image.
+     * This function will emit signal "scroll_second_page_done" after scroll action
      * are all done; Will emit signal "second_page_scrolled" everytime
      * the page scroll(if oage scrolling action is trigger by scroll_second_page)
      * @param max_search_size size of the images want to scrape
      */
-    virtual void scroll_second_page(size_t max_search_size) = 0;
+    virtual void show_more_images(size_t max_search_size) = 0;
 
     /**
      * @brief stop scrolling second page
@@ -83,17 +83,17 @@ public:
 
 signals:    
     /**
-     * @brief emit when go_to_first_page done
-     */
-    void go_to_first_page_done();
-    /**
      * @brief emit when go_to_second_page done
      */
-    void go_to_second_page_done();
+    void go_to_gallery_page_done();
     /**
-     * @brief emit when scroll_second_page done
+     * @brief emit when go_to_first_page done
      */
-    void scroll_second_page_done();
+    void go_to_search_page_done();
+    /**
+     * @brief emit when show_more_images done
+     */
+    void show_more_images_done();
 
     void search_error(image_search_error::error error);
 

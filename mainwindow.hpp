@@ -62,10 +62,10 @@ private:
     void found_img_link(QString const &big_img_link, QString const &small_img_link);
     void general_settings_ok_clicked();
     bool is_download_finished() const;
-    void process_go_to_first_page();
-    void process_go_to_second_page();
+    void process_go_to_gallery_page();
+    void process_go_to_search_page();
     void process_image_search_error(image_search_error::error error);
-    void process_scroll_second_page_done();
+    void process_show_more_images_done();
     void refresh_window();
     void set_enabled_main_window_except_stop(bool value);
 
