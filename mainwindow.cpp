@@ -119,6 +119,8 @@ void MainWindow::process_image_search_error(image_search_error::error error)
     if(error == image_search_error::error::load_page_error){
         if(!is_download_finished()){
             ui->webView->page()->load(ui->webView->page()->url());
+        }else{
+            img_search_->go_to_first_page();
         }
     }
 }
