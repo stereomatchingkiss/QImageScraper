@@ -87,6 +87,7 @@ private:
     image_search *img_search_;
     QStringList small_img_links_;
     download_statistic statistic_;
+    void change_search_engine();
 };
 
 #endif // MAINWINDOW_HPP

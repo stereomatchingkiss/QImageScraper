@@ -67,12 +67,8 @@ void MainWindow::found_img_link(const QString &big_img_link, const QString &smal
     download_img(std::make_tuple(big_img_link, small_img_link, link_choice::big));
 }
 
-void MainWindow::general_settings_ok_clicked()
+void MainWindow::change_search_engine()
 {
-    if(img_search_){
-        img_search_->deleteLater();
-    }
-
     if(general_settings_->get_search_by() == global_constant::bing_search_name()){
         img_search_ = new bing_image_search(*ui->webView->page(), this);
     }else{
@@ -84,6 +80,18 @@ void MainWindow::general_settings_ok_clicked()
     connect(img_search_, &image_search::scroll_second_page_done, this, &MainWindow::process_scroll_second_page_done);
 
     img_search_->go_to_first_page();
+}
+
+void MainWindow::general_settings_ok_clicked()
+{
+    if(img_search_){
+        if(general_settings_->search_by_changed()){
+            img_search_->deleteLater();
+            change_search_engine();
+        }
+    }else{
+        change_search_engine();
+    }
 }
 
 void MainWindow::process_go_to_first_page()

@@ -11,6 +11,7 @@
 general_settings::general_settings(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::general_settings),
+    search_by_changed_{false},
     write_able_path_(QStandardPaths::writableLocation(QStandardPaths::PicturesLocation) + "/QImageScraperDownload")
 {
     ui->setupUi(this);
@@ -63,9 +64,20 @@ QString general_settings::get_search_by() const
     return ui->comboBoxSearchBy->currentText();
 }
 
+bool general_settings::search_by_changed() const
+{
+    return search_by_changed_;
+}
+
 void general_settings::on_buttonBox_accepted()
 {
     QSettings settings;
+    if(ui->comboBoxSearchBy->currentText() != settings.value("general/search_by").toString()){
+        search_by_changed_ = true;
+    }else{
+        search_by_changed_ = false;
+    }
+
     settings.setValue("general/search_by", ui->comboBoxSearchBy->currentText());
     settings.setValue("general/max_download_img", ui->spinBoxMaxDownloadImg->value());
 

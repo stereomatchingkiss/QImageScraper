@@ -18,6 +18,7 @@ public:
     int get_max_download_img() const;
     QString get_save_at() const;
     QString get_search_by() const;
+    bool search_by_changed() const;
 
 signals:
     void cannot_create_save_dir(QString const &dir, QString const &write_able_path);
@@ -37,6 +38,7 @@ private:
 
     Ui::general_settings *ui;
 
+    bool search_by_changed_;
     QString const write_able_path_;
 };
 
