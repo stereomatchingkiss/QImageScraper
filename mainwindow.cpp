@@ -163,12 +163,12 @@ void MainWindow::download_finished(std::shared_ptr<qte::net::download_supervisor
     qDebug()<<"save as:"<<task->get_save_as();
     auto it = img_links_map_.find(task->get_unique_id());
     if(it != std::end(img_links_map_)){
-        auto const img_info = it->second;
+        auto img_info = it->second;
         img_links_map_.erase(it);
         if(task->get_is_timeout()){
             qDebug()<<__func__<<":"<<task->get_save_as()<<","<<task->get_url()<<": timeout";
             QFile::remove(task->get_save_as());
-            download_img(img_info);
+            download_img(std::move(img_info));
             return;
         }
 
@@ -184,7 +184,7 @@ void MainWindow::download_finished(std::shared_ptr<qte::net::download_supervisor
             download_next_image();
         }else{
             qDebug()<<"cannot save image choice:"<<(int)std::get<2>(img_info);
-            download_small_img(task->get_save_as(), img_info);
+            download_small_img(task->get_save_as(), std::move(img_info));
         }
         refresh_window();
     }else{
@@ -229,9 +229,12 @@ void MainWindow::on_actionScroll_triggered()
 void MainWindow::download_next_image()
 {
     if(!big_img_links_.empty()){
+        ui->webView->page()->load(small_img_links_[0]);
+        auto const big_img = big_img_links_[0];
+        auto const small_img = small_img_links_[0];
         big_img_links_.pop_front();
         small_img_links_.pop_front();
-        found_img_link(big_img_links_[0], small_img_links_[0]);
+        found_img_link(big_img, small_img);
     }
 }
 
