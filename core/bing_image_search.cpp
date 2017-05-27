@@ -113,7 +113,7 @@ void bing_image_search::load_web_page_finished(bool ok)
     }
 }
 
-void bing_image_search::parse_imgs_link(const QString &page_link,
+void bing_image_search::get_imgs_link(const QString &page_link,
                                         std::function<void (const QString &, const QString &)> callback)
 {
     parse_img_link_callback_ = callback;
@@ -121,7 +121,7 @@ void bing_image_search::parse_imgs_link(const QString &page_link,
     get_web_page().load(page_link);
 }
 
-void bing_image_search::parse_imgs_link_from_second_page(std::function<void(const QStringList &, const QStringList &)> callback)
+void bing_image_search::get_imgs_link_from_second_page(std::function<void(const QStringList &, const QStringList &)> callback)
 {
     get_web_page().toHtml([this, callback](QString const &contents)
     {

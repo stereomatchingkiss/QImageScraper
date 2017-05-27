@@ -54,7 +54,7 @@ public:
      * @param callback Upon completion, result callback is called with the
      * image links(big image link, small image link).
      */
-    virtual void parse_imgs_link(QString const &page_link,
+    virtual void get_imgs_link(QString const &page_link,
                                  std::function<void(QString const&, QString const&)> callback) = 0;
 
     /**
@@ -63,7 +63,7 @@ public:
      * @param callback callback Upon completion, result callback is called with the
      * image links(big image links, small image links).
      */
-    virtual void parse_imgs_link_from_second_page(std::function<void(QStringList const&, QStringList const&)> callback) = 0;
+    virtual void get_imgs_link_from_second_page(std::function<void(QStringList const&, QStringList const&)> callback) = 0;
 
     /**
      * @brief Asynchronous method, scroll second page of the search engine. This function

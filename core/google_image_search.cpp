@@ -59,7 +59,7 @@ void google_image_search::go_to_second_page()
     });
 }
 
-void google_image_search::parse_imgs_link(const QString &page_link,
+void google_image_search::get_imgs_link(const QString &page_link,
                                           std::function<void (const QString &, const QString &)> callback)
 {
     parse_img_link_callback_ = callback;
@@ -67,7 +67,7 @@ void google_image_search::parse_imgs_link(const QString &page_link,
     get_web_page().load(page_link);
 }
 
-void google_image_search::parse_imgs_link_from_second_page(std::function<void (const QStringList &, const QStringList &)> callback)
+void google_image_search::get_imgs_link_from_second_page(std::function<void (const QStringList &, const QStringList &)> callback)
 {
     get_web_page().toHtml([this, callback](QString const &contents)
     {
