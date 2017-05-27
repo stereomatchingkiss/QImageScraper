@@ -134,8 +134,8 @@ void MainWindow::set_enabled_main_window_except_stop(bool value)
 
 void MainWindow::refresh_window()
 {
-    qDebug()<<__func__<<":"<<img_links_.size()<<","<<img_page_links_.size();
-    if(img_links_.empty() && img_page_links_.empty()){
+    qDebug()<<__func__<<":"<<img_links_map_.size()<<","<<big_img_links_.size();
+    if(img_links_map_.empty() && big_img_links_.empty()){
         ui->labelProgress->setVisible(false);
         ui->progressBar->setVisible(false);
         set_enabled_main_window_except_stop(true);
@@ -161,10 +161,10 @@ void MainWindow::download_finished(std::shared_ptr<qte::net::download_supervisor
 {
     qDebug()<<__func__<<":"<<task->get_unique_id()<<":"<<task->get_network_error_code();
     qDebug()<<"save as:"<<task->get_save_as();
-    auto it = img_links_.find(task->get_unique_id());
-    if(it != std::end(img_links_)){
+    auto it = img_links_map_.find(task->get_unique_id());
+    if(it != std::end(img_links_map_)){
         auto const img_info = it->second;
-        img_links_.erase(it);
+        img_links_map_.erase(it);
         if(task->get_is_timeout()){
             qDebug()<<__func__<<":"<<task->get_save_as()<<","<<task->get_url()<<": timeout";
             QFile::remove(task->get_save_as());
@@ -202,7 +202,7 @@ void MainWindow::download_img(std::tuple<QString, QString, link_choice> info)
                                                                 general_settings_->get_search_by());
     auto const unique_id = downloader_->append(request, general_settings_->get_save_at(),
                                                global_constant::network_reply_timeout());
-    img_links_.emplace(unique_id, std::move(info));
+    img_links_map_.emplace(unique_id, std::move(info));
     downloader_->start_download_task(unique_id);
 }
 
@@ -228,28 +228,26 @@ void MainWindow::on_actionScroll_triggered()
 
 void MainWindow::download_next_image()
 {
-    if(!img_page_links_.empty()){
-        img_search_->parse_imgs_link(img_page_links_[0],
-                [this](QString const &big_img_link, QString const &small_img_link)
-        {
-            img_page_links_.pop_front();
-            qDebug()<<"download next image got image links\n"<<big_img_link<<"\n"<<small_img_link;
-            found_img_link(big_img_link, small_img_link);
-        });
+    if(!big_img_links_.empty()){
+        big_img_links_.pop_front();
+        small_img_links_.pop_front();
+        found_img_link(big_img_links_[0], small_img_links_[0]);
     }
 }
 
 void MainWindow::on_actionDownload_triggered()
 {
     set_enabled_main_window_except_stop(false);
-    img_search_->get_page_link([this](QStringList const &page_links)
+    img_search_->get_imgs_link_from_second_page([this](QStringList const &big_img_link, QStringList const &small_img_link)
     {
+        //qDebug()<<big_img_link.size()<<","<<small_img_link.size();
         ui->labelProgress->setVisible(true);
         ui->progressBar->setVisible(true);
-        ui->progressBar->setRange(0, page_links.size());
+        ui->progressBar->setRange(0, big_img_link.size());
         ui->progressBar->setValue(0);
-        img_page_links_ = page_links;
         qDebug()<<"progress bar min:"<<ui->progressBar->minimum()<<",max:"<<ui->progressBar->maximum();
+        big_img_links_ = big_img_link;
+        small_img_links_ = small_img_link;
         download_next_image();
     });
 }
