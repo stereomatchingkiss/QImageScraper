@@ -100,7 +100,7 @@ void google_image_search::show_more_images(size_t max_search_size)
     scroll_web_page();
 }
 
-void google_image_search::stop_scroll_second_page()
+void google_image_search::stop_show_more_images()
 {
     stop_scroll_page_ = true;
 }

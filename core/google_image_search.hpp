@@ -16,7 +16,7 @@ public:
                        std::function<void(QString const&, QString const&)> callback) override;
     void get_imgs_link_from_second_page(std::function<void(QStringList const&, QStringList const&)> callback) override;
     void show_more_images(size_t max_search_size) override;
-    void stop_scroll_second_page() override;
+    void stop_show_more_images() override;
 
 private:
     enum class state{

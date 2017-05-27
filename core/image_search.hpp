@@ -79,7 +79,7 @@ public:
     /**
      * @brief stop scrolling second page
      */
-    virtual void stop_scroll_second_page() = 0;
+    virtual void stop_show_more_images() = 0;
 
 signals:    
     /**

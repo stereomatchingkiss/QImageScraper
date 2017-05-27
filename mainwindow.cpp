@@ -337,7 +337,7 @@ void MainWindow::on_actionInfo_triggered()
 
 void MainWindow::on_actionStop_triggered()
 {
-    img_search_->stop_scroll_second_page();
+    img_search_->stop_show_more_images();
 }
 
 void MainWindow::download_statistic::clear()
