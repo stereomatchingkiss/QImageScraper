@@ -27,34 +27,16 @@ QString convert_url_to_filename(QString const &url, QString const &save_at)
     return file_name;
 }
 
-QNetworkRequest create_img_download_request(const QString &url, const QString &engine)
-{
-    if(engine == global_constant::bing_search_name()){
-        QNetworkRequest request(url);
-        //QString const header = "msnbot/2.0b (+http://search.msn.com/msnbot.htm)";
-        //QString const header = "msnbot-media/1.1 (+http://search.msn.com/msnbot.htm)";
-        QString const header = "Mozilla/5.0 (compatible; Bingbot/2.0; +http://www.bing.com/bingbot.htm)";
-        //QString const header = "Mozilla/5.0 (Windows Phone 8.1; ARM; Trident/7.0; Touch; rv:11.0; IEMobile/11.0; NOKIA; Lumia 530) like Gecko (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)";
-        request.setHeader(QNetworkRequest::UserAgentHeader, header);
+QNetworkRequest create_img_download_request(const QString &url, const QString &)
+{    
+    QNetworkRequest request(url);
+    QStringList const agents{"msnbot-media/1.1 (+http://search.msn.com/msnbot.htm)",
+                             "Googlebot-Image/1.0",
+                            "Mozilla/5.0 (compatible; Bingbot/2.0; +http://www.bing.com/bingbot.htm)",
+                            "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"};
+    request.setHeader(QNetworkRequest::UserAgentHeader, agents[qrand()%agents.size()]);
 
-        return request;
-    }else if(engine == global_constant::google_search_name()){
-        QNetworkRequest request(url);
-        QString const header = "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)";
-        //QString const header = "Googlebot-Image/1.0";
-        request.setHeader(QNetworkRequest::UserAgentHeader, header);
-    }else if(engine == global_constant::yahoo_search_name()){
-        QNetworkRequest request(url);
-        //QString const header = "Mozilla/5.0 (compatible; Yahoo! Slurp; http://help.yahoo.com/help/us/ysearch/slurp)";
-        //QString const header = "msnbot-media/1.1 (+http://search.msn.com/msnbot.htm)";
-        //QString const header = "Mozilla/5.0 (compatible; Bingbot/2.0; +http://www.bing.com/bingbot.htm)";
-        QString const header = "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)";
-        request.setHeader(QNetworkRequest::UserAgentHeader, header);
-
-        return request;
-    }
-
-    return QNetworkRequest(url);
+    return request;
 }
 
 bool is_connected_to_network()
