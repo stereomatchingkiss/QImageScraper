@@ -45,7 +45,10 @@ QNetworkRequest create_img_download_request(const QString &url, const QString &e
         request.setHeader(QNetworkRequest::UserAgentHeader, header);
     }else if(engine == global_constant::yahoo_search_name()){
         QNetworkRequest request(url);
-        QString const header = "Mozilla/5.0 (compatible; Yahoo! Slurp; http://help.yahoo.com/help/us/ysearch/slurp)";
+        //QString const header = "Mozilla/5.0 (compatible; Yahoo! Slurp; http://help.yahoo.com/help/us/ysearch/slurp)";
+        //QString const header = "msnbot-media/1.1 (+http://search.msn.com/msnbot.htm)";
+        //QString const header = "Mozilla/5.0 (compatible; Bingbot/2.0; +http://www.bing.com/bingbot.htm)";
+        QString const header = "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)";
         request.setHeader(QNetworkRequest::UserAgentHeader, header);
 
         return request;
