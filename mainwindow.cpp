@@ -3,6 +3,9 @@
 
 #include "general_settings.hpp"
 
+#include "core/bing_image_search.hpp"
+#include "core/google_image_search.hpp"
+#include "core/yahoo_image_search.hpp"
 #include "core/global_constant.hpp"
 #include "core/utility.hpp"
 
@@ -15,9 +18,7 @@
 #include <QNetworkRequest>
 #include <QSizeGrip>
 
-#include "core/bing_image_search.hpp"
-#include "core/google_image_search.hpp"
-#include "core/yahoo_image_search.hpp"
+#include <ctime>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -38,6 +39,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->labelProgress->setVisible(false);
     ui->progressBar->setVisible(false);
+
+    qsrand(std::time(0));
 
     setMinimumSize(size());
 
