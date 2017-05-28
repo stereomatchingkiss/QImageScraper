@@ -22,7 +22,7 @@ google_image_search::google_image_search(QWebEnginePage &page, QObject *parent) 
     max_search_size_{0},
     scroll_count_{0},
     scroll_limit_{2},
-    state_{state::to_first_page},
+    state_{state::to_search_page},
     stop_scroll_page_{false}
 {
 
@@ -39,7 +39,7 @@ void google_image_search::get_page_link(std::function<void (const QStringList&)>
 
 void google_image_search::go_to_search_page()
 {
-    state_ = state::to_first_page;
+    state_ = state::to_search_page;
     img_page_links_.clear();
     get_web_page().load(QUrl("https://images.google.com/"));
 }
@@ -54,7 +54,7 @@ void google_image_search::get_imgs_link(const QString &page_link,
 
 void google_image_search::get_imgs_link_from_gallery_page(std::function<void (const QStringList &, const QStringList &)> callback)
 {
-    state_ = state::get_img_link_from_sec_page;
+    state_ = state::get_img_link_from_gallery_page;
     get_web_page().toHtml([this, callback](QString const &contents)
     {
         QRegularExpression const reg("<div class=\"rg_meta\">{[^}]*}");
@@ -81,7 +81,7 @@ void google_image_search::show_more_images(size_t max_search_size)
     }else{
         scroll_limit_ = 4;
     }
-    state_ = state::scroll_page;
+    state_ = state::show_more_images;
     scroll_web_page();
 }
 
@@ -105,23 +105,23 @@ void google_image_search::load_web_page_finished(bool ok)
     if(ok){
         QRegularExpression const re("https://www.google.[^/]*/search?");
         if(get_web_page().url().toString().contains(re)){
-            state_ = state::to_second_page;
+            state_ = state::to_gallery_page;
             emit go_to_gallery_page_done();
             return;
         }
 
         switch(state_){
-        case state::to_first_page:{
+        case state::to_search_page:{
             qDebug()<<"state to first page";
             emit go_to_search_page_done();
             break;
         }
-        case state::to_second_page:{
+        case state::to_gallery_page:{
             qDebug()<<"state to second page";
             emit go_to_gallery_page_done();
             break;
         }
-        case state::scroll_page:{
+        case state::show_more_images:{
             qDebug()<<"state scroll page";
             break;
         }
@@ -130,7 +130,7 @@ void google_image_search::load_web_page_finished(bool ok)
             parse_imgs_link_content();
             break;
         }
-        case state::get_img_link_from_sec_page:{
+        case state::get_img_link_from_gallery_page:{
             qDebug()<<"state get_img_link_from_sec_page";
             return;
         }
@@ -184,7 +184,7 @@ void google_image_search::scroll_web_page()
 {
     //we need to setup timer because web view may not able to update in time,
     //this may cause the page stop scrolling too early
-    if(state_ == state::scroll_page){
+    if(state_ == state::show_more_images){
         scroll_count_ = 0;
         stop_scroll_page_ = false;
         QTimer::singleShot(scroll_page_duration, [this](){scroll_web_page_impl();});
@@ -194,7 +194,7 @@ void google_image_search::scroll_web_page()
 void google_image_search::scroll_web_page_impl()
 {
     qDebug()<<__func__<<":scroll_count:"<<scroll_count_;
-    if(state_ != state::scroll_page){
+    if(state_ != state::show_more_images){
         return;
     }
 

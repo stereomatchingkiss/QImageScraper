@@ -20,10 +20,10 @@ public:
 private:
     enum class state{
         parse_img_link,
-        to_first_page,
-        to_second_page,
-        scroll_page,
-        get_img_link_from_sec_page
+        to_search_page,
+        to_gallery_page,
+        show_more_images,
+        get_img_link_from_gallery_page
     };
 
     void load_web_page_finished(bool ok) override;
