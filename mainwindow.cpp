@@ -11,11 +11,14 @@
 
 #include "ui/info_dialog.hpp"
 
-#include <QDebug>
+#include <QsLog.h>
+
+#include <QCheckBox>
 #include <QFileInfo>
 #include <QImageReader>
 #include <QMessageBox>
 #include <QNetworkRequest>
+#include <QSettings>
 #include <QSizeGrip>
 
 #include <ctime>
@@ -23,6 +26,7 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
+    cb_gallery_basic_tutorial_{new QCheckBox(tr("Do not show this again"))},
     default_max_size_{maximumSize()},
     default_min_size_{minimumSize()},
     download_finished_{false},
@@ -57,6 +61,12 @@ MainWindow::MainWindow(QWidget *parent) :
         QMessageBox::warning(this, tr("Error"), tr("Cannot create directory to save image %1, please choose a new directory, "
                                                    "if not the images will save at %2").arg(dir).arg(write_able_path));
     });
+
+    connect(cb_gallery_basic_tutorial_, &QCheckBox::stateChanged, [this](int state){
+        if (static_cast<Qt::CheckState>(state) == Qt::CheckState::Checked) {
+            QSettings().setValue("tutorial/show_gallery_basic", true);
+        }
+    });
 }
 
 MainWindow::~MainWindow()
@@ -67,7 +77,7 @@ MainWindow::~MainWindow()
 void MainWindow::found_img_link(const QString &big_img_link, const QString &small_img_link)
 {
     static size_t img_link_count = 0;
-    qDebug()<<"found image link count:"<<img_link_count++;
+    QLOG_INFO()<<"found image link count:"<<img_link_count++;
     download_img(std::make_tuple(big_img_link, small_img_link, link_choice::big));
 }
 
@@ -118,6 +128,32 @@ void MainWindow::process_go_to_gallery_page()
     ui->actionShowMoreImage->setEnabled(true);
     ui->actionDownload->setEnabled(true);
     ui->actionStop->setEnabled(false);
+
+    QSettings settings;
+    bool show_tutorial = true;
+    if(settings.contains("tutorial/show_gallery_basic")){
+        show_tutorial = settings.value("tutorial/show_gallery_basic").toBool();
+    }
+
+    if(show_tutorial){
+        QMessageBox msgbox;
+        msgbox.setText(tr("Press %1 if you want to show more images.\n"
+                          "Press %2 if you want to start download.\n"
+                          "Press %3 if you want to select search engine and do other settings.\n"
+                          "Press %4 if you want to back to the first page.\n"
+                          "Press %5 if you want to reload this page.").
+                       arg("<img src = ':/icons/show_more_image.png' style='vertical-align:middle' />").
+                       arg("<img src = ':/icons/download.png' style='vertical-align:middle' />").
+                       arg("<img src = ':/icons/settings.png' style='vertical-align:middle' />").
+                       arg("<img src = ':/icons/home.png' style='vertical-align:middle' />").
+                       arg("<img src = ':/icons/refresh.png' style='vertical-align:middle' />"));
+        msgbox.setWindowTitle(tr("Tutorial"));
+        msgbox.setIcon(QMessageBox::Icon::Information);
+        msgbox.setDefaultButton(QMessageBox::Ok);
+        msgbox.setCheckBox(cb_gallery_basic_tutorial_);
+
+        msgbox.exec();
+    }
 }
 
 void MainWindow::process_image_search_error(image_search_error::error error)
@@ -125,7 +161,7 @@ void MainWindow::process_image_search_error(image_search_error::error error)
     if(error == image_search_error::error::load_page_error){
         if(!is_download_finished()){
             static int reload_small_img = 0;
-            qDebug()<<"reload small img:"<<reload_small_img;
+            QLOG_INFO()<<"reload small img:"<<reload_small_img;
             QTimer::singleShot(qrand() % 1000, [this](){ui->webView->page()->load(ui->webView->page()->url());});
         }else{
             img_search_->go_to_search_page();
@@ -136,7 +172,7 @@ void MainWindow::process_image_search_error(image_search_error::error error)
 void MainWindow::process_show_more_images_done()
 {
     if(img_search_){
-        qDebug()<<__func__<<":get_page_link start";
+        QLOG_INFO()<<__func__<<":get_page_link start";
         img_search_->get_page_link([this](QStringList const &links)
         {
             set_enabled_main_window_except_stop(true);
@@ -169,7 +205,7 @@ void MainWindow::set_enabled_main_window_except_stop(bool value)
 
 void MainWindow::refresh_window()
 {
-    qDebug()<<__func__<<":"<<img_links_map_.size()<<","<<big_img_links_.size();
+    QLOG_INFO()<<__func__<<":"<<img_links_map_.size()<<","<<big_img_links_.size();
     if(!download_finished_ && img_links_map_.empty() && big_img_links_.empty()){
         ui->labelProgress->setVisible(false);
         ui->progressBar->setVisible(false);
@@ -202,14 +238,14 @@ void MainWindow::download_small_img(QString const &save_as,
 
 void MainWindow::download_finished(download_img_task task)
 {
-    qDebug()<<__func__<<":"<<task->get_unique_id()<<":"<<task->get_network_error_code();
-    qDebug()<<__func__<<"save as:"<<task->get_save_as()<<",url:"<<task->get_url();
+    QLOG_INFO()<<__func__<<":"<<task->get_unique_id()<<":"<<task->get_network_error_code();
+    QLOG_INFO()<<__func__<<"save as:"<<task->get_save_as()<<",url:"<<task->get_url();
     auto it = img_links_map_.find(task->get_unique_id());
     if(it != std::end(img_links_map_)){
         auto img_info = it->second;
         img_links_map_.erase(it);
         if(task->get_is_timeout()){
-            qDebug()<<__func__<<":"<<task->get_save_as()<<","<<task->get_url()<<": timeout";
+            QLOG_INFO()<<__func__<<":"<<task->get_save_as()<<","<<task->get_url()<<": timeout";
             QFile::remove(task->get_save_as());
             download_img(std::move(img_info));
             return;
@@ -223,9 +259,9 @@ void MainWindow::download_finished(download_img_task task)
             QFile::rename(task->get_save_as(),
                           file_info.absolutePath() + "/" + file_info.completeBaseName() +
                           "." + img_format);
-            qDebug()<<"can save image choice:"<<(int)std::get<2>(img_info);
+            QLOG_INFO()<<"can save image choice:"<<(int)std::get<2>(img_info);
             ui->progressBar->setValue(ui->progressBar->value() + 1);
-            qDebug()<<"set progressBar value:"<<ui->progressBar->value();
+            QLOG_INFO()<<"set progressBar value:"<<ui->progressBar->value();
             if(std::get<2>(img_info) == link_choice::big){
                 ++statistic_.big_img_download_;
             }else{
@@ -259,7 +295,7 @@ void MainWindow::download_img(img_links_map_value info)
 
 void MainWindow::download_progress(download_img_task task, qint64 bytesReceived, qint64 bytesTotal)
 {    
-    qDebug()<<__func__<<":"<<task->get_unique_id()<<":"<<bytesReceived<<":"<<bytesTotal;
+    QLOG_INFO()<<__func__<<":"<<task->get_unique_id()<<":"<<bytesReceived<<":"<<bytesTotal;
     if(bytesTotal > 0){
         statusBar()->showMessage(tr("%1 : %2/%3").arg(QFileInfo(task->get_save_as()).fileName()).
                                  arg(bytesReceived).arg(bytesTotal));
@@ -299,8 +335,8 @@ void MainWindow::on_actionDownload_triggered()
         download_finished_ = false;
         statistic_.total_download_ = std::min(static_cast<size_t>(big_img_link.size()),
                                               static_cast<size_t>(general_settings_->get_max_download_img()));
-        qDebug()<<"big img links size:"<<big_img_link.size()<<",max download size:"
-               <<general_settings_->get_max_download_img();
+        QLOG_INFO()<<"big img links size:"<<big_img_link.size()<<",max download size:"
+                  <<general_settings_->get_max_download_img();
         ui->labelProgress->setVisible(true);
         ui->progressBar->setVisible(true);
         ui->progressBar->setRange(0, static_cast<int>(statistic_.total_download_));
@@ -329,7 +365,7 @@ void MainWindow::on_actionHome_triggered()
 
 void MainWindow::download_img_error(download_img_task task, const QString &error_msg)
 {
-    qDebug()<<__func__<<":"<<task->get_unique_id()<<":"<<error_msg;
+    QLOG_ERROR()<<__func__<<":"<<task->get_unique_id()<<":"<<error_msg;
 }
 
 void MainWindow::on_actionInfo_triggered()

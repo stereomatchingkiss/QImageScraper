@@ -17,6 +17,7 @@ class MainWindow;
 
 class general_settings;
 class image_search;
+class QCheckBox;
 
 class MainWindow : public QMainWindow
 {
@@ -85,6 +86,7 @@ private:
     };
 
     QStringList big_img_links_;
+    QCheckBox *cb_gallery_basic_tutorial_;
     QSize default_max_size_;
     QSize default_min_size_;
     bool download_finished_;
