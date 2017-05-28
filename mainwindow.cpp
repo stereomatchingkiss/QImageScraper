@@ -17,6 +17,7 @@
 
 #include "core/bing_image_search.hpp"
 #include "core/google_image_search.hpp"
+#include "core/yahoo_image_search.hpp"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -71,6 +72,8 @@ void MainWindow::change_search_engine()
 {
     if(general_settings_->get_search_by() == global_constant::bing_search_name()){
         img_search_ = new bing_image_search(*ui->webView->page(), this);
+    }else if(general_settings_->get_search_by() == global_constant::yahoo_search_name()){
+        img_search_ = new yahoo_image_search(*ui->webView->page(), this);
     }else{
         img_search_ = new google_image_search(*ui->webView->page(), this);
     }
