@@ -106,7 +106,7 @@ void yahoo_image_search::parse_page_link(QString const &contents)
         links.push_back("https://images.search.yahoo.com" + match.captured(0));
     }
     links.removeDuplicates();
-    qDebug()<<"total match link:"<<links.size();
+    QLOG_INFO()<<"total match link:"<<links.size();
     if(links.size() > img_page_links_.size()){
         links.swap(img_page_links_);
     }
@@ -125,7 +125,7 @@ void yahoo_image_search::scroll_web_page()
 
 void yahoo_image_search::scroll_web_page_impl()
 {
-    qDebug()<<__func__<<":scroll_count:"<<scroll_count_;
+    QLOG_INFO()<<__func__<<":scroll_count:"<<scroll_count_;
     if(state_ != state::show_more_images){
         return;
     }
@@ -176,7 +176,7 @@ void yahoo_image_search::get_imgs_link_from_gallery_page(std::function<void(cons
                 QRegularExpressionMatch const match = iter.next();
                 QString link = match.captured(1).replace("%2F", "//").replace("%3F", "?");
                 link.replace("%3D", "=").replace("&amp;", "&");
-                qDebug()<<"get_imgs_link_from_gallery_page:"<<link;
+                QLOG_INFO()<<"get_imgs_link_from_gallery_page:"<<link;
                 result.push_back(link);
             }
 

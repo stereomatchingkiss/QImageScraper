@@ -24,8 +24,8 @@ bing_image_search::bing_image_search(QWebEnginePage &page, QObject *parent) :
     stop_scroll_page_{false}
 {
     auto *web_page = &get_web_page();
-    connect(web_page, &QWebEnginePage::loadProgress, [](int progress){ qDebug()<<"load progress:"<<progress;});
-    connect(web_page, &QWebEnginePage::loadStarted, [](){ qDebug()<<"load started";});
+    connect(web_page, &QWebEnginePage::loadProgress, [](int progress){ QLOG_INFO()<<"load progress:"<<progress;});
+    connect(web_page, &QWebEnginePage::loadStarted, [](){ QLOG_INFO()<<"load started";});
 }
 
 void bing_image_search::get_page_link(std::function<void (const QStringList &)> callback)
@@ -123,7 +123,7 @@ void bing_image_search::get_imgs_link_from_gallery_page(std::function<void(const
         QStringList big_img, small_img;
         while(iter.hasNext()){
             QRegularExpressionMatch const match = iter.next();
-            qDebug()<<"parse_imgs_link_from_second_page:"<<match.captured(2)<<","<<match.captured(4);
+            QLOG_INFO()<<"parse_imgs_link_from_second_page:"<<match.captured(2)<<","<<match.captured(4);
             big_img.push_back(match.captured(2).replace("&amp;", "&"));
             small_img.push_back(match.captured(4).replace("&amp;", "&"));
         }
@@ -138,9 +138,9 @@ void bing_image_search::parse_imgs_link_content()
         QRegularExpression const reg("<img class=\"mainImage\" src=\"([^\"]*)\" src2=\"([^\"]*)");
         auto const match = reg.match(contents);
         if(match.hasMatch()){
-            qDebug()<<"img link:"<<match.captured(1)<<"\n"<<match.captured(2);
+            QLOG_INFO()<<"img link:"<<match.captured(1)<<"\n"<<match.captured(2);
         }else{
-            qDebug()<<"cannot capture img link";
+            QLOG_INFO()<<"cannot capture img link";
         }
         parse_img_link_callback_(match.captured(2).replace("&amp;", "&"),
                                  match.captured(1).replace("&amp;", "&"));
@@ -195,7 +195,7 @@ void bing_image_search::parse_page_link(const QString &contents)
         }
     }
     links.removeDuplicates();
-    qDebug()<<"total match link:"<<links.size();
+    QLOG_INFO()<<"total match link:"<<links.size();
     if(links.size() > img_page_links_.size()){
         links.swap(img_page_links_);
     }

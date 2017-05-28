@@ -277,7 +277,7 @@ void MainWindow::download_finished(download_img_task task)
             }
             download_next_image();
         }else{
-            qDebug()<<"cannot save image choice:"<<(int)std::get<2>(img_info);
+            QLOG_INFO()<<"cannot save image choice:"<<(int)std::get<2>(img_info);
             download_small_img(task->get_save_as(), std::move(img_info));
         }
 
@@ -349,7 +349,7 @@ void MainWindow::on_actionDownload_triggered()
         ui->progressBar->setVisible(true);
         ui->progressBar->setRange(0, static_cast<int>(statistic_.total_download_));
         ui->progressBar->setValue(0);
-        qDebug()<<"progress bar min:"<<ui->progressBar->minimum()<<",max:"<<ui->progressBar->maximum();
+        QLOG_INFO()<<"progress bar min:"<<ui->progressBar->minimum()<<",max:"<<ui->progressBar->maximum();
         big_img_links_ = big_img_link;
         small_img_links_ = small_img_link;
         download_next_image();

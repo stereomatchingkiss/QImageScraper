@@ -46,7 +46,7 @@ void google_image_search::go_to_search_page()
 }
 
 void google_image_search::get_imgs_link(const QString &page_link,
-                                          std::function<void (const QString &, const QString &)> callback)
+                                        std::function<void (const QString &, const QString &)> callback)
 {
     parse_img_link_callback_ = callback;
     state_ = state::parse_img_link;
@@ -152,10 +152,10 @@ void google_image_search::parse_imgs_link_content()
                                      "[^\\[]*\\[\\\\\"([^\"]*)\"");
         auto const match = reg.match(contents);
         if(match.hasMatch()){
-            qDebug()<<"img link:"<<decode_link_char(match.captured(2))<<"\n"
-                   <<decode_link_char(match.captured(3));
+            QLOG_INFO()<<"img link:"<<decode_link_char(match.captured(2))<<"\n"
+                      <<decode_link_char(match.captured(3));
         }else{
-            qDebug()<<"cannot capture img link";
+            QLOG_INFO()<<"cannot capture img link";
         }
 
         parse_img_link_callback_(decode_link_char(match.captured(3)),
@@ -175,7 +175,7 @@ void google_image_search::parse_page_link(const QString &contents)
         links.push_back(std::move(url));
     }
     links.removeDuplicates();
-    qDebug()<<"google parse page link total match link:"<<links.size();
+    QLOG_INFO()<<"google parse page link total match link:"<<links.size();
     if(links.size() > img_page_links_.size()){
         links.swap(img_page_links_);
     }
@@ -194,7 +194,7 @@ void google_image_search::scroll_web_page()
 
 void google_image_search::scroll_web_page_impl()
 {
-    qDebug()<<__func__<<":scroll_count:"<<scroll_count_;
+    QLOG_INFO()<<__func__<<":scroll_count:"<<scroll_count_;
     if(state_ != state::show_more_images){
         return;
     }
@@ -212,13 +212,13 @@ void google_image_search::scroll_web_page_impl()
 
     get_web_page().toHtml([this](QString const &contents)
     {
-        qDebug()<<"scroll page contents:"<<contents.size();
+        QLOG_INFO()<<"scroll page contents:"<<contents.size();
         if(contents.contains("Show more results")){
-            qDebug()<<"found Show more results";
+            QLOG_INFO()<<"found Show more results";
             get_web_page().runJavaScript("document.getElementById(\"smb\").click();"
                                          "window.scrollTo(0, document.body.scrollHeight);");
         }else{
-            qDebug()<<"cannot found Show more results";
+            QLOG_INFO()<<"cannot found Show more results";
             get_web_page().runJavaScript("window.scrollTo(0, document.body.scrollHeight)");
         }
         ++scroll_count_;
