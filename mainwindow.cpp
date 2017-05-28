@@ -44,6 +44,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->labelProgress->setVisible(false);
     ui->progressBar->setVisible(false);
 
+    QSettings settings;
+    if(settings.contains("geometry")){
+        restoreGeometry(settings.value("geometry").toByteArray());
+    }
+
     qsrand(std::time(0));
 
     setMinimumSize(size());
@@ -71,6 +76,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    QSettings settings;
+    settings.setValue("geometry", saveGeometry());
+
     delete ui;
 }
 
