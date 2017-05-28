@@ -16,3 +16,8 @@ int global_constant::network_reply_timeout()
 {
     return 5000;
 }
+
+QString global_constant::yahoo_search_name()
+{
+    return QObject::tr("Yahoo");
+}
