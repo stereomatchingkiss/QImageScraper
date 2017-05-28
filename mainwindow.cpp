@@ -54,7 +54,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(general_settings_, &general_settings::cannot_create_save_dir,
             [this](QString const &dir, QString const &write_able_path)
     {
-        QMessageBox::warning(this, tr("Error"), tr("Cannot create save at dir %1, please choose a new dir, "
+        QMessageBox::warning(this, tr("Error"), tr("Cannot create directory to save image %1, please choose a new directory, "
                                                    "if not the images will save at %2").arg(dir).arg(write_able_path));
     });
 }
