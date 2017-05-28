@@ -126,7 +126,7 @@ void MainWindow::process_image_search_error(image_search_error::error error)
         if(!is_download_finished()){
             static int reload_small_img = 0;
             qDebug()<<"reload small img:"<<reload_small_img;
-            QTimer::singleShot(500, [this](){ui->webView->page()->load(ui->webView->page()->url());});
+            QTimer::singleShot(qrand() % 1000, [this](){ui->webView->page()->load(ui->webView->page()->url());});
         }else{
             img_search_->go_to_search_page();
         }
@@ -254,7 +254,7 @@ void MainWindow::download_img(img_links_map_value info)
     auto const unique_id = downloader_->append(request, general_settings_->get_save_at(),
                                                global_constant::network_reply_timeout());
     img_links_map_.emplace(unique_id, std::move(info));
-    downloader_->start_download_task(unique_id);
+    QTimer::singleShot(qrand() % 1000, [this, unique_id](){downloader_->start_download_task(unique_id);});
 }
 
 void MainWindow::download_progress(download_img_task task, qint64 bytesReceived, qint64 bytesTotal)
