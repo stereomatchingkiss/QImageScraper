@@ -75,7 +75,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionScroll"/>
+   <addaction name="actionShowMoreImage"/>
    <addaction name="actionDownload"/>
    <addaction name="actionStop"/>
    <addaction name="actionRefresh"/>
@@ -86,15 +86,6 @@
    <addaction name="actionInfo"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
-  <action name="actionGo">
-   <property name="icon">
-    <iconset resource="icons.qrc">
-     <normaloff>:/icons/go.png</normaloff>:/icons/go.png</iconset>
-   </property>
-   <property name="text">
-    <string>Go</string>
-   </property>
-  </action>
   <action name="actionSettings">
    <property name="icon">
     <iconset resource="icons.qrc">
@@ -119,13 +110,16 @@
     <string>Ctrl+2</string>
    </property>
   </action>
-  <action name="actionScroll">
+  <action name="actionShowMoreImage">
    <property name="icon">
     <iconset resource="icons.qrc">
-     <normaloff>:/icons/scroll.png</normaloff>:/icons/scroll.png</iconset>
+     <normaloff>:/icons/show_more_image.png</normaloff>:/icons/show_more_image.png</iconset>
    </property>
    <property name="text">
-    <string>scroll</string>
+    <string>ShowMoreImage</string>
+   </property>
+   <property name="toolTip">
+    <string>show more image</string>
    </property>
    <property name="shortcut">
     <string>Alt+S</string>

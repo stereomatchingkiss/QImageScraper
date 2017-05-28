@@ -26,8 +26,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-private slots:
-    void on_actionScroll_triggered();
+private slots:    
     void on_actionDownload_triggered();
 
     void on_actionSettings_triggered();
@@ -39,6 +38,8 @@ private slots:
     void on_actionInfo_triggered();
 
     void on_actionStop_triggered();
+
+    void on_actionShowMoreImage_triggered();
 
 private:
     enum class link_choice

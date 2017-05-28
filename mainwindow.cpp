@@ -33,7 +33,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     general_settings_ok_clicked();
     ui->actionDownload->setEnabled(false);
-    ui->actionScroll->setEnabled(false);
+    ui->actionShowMoreImage->setEnabled(false);
     ui->actionStop->setEnabled(false);
     ui->actionNew->setVisible(false);
 
@@ -108,14 +108,14 @@ bool MainWindow::is_download_finished() const
 
 void MainWindow::process_go_to_search_page()
 {
-    ui->actionScroll->setEnabled(false);
+    ui->actionShowMoreImage->setEnabled(false);
     ui->actionDownload->setEnabled(false);
     ui->actionStop->setEnabled(false);
 }
 
 void MainWindow::process_go_to_gallery_page()
 {
-    ui->actionScroll->setEnabled(true);
+    ui->actionShowMoreImage->setEnabled(true);
     ui->actionDownload->setEnabled(true);
     ui->actionStop->setEnabled(false);
 }
@@ -162,7 +162,7 @@ void MainWindow::set_enabled_main_window_except_stop(bool value)
     ui->actionInfo->setEnabled(value);
     ui->actionNew->setEnabled(value);
     ui->actionRefresh->setEnabled(value);
-    ui->actionScroll->setEnabled(value);
+    ui->actionShowMoreImage->setEnabled(value);
     ui->actionSettings->setEnabled(value);
     ui->actionStop->setEnabled(!value);
 }
@@ -269,13 +269,6 @@ void MainWindow::download_progress(download_img_task task, qint64 bytesReceived,
     }
 }
 
-void MainWindow::on_actionScroll_triggered()
-{
-    set_enabled_main_window_except_stop(false);
-    setMaximumSize(size());
-    img_search_->show_more_images(1000);
-}
-
 void MainWindow::download_next_image()
 {
     if(!big_img_links_.empty()){
@@ -364,4 +357,11 @@ size_t MainWindow::download_statistic::fail() const
 size_t MainWindow::download_statistic::success() const
 {
     return big_img_download_ + small_img_download_;
+}
+
+void MainWindow::on_actionShowMoreImage_triggered()
+{
+    set_enabled_main_window_except_stop(false);
+    setMaximumSize(size());
+    img_search_->show_more_images(1000);
 }
