@@ -8,8 +8,6 @@
 
 void log_function(const QsLogging::LogMessage &message);
 
-void setup_logger(QApplication &a);
-
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
@@ -18,7 +16,20 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationDomain("https://github.com/stereomatchingkiss");
     QCoreApplication::setApplicationName("QImageScraper");
 
-    setup_logger(a);
+    using namespace QsLogging;
+    // 1. init the logging mechanism
+    Logger& logger = Logger::instance();
+    logger.setLoggingLevel(QsLogging::TraceLevel);
+    const QString sLogPath(QDir(a.applicationDirPath()).filePath("log.txt"));
+
+    // 2. add two destinations
+    DestinationPtrU fileDestination(DestinationFactory::MakeFileDestination(
+                                        sLogPath, LogRotationOption::EnableLogRotation, MaxSizeBytes(512), MaxOldLogCount(2)));
+    DestinationPtrU debugDestination(DestinationFactory::MakeDebugOutputDestination());
+    DestinationPtrU functorDestination(DestinationFactory::MakeFunctorDestination(&log_function));
+    logger.addDestination(std::move(debugDestination));
+    logger.addDestination(std::move(fileDestination));
+    logger.addDestination(std::move(functorDestination));
 
     MainWindow w;
     w.show();
@@ -30,23 +41,4 @@ void log_function(const QsLogging::LogMessage &message)
 {
     qDebug() << "From log function: " << qPrintable(message.formatted)
              << " " << static_cast<int>(message.level);
-}
-
-void setup_logger(QApplication &app)
-{
-    using namespace QsLogging;
-
-    Logger& logger = Logger::instance();
-    logger.setLoggingLevel(QsLogging::TraceLevel);
-    const QString sLogPath(QDir(app.applicationDirPath()).filePath("log.txt"));
-
-    // 2. add two destinations
-    DestinationPtr fileDestination(DestinationFactory::MakeFileDestination(
-                                       sLogPath, EnableLogRotation,
-                                       MaxSizeBytes(1024*1024*10), MaxOldLogCount(2)));
-    DestinationPtr debugDestination(DestinationFactory::MakeDebugOutputDestination());
-    DestinationPtr functorDestination(DestinationFactory::MakeFunctorDestination(&log_function));
-    logger.addDestination(debugDestination);
-    logger.addDestination(fileDestination);
-    logger.addDestination(functorDestination);
 }
