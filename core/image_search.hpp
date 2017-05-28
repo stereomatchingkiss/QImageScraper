@@ -25,13 +25,6 @@ public:
     explicit image_search(QWebEnginePage &page, QObject *parent = nullptr);
 
     /**
-     * @brief go to the gallery page of the search engine. Will
-     * emit signal "go_to_gallery_page_done" after second page is loaded.
-     * @example Bing : "https://www.bing.com/images/search?q=" + target
-     * Google : "https://www.google.co.in/search?q=" + searchtext + "&source=lnms&tbm=isch"
-     */
-    virtual void go_to_gallery_page() = 0;
-    /**
      * @brief Asynchronous method, go to the search page of the search engine. Will
      * emit signal "go_to_search_page_done" after search page is loaded.
      * @example Bing : https://www.bing.com/?scope=images&nr=1&FORM=NOFORM

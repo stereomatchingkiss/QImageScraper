@@ -43,20 +43,6 @@ void bing_image_search::go_to_search_page()
     get_web_page().load(QUrl("https://www.bing.com/?scope=images&nr=1&FORM=NOFORM"));
 }
 
-void bing_image_search::go_to_gallery_page()
-{
-    state_ = state::to_second_page;
-    get_web_page().runJavaScript("function jscmd(){return document.getElementById(\"sb_form_q\").value} jscmd()",
-                                 [this](QVariant const &contents)
-    {
-        if(contents.isValid()){
-            get_web_page().load("https://www.bing.com/images/search?q=" + contents.toString());
-        }else{
-            emit search_error(image_search_error::error::invalid_search_target);
-        }
-    });
-}
-
 void bing_image_search::show_more_images(size_t max_search_size)
 {
     max_search_size_ = max_search_size;

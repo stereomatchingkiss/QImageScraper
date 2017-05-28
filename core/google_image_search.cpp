@@ -44,21 +44,6 @@ void google_image_search::go_to_search_page()
     get_web_page().load(QUrl("https://images.google.com/"));
 }
 
-void google_image_search::go_to_gallery_page()
-{
-    state_ = state::to_second_page;
-    get_web_page().runJavaScript("function jscmd(){return document.getElementById(\"lst-ib\").value} jscmd()",
-                                 [this](QVariant const &contents)
-    {
-        if(contents.isValid() && !contents.toString().isEmpty()){
-            get_web_page().load("https://www.google.co.in/search?q=" +
-                                contents.toString() + "&source=lnms&tbm=isch");
-        }else{
-            emit search_error(image_search_error::error::invalid_search_target);
-        }
-    });
-}
-
 void google_image_search::get_imgs_link(const QString &page_link,
                                           std::function<void (const QString &, const QString &)> callback)
 {
