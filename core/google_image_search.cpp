@@ -1,7 +1,8 @@
 #include "google_image_search.hpp"
 #include "js_function.hpp"
 
-#include <QDebug>
+#include <QsLog.h>
+
 #include <QSize>
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
@@ -101,7 +102,7 @@ QString google_image_search::decode_link_char(QString link)
 
 void google_image_search::load_web_page_finished(bool ok)
 {
-    qDebug()<<"load web page finished:"<<ok<<", url:"<<get_web_page().url();
+    QLOG_INFO()<<"load web page finished:"<<ok<<", url:"<<get_web_page().url();
     if(ok){
         QRegularExpression const re("https://www.google.[^/]*/search?");
         if(get_web_page().url().toString().contains(re)){
@@ -112,30 +113,30 @@ void google_image_search::load_web_page_finished(bool ok)
 
         switch(state_){
         case state::to_search_page:{
-            qDebug()<<"state to first page";
+            QLOG_INFO()<<"state to first page";
             emit go_to_search_page_done();
             break;
         }
         case state::to_gallery_page:{
-            qDebug()<<"state to second page";
+            QLOG_INFO()<<"state to second page";
             emit go_to_gallery_page_done();
             break;
         }
         case state::show_more_images:{
-            qDebug()<<"state scroll page";
+            QLOG_INFO()<<"state scroll page";
             break;
         }
         case state::parse_img_link:{
-            qDebug()<<"state parse img link";
+            QLOG_INFO()<<"state parse img link";
             parse_imgs_link_content();
             break;
         }
         case state::get_img_link_from_gallery_page:{
-            qDebug()<<"state get_img_link_from_sec_page";
+            QLOG_INFO()<<"state get_img_link_from_sec_page";
             return;
         }
         default:
-            qDebug()<<"default state";
+            QLOG_INFO()<<"default state";
             break;
         }
     }else{

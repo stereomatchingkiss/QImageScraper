@@ -1,7 +1,8 @@
 #include "bing_image_search.hpp"
 #include "js_function.hpp"
 
-#include <QDebug>
+#include <QsLog.h>
+
 #include <QSize>
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
@@ -62,7 +63,7 @@ void bing_image_search::stop_show_more_images()
 
 void bing_image_search::load_web_page_finished(bool ok)
 {
-    qDebug()<<"load web page finished:"<<ok<<", url:"<<get_web_page().url().toString();
+    QLOG_INFO()<<"load web page finished:"<<ok<<", url:"<<get_web_page().url().toString();
     if(ok){
         if(get_web_page().url().toString().contains("https://www.bing.com/images/search?q=")){
             state_ = state::to_gallery_page;
@@ -72,30 +73,30 @@ void bing_image_search::load_web_page_finished(bool ok)
 
         switch(state_){
         case state::to_search_page:{
-            qDebug()<<"state to first page";
+            QLOG_INFO()<<"state to first page";
             emit go_to_search_page_done();
             break;
         }
         case state::to_gallery_page:{
-            qDebug()<<"state to second page";
+            QLOG_INFO()<<"state to second page";
             emit go_to_gallery_page_done();
             break;
         }
         case state::show_more_images:{
-            qDebug()<<"state scroll page";
+            QLOG_INFO()<<"state scroll page";
             break;
         }
         case state::parse_img_link:{
-            qDebug()<<"state parse img link";
+            QLOG_INFO()<<"state parse img link";
             parse_imgs_link_content();
             break;
         }
         case state::get_img_link_from_gallery_page:{
-            qDebug()<<"state get_img_link_from_sec_page";
+            QLOG_INFO()<<"state get_img_link_from_sec_page";
             return;
         }
         default:
-            qDebug()<<"default state";
+            QLOG_INFO()<<"default state";
             break;
         }
     }else{
@@ -148,7 +149,7 @@ void bing_image_search::parse_imgs_link_content()
 
 void bing_image_search::scroll_web_page_impl()
 {    
-    qDebug()<<__func__<<":scroll_count:"<<scroll_count_;
+    QLOG_INFO()<<__func__<<":scroll_count:"<<scroll_count_;
     if(state_ != state::show_more_images){
         return;
     }
@@ -167,11 +168,11 @@ void bing_image_search::scroll_web_page_impl()
     get_web_page().toPlainText([this](QString const &contents)
     {
         if(contents.contains("See more images")){
-            qDebug()<<"found See more images";
+            QLOG_INFO()<<"found See more images";
             get_web_page().runJavaScript("document.getElementsByClassName(\"btn_seemore\")[0].click();"
                                          "window.scrollTo(0, document.body.scrollHeight);");
         }else{
-            qDebug()<<"cannot found See more images";
+            QLOG_INFO()<<"cannot found See more images";
             get_web_page().runJavaScript("window.scrollTo(0, document.body.scrollHeight)");
         }
         ++scroll_count_;
