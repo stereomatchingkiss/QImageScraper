@@ -219,9 +219,10 @@ void MainWindow::download_finished(download_img_task task)
         img.setDecideFormatFromContent(true);
         if(task->get_network_error_code() == QNetworkReply::NoError && img.canRead()){
             QFileInfo file_info(task->get_save_as());
+            QString const img_format = !img.format().isEmpty() ? img.format() : "jpg";
             QFile::rename(task->get_save_as(),
                           file_info.absolutePath() + "/" + file_info.completeBaseName() +
-                          "." + img.format());
+                          "." + img_format);
             qDebug()<<"can save image choice:"<<(int)std::get<2>(img_info);
             ui->progressBar->setValue(ui->progressBar->value() + 1);
             qDebug()<<"set progressBar value:"<<ui->progressBar->value();
