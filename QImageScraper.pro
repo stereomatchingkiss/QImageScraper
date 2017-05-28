@@ -41,7 +41,8 @@ SOURCES += main.cpp\
     ui/general_settings.cpp \
     core/global_constant.cpp \
     ui/info_dialog.cpp \
-    core/google_image_search.cpp
+    core/google_image_search.cpp \
+    core/yahoo_image_search.cpp
 
 HEADERS  += mainwindow.hpp \
     core/bing_image_search.hpp \
@@ -54,7 +55,8 @@ HEADERS  += mainwindow.hpp \
     core/global_constant.hpp \
     ui/info_dialog.hpp \
     core/google_image_search.hpp \
-    core/image_search_error.hpp
+    core/image_search_error.hpp \
+    core/yahoo_image_search.hpp
 
 FORMS    += mainwindow.ui \
     ui/general_settings.ui \
