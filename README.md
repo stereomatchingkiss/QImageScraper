@@ -10,8 +10,8 @@ For more information and download prebuilt apps, see [Version Info](https://gith
 Why Qt5 ?
 ------------
 
-If you asked on Stack Overflow which tool is nice for web scraping, none of them will answer you Qt5.
-Contraty with those I answer, I think Qt5 is a great tool for this kind of task, Qt5 provide us 
+If you asked on Stack Overflow which tool is nice for web scraping, none(?) of them will answer you Qt5.
+Contrary with those answers, I think Qt5 is a great tool for this kind of task, Qt5 provide us 
 almost everything we need for web scraping, it gots
 
 - High level, intuitive, asynchronous network api like QNetworkAccessManager, QNetworkReply,
