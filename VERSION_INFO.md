@@ -1,9 +1,9 @@
 Version 1.0
 ------------
 
-[windows 32bits]()
-[linux 64bits]()
-[mac osx]()
+- [windows 32bits]()
+- [linux 64bits]()
+- [mac osx]()
 
 Features
 ------------
