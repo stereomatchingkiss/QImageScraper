@@ -7,6 +7,16 @@ for my computer vision projects).
 
 For more information and download prebuilt apps, see [Version Info](https://github.com/stereomatchingkiss/QImageScraper/blob/master/VERSION_INFO.md).
 
+- ![google gallery](
+https://s15.postimg.org/5sqfv402j/gallery_0.jpg
+)
+- ![bing gallery](
+https://s15.postimg.org/6jj60w2fv/gallery_1.jpg
+)
+- ![yahoo gallery](
+https://s15.postimg.org/5vabhy3q3/gallery_2.jpg
+)
+
 Why Qt5 ?
 ------------
 
