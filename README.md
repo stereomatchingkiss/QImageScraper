@@ -1,9 +1,9 @@
 What is QImageScraper ?
 ------------
 
-QImageScraper is an app for researching how to scrape images by Qt5 from different search engines like 
-Google, Bing and Yahoo(Primitive motivation is create an app to help me collect image needed 
-for my computer vision projects).
+QImageScraper is an free app(no advertising, no in app purchase) for researching how to scrape images 
+by Qt5 from different search engines like Google, Bing and Yahoo(Primitive motivation is create an app 
+to help me collect image needed for my computer vision projects).
 
 For more information and download prebuilt apps, see [Version Info](https://github.com/stereomatchingkiss/QImageScraper/blob/master/VERSION_INFO.md).
 
