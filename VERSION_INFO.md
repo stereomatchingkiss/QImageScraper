@@ -1,7 +1,9 @@
 Version 1.0
 ------------
 
-- [windows 32bits]()
+- [windows 32bits](
+https://mega.nz/#!w9M1UKCY!wAWzgu8jD3Xda6Jg8QGEsMPv2o5xcFsN7SrwdUhn7fE
+)
 - [linux 64bits]()
 - [mac osx]()
 
