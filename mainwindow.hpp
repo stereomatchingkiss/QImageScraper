@@ -53,6 +53,7 @@ private:
     using img_links_map_value = std::tuple<QString, QString, link_choice>;
 
     void change_search_engine();
+    void check_new_version();
     void create_search_engine(QString const &target);
     void download_img_error(download_img_task task, QString const &error_msg);
     void download_finished(download_img_task task);
@@ -65,8 +66,9 @@ private:
     void found_img_link(QString const &big_img_link, QString const &small_img_link);
     void general_settings_ok_clicked();
     bool is_download_finished() const;
+    void process_download_image(download_img_task task, img_links_map_value img_info);
     void process_go_to_gallery_page();
-    void process_go_to_search_page();
+    void process_go_to_search_page();    
     void process_image_search_error(image_search_error::error error);
     void process_show_more_images_done();
     void refresh_window();
@@ -96,7 +98,7 @@ private:
     std::map<size_t, img_links_map_value> img_links_map_;
     image_search *img_search_;
     QStringList small_img_links_;
-    download_statistic statistic_;    
+    download_statistic statistic_;        
 };
 
 #endif // MAINWINDOW_HPP

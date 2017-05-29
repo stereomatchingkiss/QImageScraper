@@ -14,6 +14,7 @@
 #include <QsLog.h>
 
 #include <QCheckBox>
+#include <QDesktopServices>
 #include <QFileInfo>
 #include <QImageReader>
 #include <QMessageBox>
@@ -48,6 +49,8 @@ MainWindow::MainWindow(QWidget *parent) :
         restoreGeometry(settings.value("geometry").toByteArray());
     }
 
+    settings.setValue("version", "1.0");
+
     qsrand(std::time(0));
 
     setMinimumSize(size());
@@ -65,6 +68,8 @@ MainWindow::MainWindow(QWidget *parent) :
         QMessageBox::warning(this, tr("Error"), tr("Cannot create directory to save image %1, please choose a new directory, "
                                                    "if not the images will save at %2").arg(dir).arg(write_able_path));
     });
+
+    check_new_version();
 }
 
 MainWindow::~MainWindow()
@@ -94,6 +99,26 @@ void MainWindow::change_search_engine()
     }
 }
 
+void MainWindow::check_new_version()
+{
+    auto *manager = downloader_->get_network_manager();
+    auto *reply = manager->get(QNetworkRequest(QUrl("https://www.dropbox.com/s/1ajwbdrnv3omdtr/version_num.txt?dl=0")));
+    connect(reply, static_cast<void(QNetworkReply::*)()>(&QNetworkReply::finished), [reply](){ reply->deleteLater(); });
+    connect(reply, static_cast<void(QNetworkReply::*)()>(&QNetworkReply::finished), [this, reply]()
+    {
+        if(reply){
+            QLOG_INFO()<<"check new version:"<<reply->error();
+            QString const str = reply->readAll();
+            if(str > QSettings().value("version").toString()){
+                ui->actionNew->setVisible(true);
+                QMessageBox::information(this, tr("Update"),
+                                         tr("Press %1 to install new version").
+                                         arg("<img src = ':/icons/new.png' style='vertical-align:middle' />"));
+            }
+        }
+    });
+}
+
 void MainWindow::create_search_engine(const QString &target)
 {
     if(img_search_){
@@ -119,9 +144,7 @@ void MainWindow::create_search_engine(const QString &target)
     }else{
         QLOG_INFO()<<"target is not empty:"<<target;
         img_search_->go_to_gallery_page(target);
-        //img_search_->go_to_search_page();
     }
-    QLOG_INFO()<<"search target:"<<target;
 }
 
 void MainWindow::general_settings_ok_clicked()
@@ -265,6 +288,31 @@ void MainWindow::download_small_img(QString const &save_as,
     }
 }
 
+void MainWindow::process_download_image(download_img_task task, img_links_map_value img_info)
+{
+    QImageReader img(task->get_save_as());
+    img.setDecideFormatFromContent(true);
+    if(task->get_network_error_code() == QNetworkReply::NoError && img.canRead()){
+        QFileInfo file_info(task->get_save_as());
+        QString const img_format = !img.format().isEmpty() ? img.format() : "jpg";
+        QFile::rename(task->get_save_as(),
+                      file_info.absolutePath() + "/" + file_info.completeBaseName() +
+                      "." + img_format);
+        QLOG_INFO()<<"can save image choice:"<<(int)std::get<2>(img_info);
+        ui->progressBar->setValue(ui->progressBar->value() + 1);
+        QLOG_INFO()<<"set progressBar value:"<<ui->progressBar->value();
+        if(std::get<2>(img_info) == link_choice::big){
+            ++statistic_.big_img_download_;
+        }else{
+            ++statistic_.small_img_download_;
+        }
+        download_next_image();
+    }else{
+        QLOG_INFO()<<"cannot save image choice:"<<(int)std::get<2>(img_info);
+        download_small_img(task->get_save_as(), std::move(img_info));
+    }
+}
+
 void MainWindow::download_finished(download_img_task task)
 {
     QLOG_INFO()<<__func__<<":"<<task->get_unique_id()<<":"<<task->get_network_error_code();
@@ -280,27 +328,7 @@ void MainWindow::download_finished(download_img_task task)
             return;
         }
 
-        QImageReader img(task->get_save_as());
-        img.setDecideFormatFromContent(true);
-        if(task->get_network_error_code() == QNetworkReply::NoError && img.canRead()){
-            QFileInfo file_info(task->get_save_as());
-            QString const img_format = !img.format().isEmpty() ? img.format() : "jpg";
-            QFile::rename(task->get_save_as(),
-                          file_info.absolutePath() + "/" + file_info.completeBaseName() +
-                          "." + img_format);
-            QLOG_INFO()<<"can save image choice:"<<(int)std::get<2>(img_info);
-            ui->progressBar->setValue(ui->progressBar->value() + 1);
-            QLOG_INFO()<<"set progressBar value:"<<ui->progressBar->value();
-            if(std::get<2>(img_info) == link_choice::big){
-                ++statistic_.big_img_download_;
-            }else{
-                ++statistic_.small_img_download_;
-            }
-            download_next_image();
-        }else{
-            QLOG_INFO()<<"cannot save image choice:"<<(int)std::get<2>(img_info);
-            download_small_img(task->get_save_as(), std::move(img_info));
-        }
+        process_download_image(task, std::move(img_info));
 
         refresh_window();
     }else{
@@ -429,4 +457,9 @@ void MainWindow::on_actionShowMoreImage_triggered()
     set_enabled_main_window_except_stop(false);
     setMaximumSize(size());
     img_search_->show_more_images(1000);
+}
+
+void MainWindow::on_actionNew_triggered()
+{
+    QDesktopServices::openUrl(QUrl(""));
 }
