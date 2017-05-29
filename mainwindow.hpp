@@ -42,6 +42,8 @@ private slots:
 
     void on_actionShowMoreImage_triggered();
 
+    void on_actionNew_triggered();
+
 private:
     enum class link_choice
     {
@@ -74,6 +76,7 @@ private:
     void refresh_window();
     void set_enabled_main_window_except_stop(bool value);
     void set_show_gallery_tutorial(int state);
+    void update_to_new_version();
 
     Ui::MainWindow *ui;
 

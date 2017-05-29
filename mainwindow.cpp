@@ -102,21 +102,11 @@ void MainWindow::change_search_engine()
 void MainWindow::check_new_version()
 {
     auto *manager = downloader_->get_network_manager();
-    auto *reply = manager->get(QNetworkRequest(QUrl("https://www.dropbox.com/s/1ajwbdrnv3omdtr/version_num.txt?dl=0")));
-    connect(reply, static_cast<void(QNetworkReply::*)()>(&QNetworkReply::finished), [reply](){ reply->deleteLater(); });
-    connect(reply, static_cast<void(QNetworkReply::*)()>(&QNetworkReply::finished), [this, reply]()
-    {
-        if(reply){
-            QLOG_INFO()<<"check new version:"<<reply->error();
-            QString const str = reply->readAll();
-            if(str > QSettings().value("version").toString()){
-                ui->actionNew->setVisible(true);
-                QMessageBox::information(this, tr("Update"),
-                                         tr("Press %1 to install new version").
-                                         arg("<img src = ':/icons/new.png' style='vertical-align:middle' />"));
-            }
-        }
-    });
+    auto *reply = manager->get(QNetworkRequest(QUrl("https://dl.dropboxusercontent.com/s/1ajwbdrnv3omdtr/version_num.txt?dl=0")));
+    connect(reply, static_cast<void(QNetworkReply::*)()>(&QNetworkReply::finished),
+            reply, &QNetworkReply::deleteLater);
+    connect(reply, static_cast<void(QNetworkReply::*)()>(&QNetworkReply::finished),
+            this, &MainWindow::update_to_new_version);
 }
 
 void MainWindow::create_search_engine(const QString &target)
@@ -252,6 +242,22 @@ void MainWindow::set_show_gallery_tutorial(int state)
     if (static_cast<Qt::CheckState>(state) == Qt::CheckState::Checked) {
         QSettings settings;
         settings.setValue("tutorial/show_gallery_basic", true);
+    }
+}
+
+void MainWindow::update_to_new_version()
+{
+    auto *reply = qobject_cast<QNetworkReply*>(sender());
+    if(reply){
+        QLOG_INFO()<<"check new version:"<<reply->error();
+        QByteArray const results = reply->readAll();
+        qDebug()<<"version number:"<<results<<","<<QSettings().value("version").toString();
+        if(results > QSettings().value("version").toString()){
+            ui->actionNew->setVisible(true);
+            QMessageBox::information(this, tr("Update"),
+                                     tr("Press %1 to install new version").
+                                     arg("<img src = ':/icons/new.png' style='vertical-align:middle' />"));
+        }
     }
 }
 
@@ -461,5 +467,5 @@ void MainWindow::on_actionShowMoreImage_triggered()
 
 void MainWindow::on_actionNew_triggered()
 {
-    QDesktopServices::openUrl(QUrl(""));
+    QDesktopServices::openUrl(QUrl("https://github.com/stereomatchingkiss/QImageScraper/blob/master/VERSION_INFO.md"));
 }
