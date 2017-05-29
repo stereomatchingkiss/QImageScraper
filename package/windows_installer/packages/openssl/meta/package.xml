@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package>
+    <DisplayName>openssl</DisplayName>
+    <Description>Install openssl</Description>
+    <Version>1.0.0</Version>
+    <ReleaseDate>2016-08-28</ReleaseDate>    
+    <Default>true</Default>
+	<Script>installscript.qs</Script>
+	<ForcedInstallation>false</ForcedInstallation>
+</Package>
