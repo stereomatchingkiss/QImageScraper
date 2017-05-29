@@ -196,7 +196,8 @@ void MainWindow::process_image_search_error(image_search_error::error error)
         if(!is_download_finished()){
             static int reload_small_img = 0;
             QLOG_INFO()<<"reload small img:"<<reload_small_img;
-            QTimer::singleShot(qrand() % 1000, [this](){ui->webView->page()->load(ui->webView->page()->url());});
+            QTimer::singleShot(qrand() % 4000 + 2000,
+                               [this](){ui->webView->page()->load(ui->webView->page()->url());});
         }else{
             img_search_->go_to_search_page();
         }
