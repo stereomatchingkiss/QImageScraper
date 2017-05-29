@@ -53,6 +53,7 @@ private:
     using img_links_map_value = std::tuple<QString, QString, link_choice>;
 
     void change_search_engine();
+    void create_search_engine(QString const &target);
     void download_img_error(download_img_task task, QString const &error_msg);
     void download_finished(download_img_task task);
     void download_img(img_links_map_value info);
@@ -70,6 +71,7 @@ private:
     void process_show_more_images_done();
     void refresh_window();
     void set_enabled_main_window_except_stop(bool value);
+    void set_show_gallery_tutorial(int state);
 
     Ui::MainWindow *ui;
 
@@ -85,8 +87,7 @@ private:
         size_t total_download_ = 0;
     };
 
-    QStringList big_img_links_;
-    QCheckBox *cb_gallery_basic_tutorial_;
+    QStringList big_img_links_;    
     QSize default_max_size_;
     QSize default_min_size_;
     bool download_finished_;

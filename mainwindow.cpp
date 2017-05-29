@@ -26,7 +26,6 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    cb_gallery_basic_tutorial_{new QCheckBox(tr("Do not show this again"))},
     default_max_size_{maximumSize()},
     default_min_size_{minimumSize()},
     download_finished_{false},
@@ -66,12 +65,6 @@ MainWindow::MainWindow(QWidget *parent) :
         QMessageBox::warning(this, tr("Error"), tr("Cannot create directory to save image %1, please choose a new directory, "
                                                    "if not the images will save at %2").arg(dir).arg(write_able_path));
     });
-
-    connect(cb_gallery_basic_tutorial_, &QCheckBox::stateChanged, [this](int state){
-        if (static_cast<Qt::CheckState>(state) == Qt::CheckState::Checked) {
-            QSettings().setValue("tutorial/show_gallery_basic", true);
-        }
-    });
 }
 
 MainWindow::~MainWindow()
@@ -90,7 +83,23 @@ void MainWindow::found_img_link(const QString &big_img_link, const QString &smal
 }
 
 void MainWindow::change_search_engine()
+{            
+    if(img_search_){
+        img_search_->get_search_target([this](QString const &target)
+        {
+            create_search_engine(target);
+        });
+    }else{
+        create_search_engine("");
+    }
+}
+
+void MainWindow::create_search_engine(const QString &target)
 {
+    if(img_search_){
+        img_search_->deleteLater();
+    }
+
     if(general_settings_->get_search_by() == global_constant::bing_search_name()){
         img_search_ = new bing_image_search(*ui->webView->page(), this);
     }else if(general_settings_->get_search_by() == global_constant::yahoo_search_name()){
@@ -104,19 +113,20 @@ void MainWindow::change_search_engine()
     connect(img_search_, &image_search::show_more_images_done, this, &MainWindow::process_show_more_images_done);
     connect(img_search_, &image_search::search_error, this, &MainWindow::process_image_search_error);
 
-    img_search_->go_to_search_page();
+    if(target.isEmpty()){
+        QLOG_INFO()<<"target is empty";
+        img_search_->go_to_search_page();
+    }else{
+        QLOG_INFO()<<"target is not empty:"<<target;
+        img_search_->go_to_gallery_page(target);
+        //img_search_->go_to_search_page();
+    }
+    QLOG_INFO()<<"search target:"<<target;
 }
 
 void MainWindow::general_settings_ok_clicked()
-{
-    if(img_search_){
-        if(general_settings_->search_by_changed()){
-            img_search_->deleteLater();
-            change_search_engine();
-        }
-    }else{
-        change_search_engine();
-    }
+{    
+    change_search_engine();
 }
 
 bool MainWindow::is_download_finished() const
@@ -145,6 +155,7 @@ void MainWindow::process_go_to_gallery_page()
 
     if(show_tutorial){
         QMessageBox msgbox;
+        QCheckBox *cb = new QCheckBox(tr("Do not show this again"));
         msgbox.setText(tr("Press %1 if you want to show more images.\n"
                           "Press %2 if you want to start download.\n"
                           "Press %3 if you want to select search engine and do other settings.\n"
@@ -158,7 +169,9 @@ void MainWindow::process_go_to_gallery_page()
         msgbox.setWindowTitle(tr("Tutorial"));
         msgbox.setIcon(QMessageBox::Icon::Information);
         msgbox.setDefaultButton(QMessageBox::Ok);
-        msgbox.setCheckBox(cb_gallery_basic_tutorial_);
+        msgbox.setCheckBox(cb);
+
+        connect(cb, &QCheckBox::stateChanged, this, &MainWindow::set_show_gallery_tutorial);
 
         msgbox.exec();
     }
@@ -209,6 +222,14 @@ void MainWindow::set_enabled_main_window_except_stop(bool value)
     ui->actionShowMoreImage->setEnabled(value);
     ui->actionSettings->setEnabled(value);
     ui->actionStop->setEnabled(!value);
+}
+
+void MainWindow::set_show_gallery_tutorial(int state)
+{
+    if (static_cast<Qt::CheckState>(state) == Qt::CheckState::Checked) {
+        QSettings settings;
+        settings.setValue("tutorial/show_gallery_basic", true);
+    }
 }
 
 void MainWindow::refresh_window()
