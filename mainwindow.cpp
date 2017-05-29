@@ -354,7 +354,7 @@ void MainWindow::download_img(img_links_map_value info)
     auto const unique_id = downloader_->append(request, general_settings_->get_save_at(),
                                                global_constant::network_reply_timeout());
     img_links_map_.emplace(unique_id, std::move(info));
-    QTimer::singleShot(qrand() % 1000, [this, unique_id](){downloader_->start_download_task(unique_id);});
+    QTimer::singleShot(qrand() % 1000 + 500, [this, unique_id](){downloader_->start_download_task(unique_id);});
 }
 
 void MainWindow::download_progress(download_img_task task, qint64 bytesReceived, qint64 bytesTotal)
