@@ -463,7 +463,7 @@ void MainWindow::on_actionShowMoreImage_triggered()
 {
     set_enabled_main_window_except_stop(false);
     setMaximumSize(size());
-    img_search_->show_more_images(1000);
+    img_search_->show_more_images(general_settings_->get_max_download_img());
 }
 
 void MainWindow::on_actionNew_triggered()
