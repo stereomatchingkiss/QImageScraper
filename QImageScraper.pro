@@ -29,9 +29,41 @@ include(../3rdLibs/qslog/QsLog.pri)
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
+TARGET_SRC  = $${OUT_PWD}/release/$${TARGET}
+
 win32{
+
 RC_FILE = icons/QImageScraper.rc
+TARGET_DEST = $${PWD}/package/windows_installer/packages/main.component/data/QImageScraper
+
 }
+
+linux-g++{
+    if( equals(TEMPLATE, app) || equals(TEMPLATE, vcapp) ){
+        # nothing to do here
+    }
+    if( equals(TEMPLATE, lib) || equals(TEMPLATE, vclib) ){
+        TARGET_SRC   = $${TARGET_SRC}.so
+        TARGET_DEST  = $${TARGET_DEST}.so
+    }
+    QMAKE_POST_LINK += $$quote(cp $${TARGET_SRC} $${TARGET_DEST}$$escape_expand(\n\t))
+}
+
+win32 {
+    if( equals(TEMPLATE, app) || equals(TEMPLATE, vcapp) ){
+        TARGET_SRC   = $${TARGET_SRC}.exe
+        TARGET_DEST  = $${TARGET_DEST}.exe
+    }
+    if( equals(TEMPLATE, lib) || equals(TEMPLATE, vclib) ){
+        TARGET_SRC   = $${TARGET_SRC}.dll
+        TARGET_DEST  = $${TARGET_DEST}.dll
+    }
+    TARGET_SRC  ~= s,/,\\,g # fix slashes
+    TARGET_DEST ~= s,/,\\,g # fix slashes
+    QMAKE_POST_LINK +=$$quote(cmd /c copy /y $${TARGET_SRC} $${TARGET_DEST}$$escape_expand(\n\t))
+}
+
+message("Will copy $${TARGET_SRC} to $${TARGET_DEST}")
 
 SOURCES += main.cpp\
         mainwindow.cpp \
