@@ -251,7 +251,7 @@ void MainWindow::update_to_new_version()
     if(reply){
         QLOG_INFO()<<"check new version:"<<reply->error();
         QByteArray const results = reply->readAll();
-        qDebug()<<"version number:"<<results<<","<<QSettings().value("version").toString();
+        QLOG_INFO()<<"version number:"<<results<<","<<QSettings().value("version").toString();
         if(results > QSettings().value("version").toString()){
             ui->actionNew->setVisible(true);
             QMessageBox::information(this, tr("Update"),
