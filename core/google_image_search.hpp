@@ -10,10 +10,12 @@ public:
     explicit google_image_search(QWebEnginePage &page, QObject *parent = nullptr);
 
     void get_page_link(std::function<void(QStringList const&)> callback) override;
-    void go_to_search_page() override;    
     void get_imgs_link(QString const &page_link,
                        std::function<void(QString const&, QString const&)> callback) override;
     void get_imgs_link_from_gallery_page(std::function<void(QStringList const&, QStringList const&)> callback) override;
+    void get_search_target(std::function<void(QString const &)> callback) override;
+    void go_to_gallery_page(QString const &target) override;
+    void go_to_search_page() override;
     void show_more_images(size_t max_search_size) override;
     void stop_show_more_images() override;
 

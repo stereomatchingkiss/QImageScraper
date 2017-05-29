@@ -74,6 +74,25 @@ void google_image_search::get_imgs_link_from_gallery_page(std::function<void (co
     });
 }
 
+void google_image_search::get_search_target(std::function<void (const QString &)> callback)
+{
+    get_web_page().runJavaScript("function jscmd(){return document.getElementById(\"lst-ib\").value} jscmd()",
+                                 [this, callback](QVariant const &contents)
+    {
+        QLOG_INFO()<<"gallery page target:"<<contents.toString();
+        callback(contents.toString());
+    });
+}
+
+void google_image_search::go_to_gallery_page(const QString &target)
+{
+    state_ = state::to_gallery_page;
+    if(!target.isEmpty()){
+        get_web_page().load("https://www.google.co.in/search?q=" +
+                            target + "&source=lnms&tbm=isch");
+    }
+}
+
 void google_image_search::show_more_images(size_t max_search_size)
 {
     max_search_size_ = max_search_size;

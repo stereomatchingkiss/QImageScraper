@@ -22,10 +22,7 @@ bing_image_search::bing_image_search(QWebEnginePage &page, QObject *parent) :
     scroll_limit_{2},
     state_{state::to_search_page},
     stop_scroll_page_{false}
-{
-    auto *web_page = &get_web_page();
-    connect(web_page, &QWebEnginePage::loadProgress, [](int progress){ QLOG_INFO()<<"load progress:"<<progress;});
-    connect(web_page, &QWebEnginePage::loadStarted, [](){ QLOG_INFO()<<"load started";});
+{    
 }
 
 void bing_image_search::get_page_link(std::function<void (const QStringList &)> callback)
@@ -105,7 +102,7 @@ void bing_image_search::load_web_page_finished(bool ok)
 }
 
 void bing_image_search::get_imgs_link(const QString &page_link,
-                                        std::function<void (const QString &, const QString &)> callback)
+                                      std::function<void (const QString &, const QString &)> callback)
 {
     parse_img_link_callback_ = callback;
     state_ = state::parse_img_link;
@@ -129,6 +126,24 @@ void bing_image_search::get_imgs_link_from_gallery_page(std::function<void(const
         }
         callback(big_img, small_img);
     });
+}
+
+void bing_image_search::get_search_target(std::function<void (const QString &)> callback)
+{
+    get_web_page().runJavaScript("function jscmd(){return document.getElementById(\"sb_form_q\").value} jscmd()",
+                                 [this, callback](QVariant const &contents)
+    {
+        QLOG_INFO()<<"gallery page target:"<<contents.toString();
+        callback(contents.toString());
+    });
+}
+
+void bing_image_search::go_to_gallery_page(const QString &target)
+{
+    state_ = state::to_gallery_page;
+    if(!target.isEmpty()){
+        get_web_page().load("https://www.bing.com/images/search?q=" + target);
+    }
 }
 
 void bing_image_search::parse_imgs_link_content()

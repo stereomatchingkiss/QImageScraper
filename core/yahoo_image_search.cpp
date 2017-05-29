@@ -34,6 +34,23 @@ void yahoo_image_search::get_page_link(std::function<void (const QStringList&)> 
     });
 }
 
+void yahoo_image_search::get_search_target(std::function<void (const QString &)> callback)
+{
+    get_web_page().runJavaScript("function jscmd(){return document.getElementById(\"yschsp\").value} jscmd()",
+                                 [this, callback](QVariant const &contents)
+    {
+        QLOG_INFO()<<"gallery page target:"<<contents.toString();
+        callback(contents.toString());
+    });
+}
+
+void yahoo_image_search::go_to_gallery_page(QString const &target)
+{
+    state_ = state::to_gallery_page;
+    get_web_page().load(QString("https://images.search.yahoo.com/search/images;?&p=%1&ei=UTF-8&iscqry=&fr=sfp").
+                        arg(target));
+}
+
 void yahoo_image_search::go_to_search_page()
 {
     state_ = state::to_search_page;

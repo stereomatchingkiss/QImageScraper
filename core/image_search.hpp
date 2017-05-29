@@ -25,14 +25,6 @@ public:
     explicit image_search(QWebEnginePage &page, QObject *parent = nullptr);
 
     /**
-     * @brief Asynchronous method, go to the search page of the search engine. Will
-     * emit signal "go_to_search_page_done" after search page is loaded.
-     * @example Bing : https://www.bing.com/?scope=images&nr=1&FORM=NOFORM
-     * Google : https://images.google.com/
-     */
-    virtual void go_to_search_page() = 0;
-
-    /**
      * @brief Asynchronous method to get page links of second page(these pages
      * contain image links). Upon completion, result callback is called with the
      * page links.
@@ -59,6 +51,29 @@ public:
      * image links(big image links, small image links).
      */
     virtual void get_imgs_link_from_gallery_page(std::function<void(QStringList const&, QStringList const&)> callback) = 0;
+
+    /**
+     * @brief Asynchronous method to get the search target. Upon
+     * completion, result callback is called with the search target
+     * @param callback self explained
+     */
+    virtual void get_search_target(std::function<void(QString const &)> callback) = 0;
+
+    /**
+      * @brief go to the gallery page of the search engine. Will
+      * emit signal "go_to_gallery_page_done" after second page is loaded.
+      * @example Bing : "https://www.bing.com/images/search?q=" + target
+      * Google : "https://www.google.co.in/search?q=" + searchtext + "&source=lnms&tbm=isch"
+      */
+    virtual void go_to_gallery_page(QString const &target ) = 0;
+
+    /**
+     * @brief Asynchronous method, go to the search page of the search engine. Will
+     * emit signal "go_to_search_page_done" after search page is loaded.
+     * @example Bing : https://www.bing.com/?scope=images&nr=1&FORM=NOFORM
+     * Google : https://images.google.com/
+     */
+    virtual void go_to_search_page() = 0;
 
     /**
      * @brief Asynchronous method, let second page of the search engine show more image.
