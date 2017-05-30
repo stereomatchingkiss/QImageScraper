@@ -90,10 +90,12 @@ void MainWindow::found_img_link(const QString &big_img_link, const QString &smal
 void MainWindow::change_search_engine()
 {            
     if(img_search_){
-        img_search_->get_search_target([this](QString const &target)
-        {
-            create_search_engine(target);
-        });
+        if(general_settings_->search_by_changed()){
+            img_search_->get_search_target([this](QString const &target)
+            {
+                create_search_engine(target);
+            });
+        }
     }else{
         create_search_engine("");
     }
