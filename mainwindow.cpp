@@ -313,7 +313,7 @@ void MainWindow::process_download_image(download_img_task task, img_links_map_va
                 file_info.completeBaseName() + "." + img_format;
         bool const can_rename_img = QFile::rename(task->get_save_as(), new_name);
         QLOG_INFO()<<"can save image choice:"<<(int)std::get<2>(img_info);
-        QLOG_INFO()<<"can rename image:"<<new_name<<":"<<can_rename_img;
+        QLOG_INFO()<<"can rename image:"<<new_name<<":"<<img.format()<<":"<<can_rename_img;
         ui->progressBar->setValue(ui->progressBar->value() + 1);
         QLOG_INFO()<<"set progressBar value:"<<ui->progressBar->value();
         if(std::get<2>(img_info) == link_choice::big){
