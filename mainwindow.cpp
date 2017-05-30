@@ -281,6 +281,7 @@ void MainWindow::refresh_window()
                                                  arg(statistic_.success()).arg(statistic_.fail()).
                                                  arg(statistic_.big_img_download_).arg(statistic_.small_img_download_));
 
+        //hacks, try to "fixed" the files cannot rename and remove
         auto future = std::async(std::launch::async, [this]()
         {
             for(auto const &pair: img_cannot_rename_){
