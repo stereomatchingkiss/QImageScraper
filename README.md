@@ -24,16 +24,21 @@ If you asked on Stack Overflow which tool is nice for web scraping, none(?) of t
 Contrary with those answers, I think Qt5 is a great tool for this kind of task, Qt5 provide us 
 almost everything we need for web scraping, it gots
 
-- High level, intuitive, asynchronous network api like QNetworkAccessManager, QNetworkReply,
-QNetworkProxy etc
+- High level, intuitive, asynchronous network api like QNetworkAccessManager, QNetworkReply, QNetworkProxy etc
 - Powerful regex class like QRegularExpression
 - Decent web engine like QtWebEngine
 - Robust, mature gui like QWidgets
 - Most of the Qt5 api are wekk designed, signal and slot make writing asynchronous codes become much easier too
-- Cross major desktop platforms, windows, mac os and linux, write once compiled anywhere,
-one code bases only.
+- Great unicode support
+- Able to determine image type from the contents
+- Feature rich file system library. Whether create, remove, rename or find standard path to save image is piece of cake in Qt5
+- QsLog is a nice logging library which only depend on Qt5
+- Asynchronous api of QNetworkAccessManager make it easy to spawn many download request at once
+- Cross major desktop platforms, windows, mac os and linux, write once compiled anywhere, one code bases only.
+- Easy to deploy on windows and mac
+- QSettings provide an easy way to provides persistent platform-independent application settings.
 
-With so many infrastructures, I think Qt5 is a nice tool to build an image scraper.
+With so many infrastructures, I think Qt5 is a nice tool to build an image scraper app.
 
 To know more details about image scraping with Qt5, see
 [Download Bing images by Qt5](http://qtandopencv.blogspot.my/2017/05/scrape-bing-images-by-qwebengine.html) 
