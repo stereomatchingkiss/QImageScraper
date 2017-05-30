@@ -6,8 +6,6 @@
 #include <QApplication>
 #include <QDir>
 
-void log_function(const QsLogging::LogMessage &message);
-
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
@@ -25,20 +23,12 @@ int main(int argc, char *argv[])
     // 2. add two destinations
     DestinationPtrU fileDestination(DestinationFactory::MakeFileDestination(
                                         sLogPath, LogRotationOption::EnableLogRotation, MaxSizeBytes(512), MaxOldLogCount(2)));
-    DestinationPtrU debugDestination(DestinationFactory::MakeDebugOutputDestination());
-    DestinationPtrU functorDestination(DestinationFactory::MakeFunctorDestination(&log_function));
+    DestinationPtrU debugDestination(DestinationFactory::MakeDebugOutputDestination());    
     logger.addDestination(std::move(debugDestination));
-    logger.addDestination(std::move(fileDestination));
-    logger.addDestination(std::move(functorDestination));
+    logger.addDestination(std::move(fileDestination));    
 
     MainWindow w;
     w.show();
 
     return a.exec();
-}
-
-void log_function(const QsLogging::LogMessage &message)
-{
-    qDebug() << "From log function: " << qPrintable(message.formatted)
-             << " " << static_cast<int>(message.level);
 }
