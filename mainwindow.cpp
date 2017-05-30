@@ -330,7 +330,8 @@ void MainWindow::process_download_image(download_img_task task, img_links_map_va
     img.setDecideFormatFromContent(true);
     if(task->get_network_error_code() == QNetworkReply::NoError && img.canRead()){
         QFileInfo file_info(task->get_save_as());
-        bool const change_suffix = file_info.suffix() != img.format();
+        QString const suffix = file_info.suffix() == "jpg" ? "jpeg" : file_info.suffix();
+        bool const change_suffix = suffix != img.format();
         QLOG_INFO()<<"can save image choice:"<<(int)std::get<2>(img_info);
         if(change_suffix){
             QString const new_name = file_info.absolutePath() + "/" +
