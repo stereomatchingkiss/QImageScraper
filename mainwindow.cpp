@@ -281,7 +281,7 @@ void MainWindow::refresh_window()
                                                  arg(statistic_.success()).arg(statistic_.fail()).
                                                  arg(statistic_.big_img_download_).arg(statistic_.small_img_download_));
 
-        std::async(std::launch::async, [this]()
+        auto future = std::async(std::launch::async, [this]()
         {
             for(auto const &pair: img_cannot_rename_){
                 qDebug()<<"can rename in refresh window:"<<QFile::rename(pair.first, pair.second);
@@ -297,6 +297,7 @@ void MainWindow::refresh_window()
             statusBar()->showMessage("");
             img_search_->go_to_search_page();
         }
+        future.get();
     }
 }
 
