@@ -184,6 +184,10 @@ void bing_image_search::scroll_web_page_impl()
     {
         if(contents.contains("See more images")){
             QLOG_INFO()<<"found See more images";
+            //should not click See more images button if it is not shown on
+            //the page, click it blindly may cause the scrolling process become
+            //extremely slow(this maybe a trap setup by the search engine, to
+            //prevent robot)
             get_web_page().runJavaScript("document.getElementsByClassName(\"btn_seemore\")[0].click();"
                                          "window.scrollTo(0, document.body.scrollHeight);");
         }else{
