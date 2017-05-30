@@ -70,26 +70,26 @@ void bing_image_search::load_web_page_finished(bool ok)
 
         switch(state_){
         case state::to_search_page:{
-            QLOG_INFO()<<"state to first page";
+            QLOG_INFO()<<"state to_search_page";
             emit go_to_search_page_done();
             break;
         }
         case state::to_gallery_page:{
-            QLOG_INFO()<<"state to second page";
+            QLOG_INFO()<<"state to_gallery_page";
             emit go_to_gallery_page_done();
             break;
         }
         case state::show_more_images:{
-            QLOG_INFO()<<"state scroll page";
+            QLOG_INFO()<<"state show_more_images";
             break;
         }
         case state::parse_img_link:{
-            QLOG_INFO()<<"state parse img link";
+            QLOG_INFO()<<"state parse_img_link";
             parse_imgs_link_content();
             break;
         }
         case state::get_img_link_from_gallery_page:{
-            QLOG_INFO()<<"state get_img_link_from_sec_page";
+            QLOG_INFO()<<"state get_img_link_from_gallery_page";
             return;
         }
         default:
