@@ -350,8 +350,7 @@ void MainWindow::download_img(img_links_map_value info)
 {
     QString const &img_link = std::get<2>(info) == link_choice::big ?
                 std::get<0>(info) : std::get<1>(info);
-    QNetworkRequest const request = create_img_download_request(img_link,
-                                                                general_settings_->get_search_by());
+    QNetworkRequest const request = create_img_download_request(img_link);
     auto const unique_id = downloader_->append(request, general_settings_->get_save_at(),
                                                global_constant::network_reply_timeout());
     img_links_map_.emplace(unique_id, std::move(info));
