@@ -5,7 +5,7 @@ Version 1.0
 https://mega.nz/#!w9M1UKCY!wAWzgu8jD3Xda6Jg8QGEsMPv2o5xcFsN7SrwdUhn7fE
 )
 - [linux 64bits]()
-- [mac osx]()
+- [mac osx](https://mega.nz/#!B50nHTAR!ihOQrSmY6ayvAUNpCReiSIGu3-OF9lkbF-kqmOQ6l9g)
 
 Features
 ------------
