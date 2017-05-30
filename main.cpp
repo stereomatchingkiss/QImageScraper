@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
 
     // 2. add two destinations
     DestinationPtrU fileDestination(DestinationFactory::MakeFileDestination(
-                                        sLogPath, LogRotationOption::EnableLogRotation, MaxSizeBytes(1024*5), MaxOldLogCount(2)));
+                                        sLogPath, LogRotationOption::EnableLogRotation, MaxSizeBytes(1024*1024*2), MaxOldLogCount(2)));
     DestinationPtrU debugDestination(DestinationFactory::MakeDebugOutputDestination());    
     logger.addDestination(std::move(debugDestination));
     logger.addDestination(std::move(fileDestination));    
