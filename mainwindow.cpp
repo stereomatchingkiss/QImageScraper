@@ -272,16 +272,18 @@ void MainWindow::refresh_window()
         ui->labelProgress->setVisible(false);
         ui->progressBar->setVisible(false);
         set_enabled_main_window_except_stop(true);
-        img_search_->go_to_search_page();
-        statusBar()->showMessage("");
         download_finished_ = true;
 
-        QMessageBox::information(this, tr("Download finished"),
-                                 tr("Total download %1\n"
-                                    "Success %2. Fail %3\n"
-                                    "Big images %4. Thumbnail %5").arg(statistic_.total_download_).
-                                 arg(statistic_.success()).arg(statistic_.fail()).
-                                 arg(statistic_.big_img_download_).arg(statistic_.small_img_download_));
+        int const ret = QMessageBox::information(this, tr("Download finished"),
+                                                 tr("Total download %1\n"
+                                                    "Success %2. Fail %3\n"
+                                                    "Big images %4. Thumbnail %5").arg(statistic_.total_download_).
+                                                 arg(statistic_.success()).arg(statistic_.fail()).
+                                                 arg(statistic_.big_img_download_).arg(statistic_.small_img_download_));
+        if(ret == QMessageBox::Ok){
+            statusBar()->showMessage("");
+            img_search_->go_to_search_page();
+        }
     }
 }
 
