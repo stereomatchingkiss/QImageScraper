@@ -289,8 +289,9 @@ void MainWindow::refresh_window()
 
 void MainWindow::download_small_img(QString const &save_as,
                                     std::tuple<QString, QString, link_choice> const &img_info)
-{
-    QFile::remove(save_as);
+{    
+    bool const can_remove = QFile::remove(save_as);
+    QLOG_INFO()<<__func__<<":download_small_img, can remove file:"<<can_remove;
     if(std::get<2>(img_info) == link_choice::big && std::get<0>(img_info) != std::get<1>(img_info) &&
             !std::get<1>(img_info).isEmpty()){
         download_img(std::make_tuple(std::get<0>(img_info), std::get<1>(img_info), link_choice::small));
@@ -335,7 +336,8 @@ void MainWindow::download_finished(download_img_task task)
         img_links_map_.erase(it);
         if(task->get_is_timeout()){
             QLOG_INFO()<<__func__<<":"<<task->get_save_as()<<","<<task->get_url()<<": timeout";
-            QFile::remove(task->get_save_as());
+            bool const can_remove = QFile::remove(task->get_save_as());
+            QLOG_INFO()<<__func__<<":time out. Can remove file:"<<can_remove;
             download_img(std::move(img_info));
             return;
         }
@@ -345,7 +347,8 @@ void MainWindow::download_finished(download_img_task task)
         refresh_window();
     }else{
         ui->progressBar->setValue(ui->progressBar->value() + 1);
-        QFile::remove(task->get_save_as());
+        bool const can_remove = QFile::remove(task->get_save_as());
+        QLOG_INFO()<<__func__<<":cannot find id in img_links_map_. Can remove file:"<<can_remove;
         download_next_image();
     }
 }
