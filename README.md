@@ -40,6 +40,12 @@ almost everything we need for web scraping, it gots
 
 With so many infrastructures, I think Qt5 is a nice tool to build an image scraper app.
 
+Someone may say, "c++ is very low level, I do not want to manage memory by myself".
+My answer are
+
+- We have a python binding of Qt(PyQt)
+- I seldom found a need to worry about any resource leak by using c++ after I learn RAII, parent and child relationship of Qt.If you always found the resource of c++ hard to manage, that means you do not know how to use c++ effectively.
+
 To know more details about image scraping with Qt5, see
 [Download Bing images by Qt5](http://qtandopencv.blogspot.my/2017/05/scrape-bing-images-by-qwebengine.html) 
 
