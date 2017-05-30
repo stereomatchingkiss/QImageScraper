@@ -276,8 +276,8 @@ void MainWindow::refresh_window()
 
         QMessageBox::information(this, tr("Download finished"),
                                  tr("Total download %1\n"
-                                    "Success %2 , Fail %3\n"
-                                    "big images %4, small images %5").arg(statistic_.total_download_).
+                                    "Success %2. Fail %3\n"
+                                    "Big images %4. Thumbnail %5").arg(statistic_.total_download_).
                                  arg(statistic_.success()).arg(statistic_.fail()).
                                  arg(statistic_.big_img_download_).arg(statistic_.small_img_download_));
     }
