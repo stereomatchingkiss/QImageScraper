@@ -63,8 +63,7 @@ private:
     void download_next_image();
     void download_progress(download_img_task task,
                            qint64 bytesReceived, qint64 bytesTotal);
-    void download_small_img(QString const &save_as,
-                            img_links_map_value const &img_info);    
+    void download_small_img(img_links_map_value img_info);
     void found_img_link(QString const &big_img_link, QString const &small_img_link);
     void general_settings_ok_clicked();
     bool is_download_finished() const;
@@ -74,6 +73,7 @@ private:
     void process_image_search_error(image_search_error::error error);
     void process_show_more_images_done();
     void refresh_window();
+    void remove_file(QString const &debug_msg, download_img_task task);
     void set_enabled_main_window_except_stop(bool value);
     void set_show_gallery_tutorial(int state);
     void update_to_new_version();
@@ -94,10 +94,11 @@ private:
 
     QStringList big_img_links_;    
     QSize default_max_size_;
-    QSize default_min_size_;
-    bool download_finished_;
+    QSize default_min_size_;    
     qte::net::download_supervisor *downloader_;    
     general_settings *general_settings_;
+    QStringList img_cannot_remove_;
+    std::vector<std::pair<QString, QString>> img_cannot_rename_;
     std::map<size_t, img_links_map_value> img_links_map_;
     image_search *img_search_;
     QStringList small_img_links_;
