@@ -169,10 +169,10 @@ void MainWindow::process_go_to_gallery_page()
     if(show_tutorial){
         QMessageBox msgbox;
         QCheckBox *cb = new QCheckBox(tr("Do not show this again"));
-        msgbox.setText(tr("Press %1 if you want to show more images.\n"
-                          "Press %2 if you want to start download.\n"
-                          "Press %3 if you want to select search engine and do other settings.\n"
-                          "Press %4 if you want to back to the first page.\n"
+        msgbox.setText(tr("Press %1 if you want to show more images.<br>"
+                          "Press %2 if you want to start download.<br>"
+                          "Press %3 if you want to select search engine and do other settings.<br>"
+                          "Press %4 if you want to back to the first page.<br>"
                           "Press %5 if you want to reload this page.").
                        arg("<img src = ':/icons/show_more_image.png' style='vertical-align:middle' />").
                        arg("<img src = ':/icons/download.png' style='vertical-align:middle' />").
@@ -214,13 +214,14 @@ void MainWindow::process_show_more_images_done()
             setMaximumSize(default_max_size_);
             setMinimumSize(default_min_size_);
             QMessageBox::information(this, tr("Auto scroll end"),
-                                     tr("Found %1 images."
-                                        "<p>Press <img src = ':/icons/scroll.png' style='vertical-align:middle' /> "
-                                        "or scroll manually if you want to scroll further,"
-                                        "press <img src = ':/icons/download.png' style='vertical-align:middle' /> "
-                                        "if you want to download the images</p>, press "
-                                        "<img src = ':/icons/settings.png' style='vertical-align:middle' /> if "
-                                        "you want to configure your options").arg(links.size()));
+                                     tr("Found %1 images<br>"
+                                        "Press %2 to scroll the page automatic<br>"
+                                        "press %3 if you want to download the images<br> "
+                                        "press %4 if you want to configure your options").
+                                     arg(links.size()).
+                                     arg("<img src = ':/icons/show_more_image.png' style='vertical-align:middle' />").
+                                     arg("<img src = ':/icons/download.png' style='vertical-align:middle' />").
+                                     arg("<img src = ':/icons/settings.png' style='vertical-align:middle' />"));
         });
     }
 }
