@@ -308,10 +308,11 @@ void MainWindow::process_download_image(download_img_task task, img_links_map_va
     if(task->get_network_error_code() == QNetworkReply::NoError && img.canRead()){
         QFileInfo file_info(task->get_save_as());
         QString const img_format = !img.format().isEmpty() ? img.format() : "jpg";
-        QFile::rename(task->get_save_as(),
-                      file_info.absolutePath() + "/" + file_info.completeBaseName() +
-                      "." + img_format);
+        QString const new_name = file_info.absolutePath() + "/" +
+                file_info.completeBaseName() + "." + img_format;
+        bool const can_rename_img = QFile::rename(task->get_save_as(), new_name);
         QLOG_INFO()<<"can save image choice:"<<(int)std::get<2>(img_info);
+        QLOG_INFO()<<"can rename image:"<<new_name<<":"<<can_rename_img;
         ui->progressBar->setValue(ui->progressBar->value() + 1);
         QLOG_INFO()<<"set progressBar value:"<<ui->progressBar->value();
         if(std::get<2>(img_info) == link_choice::big){
