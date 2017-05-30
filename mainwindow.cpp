@@ -284,10 +284,12 @@ void MainWindow::refresh_window()
         auto future = std::async(std::launch::async, [this]()
         {
             for(auto const &pair: img_cannot_rename_){
-                qDebug()<<"can rename in refresh window:"<<QFile::rename(pair.first, pair.second);
+                bool const can_rename = QFile::rename(pair.first, pair.second);
+                QLOG_INFO()<<"can rename in refresh window:"<<can_rename;
             }
             for(auto const &img : img_cannot_remove_){
-                qDebug()<<"can remove in refresh window:"<<QFile::remove(img);
+                bool const can_remove = QFile::remove(img);
+                QLOG_INFO()<<"can remove in refresh window:"<<can_remove;
             }
             img_cannot_remove_.clear();
             img_cannot_rename_.clear();
