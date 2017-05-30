@@ -338,6 +338,7 @@ void MainWindow::download_finished(download_img_task task)
             QLOG_INFO()<<__func__<<":"<<task->get_save_as()<<","<<task->get_url()<<": timeout";
             bool const can_remove = QFile::remove(task->get_save_as());
             QLOG_INFO()<<__func__<<":time out. Can remove file:"<<can_remove;
+            statusBar()->showMessage(tr("Waiting reply from the server, please give some patient"));
             download_img(std::move(img_info));
             return;
         }
