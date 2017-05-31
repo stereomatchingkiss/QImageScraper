@@ -28,15 +28,16 @@ almost everything we need for web scraping, it gots
 - Powerful regex class like QRegularExpression
 - Decent web engine like QtWebEngine
 - Robust, mature gui like QWidgets
-- Most of the Qt5 api are wekk designed, signal and slot make writing asynchronous codes become much easier too
+- Most of the Qt5 api are well designed, signal and slot make writing asynchronous codes become much easier too
 - Great unicode support
 - Able to determine image type from the contents
 - Feature rich file system library. Whether create, remove, rename or find standard path to save image is piece of cake in Qt5
 - QsLog is a nice logging library which only depend on Qt5
 - Asynchronous api of QNetworkAccessManager make it easy to spawn many download request at once
 - Cross major desktop platforms, windows, mac os and linux, write once compiled anywhere, one code bases only.
-- Easy to deploy on windows and mac
+- Easy to deploy on windows and mac(linux?maybe linuxdeployqt can save us tons of troubles)
 - QSettings provide an easy way to provides persistent platform-independent application settings.
+- and so on
 
 With so many infrastructures, I think Qt5 is a nice tool to build an image scraper app.
 
@@ -62,4 +63,4 @@ To build QImageScraper from source you will need
 Bug Reporting
 -------------
 
-Please open an issue in github(recommended) or send me an [email](thamngapwei@gmail.com)
+Please open an issue on github(recommended) or send me an [email](thamngapwei@gmail.com)
