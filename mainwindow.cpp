@@ -24,13 +24,12 @@
 #include <QSizeGrip>
 
 #include <ctime>
-#include <future>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     default_max_size_{maximumSize()},
-    default_min_size_{minimumSize()},    
+    default_min_size_{minimumSize()},
     downloader_{new qte::net::download_supervisor(this)},
     general_settings_{new general_settings(this)},
     img_search_{nullptr}
@@ -272,7 +271,7 @@ void MainWindow::refresh_window()
     if(is_download_finished() || (img_links_map_.empty() && big_img_links_.empty())){
         ui->labelProgress->setVisible(false);
         ui->progressBar->setVisible(false);
-        set_enabled_main_window_except_stop(true);        
+        set_enabled_main_window_except_stop(true);
 
         int const ret = QMessageBox::information(this, tr("Download finished"),
                                                  tr("Total download %1\n"
@@ -281,26 +280,10 @@ void MainWindow::refresh_window()
                                                  arg(statistic_.success()).arg(statistic_.fail()).
                                                  arg(statistic_.big_img_download_).arg(statistic_.small_img_download_));
 
-        //hacks, try to "fixed" the files cannot rename and remove
-        auto future = std::async(std::launch::async, [this]()
-        {
-            for(auto const &pair: img_cannot_rename_){
-                bool const can_rename = QFile::rename(pair.first, pair.second);
-                QLOG_INFO()<<"can rename in refresh window:"<<can_rename;
-            }
-            for(auto const &img : img_cannot_remove_){
-                bool const can_remove = QFile::remove(img);
-                QLOG_INFO()<<"can remove in refresh window:"<<can_remove;
-            }
-            img_cannot_remove_.clear();
-            img_cannot_rename_.clear();
-        });
-
         if(ret == QMessageBox::Ok){
             statusBar()->showMessage("");
             img_search_->go_to_search_page();
         }
-        future.get();
     }
 }
 
@@ -308,9 +291,6 @@ void MainWindow::remove_file(const QString &debug_msg, MainWindow::download_img_
 {
     bool const can_remove = QFile::remove(task->get_save_as());
     QLOG_INFO()<<__func__<<":"<<debug_msg<<task->get_save_as()<<":"<<can_remove;
-    if(!can_remove){
-        img_cannot_remove_.push_back(task->get_save_as());
-    }
 }
 
 void MainWindow::download_small_img(img_links_map_value img_info)
@@ -326,23 +306,25 @@ void MainWindow::download_small_img(img_links_map_value img_info)
 
 void MainWindow::process_download_image(download_img_task task, img_links_map_value img_info)
 {
-    QImageReader img(task->get_save_as());
-    img.setDecideFormatFromContent(true);
-    if(task->get_network_error_code() == QNetworkReply::NoError && img.canRead()){
+    bool img_can_read = true;
+    QByteArray format;
+    {
+        QImageReader img(task->get_save_as());
+        img.setDecideFormatFromContent(true);
+        img_can_read = img.canRead();
+        format = img.format();
+    }
+    if(task->get_network_error_code() == QNetworkReply::NoError && img_can_read){
         QFileInfo file_info(task->get_save_as());
         QString const suffix = file_info.suffix() == "jpg" ? "jpeg" : file_info.suffix();
-        bool const change_suffix = suffix != img.format();
+        bool const change_suffix = suffix != format;
         QLOG_INFO()<<"can save image choice:"<<(int)std::get<2>(img_info);
         if(change_suffix){
             QString const new_name = file_info.absolutePath() + "/" +
-                    file_info.completeBaseName() + "." + img.format();
+                    file_info.completeBaseName() + "." + format;
             bool const can_rename_img = QFile::rename(task->get_save_as(), new_name);
-            //bool const can_rename_img = task->rename(file_info.completeBaseName() + "." + img.format());
             QLOG_INFO()<<"QFile::rename, can rename image from:"<<task->get_save_as()<<", to:"<<
-                         new_name<<":"<<img.format()<<":"<<can_rename_img;
-            if(!can_rename_img){
-                img_cannot_rename_.emplace_back(task->get_save_as(), new_name);
-            }
+                         new_name<<":"<<format<<":"<<can_rename_img;
         }
         ui->progressBar->setValue(ui->progressBar->value() + 1);
         QLOG_INFO()<<"set progressBar value:"<<ui->progressBar->value();
@@ -354,8 +336,6 @@ void MainWindow::process_download_image(download_img_task task, img_links_map_va
         download_next_image();
     }else{
         QLOG_INFO()<<"cannot save image choice:"<<(int)std::get<2>(img_info);
-        //bool const can_remove = QFile::remove(task->get_save_as());
-        //QLOG_INFO()<<__func__<<":big image, can remove file:"<<task->get_save_as()<<":"<<can_remove;
         remove_file("big image, can remove file:", task);
         download_small_img(std::move(img_info));
     }
@@ -364,15 +344,13 @@ void MainWindow::process_download_image(download_img_task task, img_links_map_va
 void MainWindow::download_finished(download_img_task task)
 {
     QLOG_INFO()<<__func__<<":"<<task->get_unique_id()<<":"<<task->get_network_error_code();
-    QLOG_INFO()<<__func__<<"save as:"<<task->get_save_as()<<",url:"<<task->get_url();    
+    QLOG_INFO()<<__func__<<"save as:"<<task->get_save_as()<<",url:"<<task->get_url();
     auto it = img_links_map_.find(task->get_unique_id());
     if(it != std::end(img_links_map_)){
         auto img_info = it->second;
         img_links_map_.erase(it);
         if(task->get_is_timeout()){
             QLOG_INFO()<<__func__<<":"<<task->get_save_as()<<","<<task->get_url()<<": timeout";
-            //bool const can_remove = QFile::remove(task->get_save_as());
-            //QLOG_INFO()<<__func__<<":time out, can remove file:"<<can_remove;
             statusBar()->showMessage(tr("Waiting reply from the server, please give some patient"));
             remove_file("time out issue:", task);
             download_img(std::move(img_info));
@@ -384,8 +362,6 @@ void MainWindow::download_finished(download_img_task task)
         refresh_window();
     }else{
         ui->progressBar->setValue(ui->progressBar->value() + 1);
-        //bool const can_remove = QFile::remove(task->get_save_as());
-        //QLOG_INFO()<<__func__<<":cannot find id in img_links_map_, can remove file:"<<can_remove;
         remove_file("cannot find id in img_links_map, can remove file:", task);
         download_next_image();
     }
@@ -440,7 +416,7 @@ void MainWindow::on_actionDownload_triggered()
     img_search_->get_imgs_link_from_gallery_page([this](QStringList const &big_img_link, QStringList const &small_img_link)
     {
         statistic_.clear();
-        img_links_map_.clear();        
+        img_links_map_.clear();
         statistic_.total_download_ = std::min(static_cast<size_t>(big_img_link.size()),
                                               static_cast<size_t>(general_settings_->get_max_download_img()));
         QLOG_INFO()<<"big img links size:"<<big_img_link.size()<<",max download size:"
@@ -452,8 +428,6 @@ void MainWindow::on_actionDownload_triggered()
         QLOG_INFO()<<"progress bar min:"<<ui->progressBar->minimum()<<",max:"<<ui->progressBar->maximum();
         big_img_links_ = big_img_link;
         small_img_links_ = small_img_link;
-        img_cannot_remove_.clear();
-        img_cannot_rename_.clear();
         download_next_image();
     });
 }

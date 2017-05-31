@@ -96,9 +96,7 @@ private:
     QSize default_max_size_;
     QSize default_min_size_;    
     qte::net::download_supervisor *downloader_;    
-    general_settings *general_settings_;
-    QStringList img_cannot_remove_;
-    std::vector<std::pair<QString, QString>> img_cannot_rename_;
+    general_settings *general_settings_;        
     std::map<size_t, img_links_map_value> img_links_map_;
     image_search *img_search_;
     QStringList small_img_links_;
