@@ -1,0 +1,41 @@
+digraph {       
+    label="Download small images";
+	
+    download_big_image [label="Refer to Fig.2" color=Black]
+	download_small_image [label="Download small image" color=Black]
+    time_out [label="Time out" color=Black]
+	network_error [label="Network error" color=Black]
+	image_can_not_read [label="Image cannot read" color=Black]
+	download_success [label="Download success" color=Brown, fontcolor=Black, shape=diamond]
+	download_next_image [label="Download next image", color=Brown, fontcolor=Black, shape=diamond]		
+    end_of_download [label="Download end" color=Black, fontcolor=Black]
+	restart_download [label="Restart download" color=Black]
+	show_statistic [label="Show statistic message" color=Black, fontcolor=Black]
+	
+	subgraph cluster_0 {
+		label="Download Big Image";
+        download_big_image;
+    }
+		    		
+	//process download success
+	download_small_image->download_success
+	download_success->download_next_image [label="yes", color=blue];
+	download_next_image->end_of_download [label="no", color=red];
+	download_next_image->download_big_image [label="yes", color=blue];
+	end_of_download->show_statistic
+	
+	//process download fail
+	download_success->time_out [label="no", color=red];
+	download_success->network_error [label="no", color=red];
+	download_success->image_can_not_read [label="no", color=red];
+	
+	//process time out
+    time_out->restart_download
+	restart_download->download_success
+	
+	//process network error
+	network_error->download_next_image	
+	
+	//process image can read
+	image_can_not_read->download_next_image		
+}

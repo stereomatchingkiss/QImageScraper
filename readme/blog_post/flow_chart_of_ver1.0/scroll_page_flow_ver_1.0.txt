@@ -1,0 +1,16 @@
+digraph {       
+    label="Show more image";
+    scroll_page [label="Scroll page" color=Black]
+	
+    reach_n_times [label="Reach n times\nn == (Desired image size - found image size)/constant" color=Brown, fontcolor=Black, shape=diamond]
+	
+	want_more_image [label="Want to show more image?", color=Brown, fontcolor=Black, shape=diamond]
+	
+    end_of_scroll [label="End of scrolling" color=Black, fontcolor=Black]	
+		    		
+	scroll_page->reach_n_times [fontcolor=black];
+	reach_n_times->want_more_image [label="yes", color=blue];
+	reach_n_times->scroll_page [label="no", color=red];
+	want_more_image->scroll_page [label="yes", color=blue];
+	want_more_image->end_of_scroll [label="no", color=red];
+}
