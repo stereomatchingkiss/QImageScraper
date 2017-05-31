@@ -29,16 +29,17 @@ include(../3rdLibs/qslog/QsLog.pri)
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-TARGET_SRC  = $${OUT_PWD}/release/$${TARGET}
-
 win32{
 
 RC_FILE = icons/QImageScraper.rc
+TARGET_SRC  = $${OUT_PWD}/release/$${TARGET}
 TARGET_DEST = $${PWD}/package/windows_installer/packages/main.component/data/QImageScraper
 
 }
 
 linux-g++{
+    TARGET_SRC  = $${OUT_PWD}/$${TARGET}
+    TARGET_DEST = $${PWD}/package/linux_appimage/$${TARGET}
     if( equals(TEMPLATE, app) || equals(TEMPLATE, vcapp) ){
         # nothing to do here
     }
