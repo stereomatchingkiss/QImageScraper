@@ -102,7 +102,7 @@ void bing_image_search::load_web_page_finished(bool ok)
 }
 
 void bing_image_search::get_imgs_link(const QString &page_link,
-                                      std::function<void (const QString &, const QString &)> callback)
+                                      std::function<void(QStringList const&, QStringList const&)> callback)
 {
     parse_img_link_callback_ = callback;
     state_ = state::parse_img_link;
@@ -157,8 +157,8 @@ void bing_image_search::parse_imgs_link_content()
         }else{
             QLOG_INFO()<<"cannot capture img link";
         }
-        parse_img_link_callback_(match.captured(2).replace("&amp;", "&"),
-                                 match.captured(1).replace("&amp;", "&"));
+        parse_img_link_callback_({match.captured(2).replace("&amp;", "&")},
+        {match.captured(1).replace("&amp;", "&")});
     });
 }
 

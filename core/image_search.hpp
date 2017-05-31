@@ -42,7 +42,7 @@ public:
      * image links(big image link, small image link).
      */
     virtual void get_imgs_link(QString const &page_link,
-                               std::function<void(QString const&, QString const&)> callback) = 0;
+                               std::function<void(QStringList const&, QStringList const&)> callback) = 0;
 
     /**
      * @brief Asynchronous method to parse all of the image links from gallery page. Upon

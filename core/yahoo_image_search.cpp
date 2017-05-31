@@ -174,8 +174,7 @@ void yahoo_image_search::scroll_web_page_impl()
     });
 }
 
-void yahoo_image_search::get_imgs_link(const QString&,
-                                       std::function<void (const QString&, const QString&)>)
+void yahoo_image_search::get_imgs_link(const QString&, std::function<void(QStringList const&, QStringList const&)>)
 {
     throw std::runtime_error("void yahoo_image_search::get_imgs_link haven't implemented yet");
 }

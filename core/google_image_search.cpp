@@ -46,7 +46,7 @@ void google_image_search::go_to_search_page()
 }
 
 void google_image_search::get_imgs_link(const QString &page_link,
-                                        std::function<void (const QString &, const QString &)> callback)
+                                        std::function<void(QStringList const&, QStringList const&)> callback)
 {
     parse_img_link_callback_ = callback;
     state_ = state::parse_img_link;
@@ -177,8 +177,8 @@ void google_image_search::parse_imgs_link_content()
             QLOG_INFO()<<"cannot capture img link";
         }
 
-        parse_img_link_callback_(decode_link_char(match.captured(3)),
-                                 decode_link_char(match.captured(2)));
+        parse_img_link_callback_({decode_link_char(match.captured(3))},
+        {decode_link_char(match.captured(2))});
     });
 }
 
