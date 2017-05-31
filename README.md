@@ -36,10 +36,10 @@ almost everything we need for web scraping, it gots
 - Asynchronous api of QNetworkAccessManager make it easy to spawn many download request at once
 - Cross major desktop platforms, windows, mac os and linux, write once compiled anywhere, one code bases only.
 - Easy to deploy on windows and mac(linux?maybe linuxdeployqt can save us tons of troubles)
-- QSettings provide an easy way to provides persistent platform-independent application settings.
+- QSettings provides persistent platform-independent application settings.
 - and so on
 
-With so many infrastructures, I think Qt5 is a nice tool to build an image scraper app.
+With so many infrastructures, I think Qt5 is a nice tool to build a serious image scraper app.
 
 Someone may say, "c++ is very low level, I do not want to manage memory by myself".
 My answer are
