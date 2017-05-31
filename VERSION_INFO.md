@@ -3,12 +3,15 @@ Version 1.1
 - [windows 32bits](
 https://mega.nz/#!d58E2JjR!KaoYjm_WnJr6ejWKcDhSublzYXAt9WiEJmeQxGuy64g
 )
+- [mac os](
+https://mega.nz/#!Asc02BQJ!wDiaO_ldhU9mBRjjigCcNZWV8h_0BNJyiANa3vkRH3k
+)
 
 **What changed**
 
 - Refine messages, easier to read
 - Fix bug, message box shown empty icon
-- Fix bug, fail to rename/remove files
+- Fix bug, fail to rename/remove files on windows
 - Fix bug, reload search engine even user did not switch
 - Add message on status if network connection timeout
 
