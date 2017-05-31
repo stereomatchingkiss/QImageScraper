@@ -47,7 +47,8 @@ My answer are
 - I seldom found a need to worry about any resource leak by using c++ after I learn RAII, parent and child relationship of Qt.If you always found the resource of c++ as hard to manage as c, that means you do not know how to use c++ effectively.
 
 To know more details about image scraping with Qt5, see
-[Download Bing images by Qt5](http://qtandopencv.blogspot.my/2017/05/scrape-bing-images-by-qwebengine.html) 
+- [Download Bing images by Qt5](http://qtandopencv.blogspot.my/2017/05/scrape-bing-images-by-qwebengine.html) 
+- [Create a better images downloader(Google, Bing and Yahoo) by Qt5](http://qtandopencv.blogspot.my/2017/05/create-better-images-downloadergoogle.html)
 
 Dependencies
 ------------
