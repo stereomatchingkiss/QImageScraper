@@ -30,12 +30,13 @@ image_search::image_search(QWebEnginePage &page, QObject *parent) :
     });
     connect(timer_, &QTimer::timeout, [this]()
     {
-        if(reload_time_ < 2){
-            ++reload_time_;
+        if(reload_time_++ < global_constant::download_retry_limit()){
             web_page_.load(web_page_.url());
             timer_->start(global_constant::network_reply_timeout());
         }else{
-            get_web_view_img_callback_(QImage());
+            if(get_web_view_img_callback_){
+                get_web_view_img_callback_(QImage());
+            }
         }
     });
 }
@@ -63,5 +64,7 @@ void image_search::clipboard_data_changed()
 {
     QLOG_INFO()<<__func__<<":get image from clipboard";
     timer_->stop();
-    get_web_view_img_callback_(QGuiApplication::clipboard()->image(QClipboard::Clipboard));
+    if(get_web_view_img_callback_){
+        get_web_view_img_callback_(QGuiApplication::clipboard()->image(QClipboard::Clipboard));
+    }
 }
