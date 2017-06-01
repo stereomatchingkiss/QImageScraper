@@ -45,6 +45,12 @@ void google_image_search::go_to_search_page()
     get_web_page().load(QUrl("https://images.google.com/"));
 }
 
+void google_image_search::load(const QUrl &url)
+{
+    state_ = state::load_url;
+    image_search::load(url);
+}
+
 void google_image_search::reload()
 {
     state_ = state::reload_url;
@@ -137,6 +143,11 @@ void google_image_search::load_web_page_finished(bool ok)
         }
 
         switch(state_){
+        case state::load_url:{
+            QLOG_INFO()<<"state load_url";
+            emit load_url_done();
+            break;
+        }
         case state::reload_url:{
             QLOG_INFO()<<"state reload_url";
             emit reload_url_done();

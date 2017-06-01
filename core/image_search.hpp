@@ -76,6 +76,12 @@ public:
     virtual void go_to_search_page() = 0;
 
     /**
+     * @brief load url
+     * @param url self explained
+     */
+    virtual void load(QUrl const &url);
+
+    /**
      * @brief reload current url
      */
     virtual void reload() = 0;
@@ -106,6 +112,10 @@ signals:
      */
     void go_to_search_page_done();
 
+    /**
+     * @brief emit when load url done
+     */
+    void load_url_done();
     /**
      * @brief emit when reload done
      */
