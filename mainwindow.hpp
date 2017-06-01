@@ -16,6 +16,7 @@ class MainWindow;
 }
 
 class general_settings;
+class image_downloader;
 class image_search;
 class QCheckBox;
 
@@ -45,29 +46,15 @@ private slots:
     void on_actionNew_triggered();
 
 private:
-    enum class link_choice
-    {
-        big,
-        small
-    };
-
     using download_img_task = std::shared_ptr<qte::net::download_supervisor::download_task>;
-    using img_links_map_value = std::tuple<QString, QString, link_choice>;
 
     void change_search_engine();
     void check_new_version();
     void create_search_engine(QString const &target);
-    void download_img_error(download_img_task task, QString const &error_msg);
-    void download_finished(download_img_task task);
-    void download_img(img_links_map_value info);
-    void download_next_image();
     void download_progress(download_img_task task,
-                           qint64 bytesReceived, qint64 bytesTotal);
-    void download_small_img(img_links_map_value img_info);
-    void found_img_link(QString const &big_img_link, QString const &small_img_link);
+                           qint64 bytesReceived, qint64 bytesTotal);    
     void general_settings_ok_clicked();
-    bool is_download_finished() const;
-    void process_download_image(download_img_task task, img_links_map_value img_info);
+    bool is_download_finished() const;    
     void process_go_to_gallery_page();
     void process_go_to_search_page();    
     void process_image_search_error(image_search_error::error error);
@@ -79,28 +66,11 @@ private:
     void update_to_new_version();
 
     Ui::MainWindow *ui;
-
-    struct download_statistic
-    {
-        void clear();
-
-        size_t fail() const;
-        size_t success() const;
-
-        size_t big_img_download_ = 0;
-        size_t small_img_download_ = 0;
-        size_t total_download_ = 0;
-    };
-
-    QStringList big_img_links_;    
     QSize default_max_size_;
-    QSize default_min_size_;    
-    qte::net::download_supervisor *downloader_;    
-    general_settings *general_settings_;        
-    std::map<size_t, img_links_map_value> img_links_map_;
-    image_search *img_search_;
-    QStringList small_img_links_;
-    download_statistic statistic_;        
+    QSize default_min_size_;
+    image_downloader *img_downloader_;        
+    general_settings *general_settings_;
+    image_search *img_search_;            
 };
 
 #endif // MAINWINDOW_HPP
