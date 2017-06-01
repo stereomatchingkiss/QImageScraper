@@ -60,6 +60,14 @@ public:
     virtual void get_search_target(std::function<void(QString const &)> callback) = 0;
 
     /**
+     * @brief Asynchronous method to get web view image. Upon
+     * completion, result callback is called with the web view image
+     * @param callback self explained
+     * @warning this function is no re-entrant
+     */
+    virtual void get_web_view_image(std::function<void(QImage const&)> callback);
+
+    /**
       * @brief go to the gallery page of the search engine. Will
       * emit signal "go_to_gallery_page_done" after second page is loaded.
       * @example Bing : "https://www.bing.com/images/search?q=" + target
@@ -85,12 +93,6 @@ public:
      * @brief reload current url
      */
     virtual void reload() = 0;
-
-    /**
-     * @brief Asynchronous method to save web view image
-     * @param save_at directory to save the image
-     */
-    virtual void save_web_view_image(QString const &save_at);
 
     /**
      * @brief Asynchronous method, let second page of the search engine show more image.
@@ -125,11 +127,6 @@ signals:
      */
     void reload_url_done();
     /**
-     * @brief emit when save_web_view_image done
-     * @param ok self explained
-     */
-    void save_web_view_image_done(bool ok);
-    /**
      * @brief emit when show_more_images done
      */
     void show_more_images_done();
@@ -145,8 +142,10 @@ protected:
     QWebEnginePage& get_web_page();
 
 private:
+    void clipboard_data_changed();
     virtual void load_web_page_finished(bool ok) = 0;
 
+    std::function<void(QImage const&)> get_web_view_img_callback_;
     QWebEnginePage &web_page_;
 };
 

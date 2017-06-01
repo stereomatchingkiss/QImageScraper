@@ -16,6 +16,9 @@ image_search::image_search(QWebEnginePage &page, QObject *parent) :
     web_page_(page)
 {
     connect(&web_page_, &QWebEnginePage::loadFinished, this, &image_search::load_web_page_finished);
+    QClipboard *clipboard = QGuiApplication::clipboard();
+    connect(clipboard, &QClipboard::dataChanged, this, &image_search::clipboard_data_changed);
+
 }
 
 void image_search::load(const QUrl &url)
@@ -23,31 +26,20 @@ void image_search::load(const QUrl &url)
     web_page_.load(url);
 }
 
-void image_search::save_web_view_image(QString const &save_at)
-{
-    QLOG_INFO()<<__func__<<":access clipboard";
-    QClipboard *clipboard = QGuiApplication::clipboard();
-    connect(clipboard, &QClipboard::dataChanged, [this, clipboard, save_at]()
-    {
-        QLOG_INFO()<<__func__<<":get image from clipboard";
-        QImage const img = clipboard->image(QClipboard::Clipboard);
-        if(!img.isNull()){
-            QLOG_INFO()<<__func__<<":image is not null";
-            QString const url = web_page_.url().toString();
-            QString const file_name = qte::utils::unique_file_name(save_at, QFileInfo(url).fileName());
-            QLOG_INFO()<<__func__<<":save image as:"<<file_name;
-            emit save_web_view_image_done(img.save(save_at + "/" + file_name));
-        }else{
-            QLOG_INFO()<<__func__<<"image is null";
-            emit save_web_view_image_done(true);
-        }
-    });
-
+void image_search::get_web_view_image(std::function<void(QImage const&)> callback)
+{    
     QLOG_INFO()<<__func__<<":trigger copy action";
-    web_page_.triggerAction(QWebEnginePage::WebAction::Copy);    
+    get_web_view_img_callback_ = callback;
+    web_page_.triggerAction(QWebEnginePage::WebAction::Copy);
 }
 
 QWebEnginePage& image_search::get_web_page()
 {
     return web_page_;
+}
+
+void image_search::clipboard_data_changed()
+{
+    QLOG_INFO()<<__func__<<":get image from clipboard";
+    get_web_view_img_callback_(QGuiApplication::clipboard()->image(QClipboard::Clipboard));
 }
