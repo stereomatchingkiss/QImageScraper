@@ -45,6 +45,12 @@ void google_image_search::go_to_search_page()
     get_web_page().load(QUrl("https://images.google.com/"));
 }
 
+void google_image_search::reload()
+{
+    state_ = state::reload_url;
+    get_web_page().load(get_web_page().url());
+}
+
 void google_image_search::get_imgs_link(const QString &page_link,
                                         std::function<void(QStringList const&, QStringList const&)> callback)
 {
@@ -131,6 +137,11 @@ void google_image_search::load_web_page_finished(bool ok)
         }
 
         switch(state_){
+        case state::reload_url:{
+            QLOG_INFO()<<"state reload_url";
+            emit reload_url_done();
+            break;
+        }
         case state::to_search_page:{
             QLOG_INFO()<<"state to first page";
             emit go_to_search_page_done();

@@ -16,12 +16,14 @@ public:
     void get_search_target(std::function<void(QString const &)> callback) override;
     void go_to_gallery_page(QString const &target) override;
     void go_to_search_page() override;
+    void reload() override;
     void show_more_images(size_t max_search_size) override;
     void stop_show_more_images() override;
 
 private:
     enum class state{
         parse_img_link,
+        reload_url,
         to_search_page,
         to_gallery_page,
         show_more_images,

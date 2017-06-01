@@ -58,6 +58,12 @@ void yahoo_image_search::go_to_search_page()
     get_web_page().load(QUrl("https://images.search.yahoo.com/"));
 }
 
+void yahoo_image_search::reload()
+{
+    state_ = state::reload_url;
+    get_web_page().load(get_web_page().url());
+}
+
 void yahoo_image_search::show_more_images(size_t max_search_size)
 {
     max_search_size_ = max_search_size;
@@ -86,6 +92,11 @@ void yahoo_image_search::load_web_page_finished(bool ok)
         }
 
         switch(state_){
+        case state::reload_url:{
+            QLOG_INFO()<<"state reload_url";
+            emit reload_url_done();
+            break;
+        }
         case state::to_search_page:{
             QLOG_INFO()<<"state to search page";
             emit go_to_search_page_done();
