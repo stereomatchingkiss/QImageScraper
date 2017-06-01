@@ -34,14 +34,13 @@ public:
 
     explicit image_downloader(QObject *parent = nullptr);
 
-    void add_big_image_count();
     void download_next_image();
-    void download_small_img();
     void download_web_view_img();
     download_state get_download_state() const;
     QNetworkAccessManager* get_network_manager() const;
     download_statistic get_statistic() const;
     bool image_links_empty() const;
+    void process_web_view_image(QImage img, QString const &url);
     void set_download_request(QStringList big_image_links, QStringList small_image_links,
                               size_t max_download, QString const &save_at);    
 
@@ -77,6 +76,7 @@ private:
     void download_image_error(download_img_task task, QString const &error_msg);
     void download_small_img(img_links_map_value img_info);
     void download_web_view_img(img_links_map_value img_info);
+    QString get_valid_image_name(QString const &save_as, QString const &img_format);
     void process_download_image(download_img_task task, img_links_map_value img_info);
     void remove_file(QString const &debug_msg, download_img_task task);
     void start_download(QString const &big_img_link, QString const &small_img_link);

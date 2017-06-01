@@ -4,6 +4,7 @@
 #include "utility.hpp"
 
 #include <qt_enhance/network/download_supervisor.hpp>
+#include <qt_enhance/utility/qte_utility.hpp>
 
 #include <QsLog.h>
 
@@ -23,10 +24,11 @@ image_downloader::image_downloader(QObject *parent) :
 }
 
 void image_downloader::set_download_request(QStringList big_image_links, QStringList small_image_links,
-                                     size_t max_download, QString const &save_at)
+                                            size_t max_download, QString const &save_at)
 {
     big_img_links_.swap(big_image_links);
     small_img_links_.swap(small_image_links);
+    QLOG_INFO()<<__func__<<":big img:"<<big_img_links_.size()<<",small img:"<<small_img_links_.size();
     statistic_.clear();
     img_links_map_.clear();
     save_at_ = save_at;
@@ -44,7 +46,7 @@ void image_downloader::download_finished(image_downloader::download_img_task tas
         auto img_info = it->second;
         img_links_map_.erase(it);
         if(task->get_is_timeout()){
-            QLOG_INFO()<<__func__<<":"<<task->get_save_as()<<","<<task->get_url()<<": timeout";            
+            QLOG_INFO()<<__func__<<":"<<task->get_save_as()<<","<<task->get_url()<<": timeout";
             emit set_statusbar_msg(tr("Waiting reply from the server, please give some patient"));
             remove_file("time out issue:", task);
             download_image(std::move(img_info));
@@ -89,6 +91,7 @@ void image_downloader::download_small_img(image_downloader::img_links_map_value 
     if(img_info.choice_ == link_choice::web_view && img_info.big_img_link_ != img_info.small_img_link_ &&
             !img_info.small_img_link_.isEmpty()){
         img_info.choice_ = link_choice::small;
+        img_info.retry_num_ = 0;
         download_image(std::move(img_info));
     }else{
         increase_progress();
@@ -105,10 +108,27 @@ void image_downloader::download_web_view_img(img_links_map_value img_info)
         //non scalable for multi download, but easier to implement
         img_info_ = std::move(img_info);
         img_info_.choice_ = link_choice::web_view;
+        img_info.retry_num_ = 0;
         emit load_image(img_info_.big_img_link_);
     }else{
         increase_progress();
         download_next_image();
+    }
+}
+
+QString image_downloader::get_valid_image_name(QString const &save_as, QString const &img_format)
+{
+    QFileInfo const file_info(save_as);
+    QString const suffix = file_info.suffix() == "jpg" ? "jpeg" : file_info.suffix();
+
+    bool const change_suffix = suffix != img_format;
+    if(change_suffix){
+        QString const new_name = file_info.absolutePath() + "/" +
+                file_info.completeBaseName() + "." + img_format;
+
+        return new_name;
+    }else{
+        return save_as;
     }
 }
 
@@ -130,16 +150,12 @@ void image_downloader::process_download_image(image_downloader::download_img_tas
         format = img.format();
     }
     if(task->get_network_error_code() == QNetworkReply::NoError && img_can_read){
-        QFileInfo file_info(task->get_save_as());
-        QString const suffix = file_info.suffix() == "jpg" ? "jpeg" : file_info.suffix();
-        bool const change_suffix = suffix != format;
         QLOG_INFO()<<"can save image choice:"<<(int)img_info.choice_;
-        if(change_suffix){
-            QString const new_name = file_info.absolutePath() + "/" +
-                    file_info.completeBaseName() + "." + format;
-            bool const can_rename_img = QFile::rename(task->get_save_as(), new_name);
+        QString const &valid_name = get_valid_image_name(task->get_save_as(), format);
+        if(valid_name != task->get_save_as()){
+            bool const can_rename_img = QFile::rename(task->get_save_as(), valid_name);
             QLOG_INFO()<<"QFile::rename, can rename image from:"<<task->get_save_as()<<", to:"<<
-                         new_name<<":"<<format<<":"<<can_rename_img;
+                         valid_name<<":"<<format<<":"<<can_rename_img;
         }
         increase_progress();
         if(img_info.choice_ == link_choice::big){
@@ -182,15 +198,19 @@ void image_downloader::start_download(const QString &big_img_link, const QString
 
 void image_downloader::download_next_image()
 {
+    QLOG_INFO()<<"enter : "<<__func__;
     if(!big_img_links_.empty()){
+        QLOG_INFO()<<__func__<<":big img is not empty";
         auto const big_img = big_img_links_[0];
         auto const small_img = small_img_links_[0];
-        if(statistic_.downloaded_file_ == statistic_.total_download_){
+        if(statistic_.downloaded_file_ != statistic_.total_download_){
+            QLOG_INFO()<<__func__<<":need to download more image";
             big_img_links_.pop_front();
             small_img_links_.pop_front();
             emit load_image(small_img);
             start_download(big_img, small_img);
         }else{
+            QLOG_INFO()<<__func__<<":reach download target";
             big_img_links_.clear();
             small_img_links_.clear();
             img_links_map_.clear();
@@ -199,14 +219,9 @@ void image_downloader::download_next_image()
     }
 }
 
-void image_downloader::download_small_img()
-{
-    download_small_img(std::move(img_info_));
-}
-
 void image_downloader::download_web_view_img()
 {
-    download_web_view_img(img_info_);
+    download_web_view_img(std::move(img_info_));
 }
 
 image_downloader::download_state image_downloader::get_download_state() const
@@ -229,9 +244,25 @@ bool image_downloader::image_links_empty() const
     return big_img_links_.empty() && small_img_links_.empty();
 }
 
-void image_downloader::add_big_image_count()
+void image_downloader::process_web_view_image(QImage img, QString const &url)
 {
-    ++statistic_.big_img_download_;
+    if(!img.isNull()){
+        QLOG_INFO()<<"process_load_url_done->image is not null";
+        QString const file_name =
+                qte::utils::unique_file_name(save_at_, QFileInfo(url).fileName());
+        QLOG_INFO()<<"process_load_url_done->save image as:"<<file_name;
+        if(img.save(get_valid_image_name(save_at_ + "/" + file_name, "jpg"))){
+            increase_progress();
+            download_next_image();
+        }else{
+            QLOG_INFO()<<"process_load_url_done->cannot save downloaded image:"
+                      <<save_at_ + "/" + file_name;
+            download_small_img(std::move(img_info_));
+        }
+    }else{
+        QLOG_INFO()<<"process_load_url_done->cannot save image:"<<url;
+        download_small_img(std::move(img_info_));
+    }
 }
 
 void image_downloader::download_statistic::clear()
