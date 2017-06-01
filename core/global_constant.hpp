@@ -8,7 +8,15 @@ class global_constant
 public:
     static QString bing_search_name();
     static QString google_search_name();
-    static int network_reply_timeout();
+    static constexpr int network_reply_timeout()
+    {
+        return 1000 * 60;
+    }
+    static constexpr size_t download_retry_limit()
+    {
+        return 2;
+    }
+
     static QString yahoo_search_name();
 };
 
