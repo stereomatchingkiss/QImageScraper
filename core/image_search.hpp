@@ -76,6 +76,13 @@ public:
     virtual void go_to_search_page() = 0;
 
     /**
+     * @brief reload current url
+     */
+    virtual void reload() = 0;
+
+    virtual bool save_web_view_image(QString const &save_at);
+
+    /**
      * @brief Asynchronous method, let second page of the search engine show more image.
      * This function will emit signal "scroll_second_page_done" after scroll action
      * are all done; Will emit signal "second_page_scrolled" everytime
@@ -98,6 +105,11 @@ signals:
      * @brief emit when go_to_first_page done
      */
     void go_to_search_page_done();
+
+    /**
+     * @brief emit when reload done
+     */
+    void reload_url_done();
     /**
      * @brief emit when show_more_images done
      */
