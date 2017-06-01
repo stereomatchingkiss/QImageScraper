@@ -88,7 +88,8 @@ SOURCES += main.cpp\
     ui/info_dialog.cpp \
     core/google_image_search.cpp \
     core/yahoo_image_search.cpp \
-    ../qt_enhance/utility/qte_utility.cpp
+    ../qt_enhance/utility/qte_utility.cpp \
+    core/image_downloader.cpp
 
 HEADERS  += mainwindow.hpp \
     core/bing_image_search.hpp \
@@ -103,7 +104,8 @@ HEADERS  += mainwindow.hpp \
     core/google_image_search.hpp \
     core/image_search_error.hpp \
     core/yahoo_image_search.hpp \
-    ../qt_enhance/utility/qte_utility.hpp
+    ../qt_enhance/utility/qte_utility.hpp \
+    core/image_downloader.hpp
 
 FORMS    += mainwindow.ui \
     ui/general_settings.ui \
