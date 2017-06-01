@@ -87,7 +87,8 @@ SOURCES += main.cpp\
     core/global_constant.cpp \
     ui/info_dialog.cpp \
     core/google_image_search.cpp \
-    core/yahoo_image_search.cpp
+    core/yahoo_image_search.cpp \
+    ../qt_enhance/utility/qte_utility.cpp
 
 HEADERS  += mainwindow.hpp \
     core/bing_image_search.hpp \
@@ -101,7 +102,8 @@ HEADERS  += mainwindow.hpp \
     ui/info_dialog.hpp \
     core/google_image_search.hpp \
     core/image_search_error.hpp \
-    core/yahoo_image_search.hpp
+    core/yahoo_image_search.hpp \
+    ../qt_enhance/utility/qte_utility.hpp
 
 FORMS    += mainwindow.ui \
     ui/general_settings.ui \
