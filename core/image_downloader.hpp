@@ -78,7 +78,7 @@ private:
     void download_web_view_img(img_links_map_value img_info);
     QString get_valid_image_name(QString const &save_as, QString const &img_format);
     void process_download_image(download_img_task task, img_links_map_value img_info);
-    void remove_file(QString const &debug_msg, download_img_task task);
+    bool remove_file(QString const &debug_msg, download_img_task task) const;
     void start_download(QString const &big_img_link, QString const &small_img_link);
 
     QStringList big_img_links_;

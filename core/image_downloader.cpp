@@ -166,6 +166,7 @@ void image_downloader::process_download_image(image_downloader::download_img_tas
         img_info_.retry_num_ = 0;
         download_next_image();
     }else{
+        remove_file("network error or cannot read img, can remove file:", task);
         if(task->get_network_error_code() != QNetworkReply::NoError &&
                 img_info.retry_num_++ < global_constant::download_retry_limit()){
             download_image(std::move(img_info));
@@ -174,19 +175,18 @@ void image_downloader::process_download_image(image_downloader::download_img_tas
             img_info.retry_num_ = 0;
         }
         QLOG_INFO()<<"cannot save image choice:"<<(int)img_info.choice_;
-        remove_file("big image, can remove file:", task);
         if(img_info.choice_ == link_choice::big){
-            download_web_view_img(std::move(img_info));
-        }else if(img_info.choice_ == link_choice::web_view){
             download_small_img(std::move(img_info));
         }
     }
 }
 
-void image_downloader::remove_file(const QString &debug_msg, image_downloader::download_img_task task)
+bool image_downloader::remove_file(const QString &debug_msg, image_downloader::download_img_task task) const
 {
     bool const can_remove = QFile::remove(task->get_save_as());
     QLOG_INFO()<<__func__<<":"<<debug_msg<<task->get_save_as()<<":"<<can_remove;
+
+    return can_remove;
 }
 
 void image_downloader::start_download(const QString &big_img_link, const QString &small_img_link)
