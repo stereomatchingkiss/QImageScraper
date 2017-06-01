@@ -86,7 +86,11 @@ public:
      */
     virtual void reload() = 0;
 
-    virtual bool save_web_view_image(QString const &save_at);
+    /**
+     * @brief Asynchronous method to save web view image
+     * @param save_at directory to save the image
+     */
+    virtual void save_web_view_image(QString const &save_at);
 
     /**
      * @brief Asynchronous method, let second page of the search engine show more image.
@@ -120,6 +124,11 @@ signals:
      * @brief emit when reload done
      */
     void reload_url_done();
+    /**
+     * @brief emit when save_web_view_image done
+     * @param ok self explained
+     */
+    void save_web_view_image_done(bool ok);
     /**
      * @brief emit when show_more_images done
      */
