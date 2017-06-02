@@ -39,8 +39,7 @@ public:
     download_state get_download_state() const;
     QNetworkAccessManager* get_network_manager() const;
     download_statistic get_statistic() const;
-    bool image_links_empty() const;
-    void process_web_view_image(QImage img, QString const &url);
+    bool image_links_empty() const;    
     void set_download_request(QStringList big_image_links, QStringList small_image_links,
                               size_t max_download, QString const &save_at);    
 
@@ -56,8 +55,7 @@ private:
     enum class link_choice
     {
         big,
-        small,
-        web_view //save big image by web_view
+        small
     };    
 
     struct img_links_map_value
@@ -74,23 +72,21 @@ private:
     void download_finished(download_img_task task);
     void download_image(img_links_map_value info);
     void download_image_error(download_img_task task, QString const &error_msg);
-    void download_small_img(img_links_map_value img_info);
-    void download_web_view_img(img_links_map_value img_info);
+    void download_small_img(img_links_map_value img_info);    
     QString get_valid_image_name(QString const &save_as, QString const &img_format);
+    void increase_progress();
     void process_download_image(download_img_task task, img_links_map_value img_info);
+    bool reach_download_target() const;
     bool remove_file(QString const &debug_msg, download_img_task task) const;
     void start_download(QString const &big_img_link, QString const &small_img_link);
 
-    QStringList big_img_links_;
-    img_links_map_value img_info_;
+    QStringList big_img_links_;    
     download_state download_state_;
     qte::net::download_supervisor *downloader_;
     std::map<size_t, img_links_map_value> img_links_map_;
     QString save_at_;
     QStringList small_img_links_;
-    download_statistic statistic_;
-
-    void increase_progress();
+    download_statistic statistic_;    
 };
 
 #endif // IMG_DOWNLOADER_HPP

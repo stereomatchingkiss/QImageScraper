@@ -50,15 +50,11 @@ void image_downloader::download_finished(image_downloader::download_img_task tas
             emit set_statusbar_msg(tr("Waiting reply from the server, please give some patient"));
             remove_file("time out issue:", task);
             download_image(std::move(img_info));
-            return;
+        }else{
+            process_download_image(task, std::move(img_info));
         }
-
-        process_download_image(task, std::move(img_info));
-
-        refresh_window();
     }else{
-        increase_progress();
-        remove_file("cannot find id in img_links_map, can remove file:", task);
+        remove_file("cannot find id in img_links_map:", task);
         download_next_image();
     }
 }
@@ -66,12 +62,6 @@ void image_downloader::download_finished(image_downloader::download_img_task tas
 void image_downloader::download_image(image_downloader::img_links_map_value info)
 {
     auto const choice = info.choice_;
-    if(choice != link_choice::web_view){
-        download_state_ = download_state::normal;
-    }else{
-        download_state_ = download_state::show_big_img_by_web_view;
-    }
-
     QString const &img_link = choice == link_choice::big ?
                 info.big_img_link_ : info.small_img_link_;
     QNetworkRequest const request = create_img_download_request(img_link);
@@ -88,30 +78,13 @@ void image_downloader::download_image_error(download_img_task task, const QStrin
 
 void image_downloader::download_small_img(image_downloader::img_links_map_value img_info)
 {
-    if(img_info.choice_ == link_choice::web_view && img_info.big_img_link_ != img_info.small_img_link_ &&
-            !img_info.small_img_link_.isEmpty()){
+    if(img_info.big_img_link_ != img_info.small_img_link_ &&
+            !img_info.small_img_link_.isEmpty() && img_info.choice_ == link_choice::big){
+        QLOG_INFO()<<"download small image:"<<img_info.small_img_link_;
         img_info.choice_ = link_choice::small;
         img_info.retry_num_ = 0;
         download_image(std::move(img_info));
     }else{
-        increase_progress();
-        download_next_image();
-    }
-}
-
-void image_downloader::download_web_view_img(img_links_map_value img_info)
-{
-    QLOG_INFO()<<"enter "<<__func__;
-    if(img_info.choice_ == link_choice::big){
-        QLOG_INFO()<<__func__<<" : download big img by web_view";
-        download_state_ = download_state::show_big_img_by_web_view;
-        //non scalable for multi download, but easier to implement
-        img_info_ = std::move(img_info);
-        img_info_.choice_ = link_choice::web_view;
-        img_info.retry_num_ = 0;
-        emit load_image(img_info_.big_img_link_);
-    }else{
-        increase_progress();
         download_next_image();
     }
 }
@@ -157,20 +130,17 @@ void image_downloader::process_download_image(image_downloader::download_img_tas
             QLOG_INFO()<<"QFile::rename, can rename image from:"<<task->get_save_as()<<", to:"<<
                          valid_name<<":"<<format<<":"<<can_rename_img;
         }
-        increase_progress();
         if(img_info.choice_ == link_choice::big){
             ++statistic_.big_img_download_;
         }else{
             ++statistic_.small_img_download_;
         }
-        img_info_.retry_num_ = 0;
         download_next_image();
     }else{
-        remove_file("network error or cannot read img, can remove file:", task);
+        remove_file("network error or cannot read img:", task);
         if(task->get_network_error_code() != QNetworkReply::NoError &&
                 img_info.retry_num_++ < global_constant::download_retry_limit()){
             download_image(std::move(img_info));
-            return;
         }else{
             img_info.retry_num_ = 0;
         }
@@ -181,10 +151,15 @@ void image_downloader::process_download_image(image_downloader::download_img_tas
     }
 }
 
+bool image_downloader::reach_download_target() const
+{
+    return statistic_.downloaded_file_ >= statistic_.total_download_;
+}
+
 bool image_downloader::remove_file(const QString &debug_msg, image_downloader::download_img_task task) const
 {
     bool const can_remove = QFile::remove(task->get_save_as());
-    QLOG_INFO()<<__func__<<":"<<debug_msg<<task->get_save_as()<<":"<<can_remove;
+    QLOG_INFO()<<__func__<<":"<<debug_msg<<task->get_save_as()<<":can remove file:"<<can_remove;
 
     return can_remove;
 }
@@ -199,29 +174,25 @@ void image_downloader::start_download(const QString &big_img_link, const QString
 void image_downloader::download_next_image()
 {
     QLOG_INFO()<<"enter : "<<__func__;
-    if(!big_img_links_.empty()){
-        QLOG_INFO()<<__func__<<":big img is not empty";
+    if(!big_img_links_.empty() && !reach_download_target()){
+        QLOG_INFO()<<__func__<<":big img is not empty, downloaded file vs total download:("
+                  <<statistic_.downloaded_file_<<","<<statistic_.total_download_<<")";
         auto const big_img = big_img_links_[0];
         auto const small_img = small_img_links_[0];
-        if(statistic_.downloaded_file_ != statistic_.total_download_){
-            QLOG_INFO()<<__func__<<":need to download more image";
-            big_img_links_.pop_front();
-            small_img_links_.pop_front();
-            emit load_image(small_img);
-            start_download(big_img, small_img);
-        }else{
-            QLOG_INFO()<<__func__<<":reach download target";
-            big_img_links_.clear();
-            small_img_links_.clear();
-            img_links_map_.clear();
+        QLOG_INFO()<<__func__<<":need to download more image";
+        big_img_links_.pop_front();
+        small_img_links_.pop_front();
+        emit load_image(small_img);
+        increase_progress();
+        start_download(big_img, small_img);
+    }else{
+        QLOG_INFO()<<__func__<<":reach download target";
+        if(img_links_map_.empty()){
             refresh_window();
+        }else{
+            emit set_statusbar_msg(tr("Please wait a moment"));
         }
     }
-}
-
-void image_downloader::download_web_view_img()
-{
-    download_web_view_img(std::move(img_info_));
 }
 
 image_downloader::download_state image_downloader::get_download_state() const
@@ -242,27 +213,6 @@ image_downloader::download_statistic image_downloader::get_statistic() const
 bool image_downloader::image_links_empty() const
 {
     return big_img_links_.empty() && small_img_links_.empty();
-}
-
-void image_downloader::process_web_view_image(QImage img, QString const &url)
-{
-    if(!img.isNull()){
-        QLOG_INFO()<<"process_load_url_done->image is not null";
-        QString const file_name =
-                qte::utils::unique_file_name(save_at_, QFileInfo(url).fileName());
-        QLOG_INFO()<<"process_load_url_done->save image as:"<<file_name;
-        if(img.save(get_valid_image_name(save_at_ + "/" + file_name, "jpg"))){
-            increase_progress();
-            download_next_image();
-        }else{
-            QLOG_INFO()<<"process_load_url_done->cannot save downloaded image:"
-                      <<save_at_ + "/" + file_name;
-            download_small_img(std::move(img_info_));
-        }
-    }else{
-        QLOG_INFO()<<"process_load_url_done->cannot save image:"<<url;
-        download_small_img(std::move(img_info_));
-    }
 }
 
 void image_downloader::download_statistic::clear()
