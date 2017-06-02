@@ -1,3 +1,17 @@
+Version 1.2
+------------
+- [windows 32bits](
+https://mega.nz/#!40131DKR!J_4nAOBcrSSTJi1KRl3lMIJJf86pywRVpSyX-iYW93k
+)
+- [mac os](
+https://mega.nz/#!Yh9n1BQC!YPQ90Z-OyIV3qt3XyMItVMuUytWJwHQ4OCem7jaw22w
+)
+
+**What changed**
+
+- Fix bug, when download finished, message box may show many times
+- Fix bug, tutorial of gallery page always shown even select "Do not show this again"
+
 Version 1.1
 ------------
 - [windows 32bits](
@@ -21,7 +35,6 @@ Version 1.0
 - [windows 32bits](
 https://mega.nz/#!w9M1UKCY!wAWzgu8jD3Xda6Jg8QGEsMPv2o5xcFsN7SrwdUhn7fE
 )
-- [mac osx](https://mega.nz/#!B50nHTAR!ihOQrSmY6ayvAUNpCReiSIGu3-OF9lkbF-kqmOQ6l9g)
 
 
 **Features**
