@@ -7,8 +7,6 @@
 
 #include <functional>
 
-class QColor;
-class QTimer;
 class QWebEnginePage;
 
 /**
@@ -59,14 +57,6 @@ public:
      * @param callback self explained
      */
     virtual void get_search_target(std::function<void(QString const &)> callback) = 0;
-
-    /**
-     * @brief Asynchronous method to get web view image. Upon
-     * completion, result callback is called with the web view image
-     * @param callback self explained
-     * @warning this function is no re-entrant
-     */
-    virtual void get_web_view_image(std::function<void(QImage)> callback);
 
     /**
       * @brief go to the gallery page of the search engine. Will
@@ -138,9 +128,7 @@ signals:
     /**
      * @brief emit whenever second page scrolled
      */
-    void second_page_scrolled();
-
-    void web_page_load_prgress(int progress);
+    void second_page_scrolled();    
 
 protected:
     QWebEnginePage& get_web_page();
@@ -149,9 +137,6 @@ private:
     void clipboard_data_changed();
     virtual void load_web_page_finished(bool ok) = 0;
 
-    std::function<void(QImage)> get_web_view_img_callback_;
-    size_t reload_time_;
-    QTimer *timer_;
     QWebEnginePage &web_page_;
 };
 
