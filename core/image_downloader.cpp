@@ -55,6 +55,7 @@ void image_downloader::download_finished(image_downloader::download_img_task tas
         }
     }else{
         remove_file("cannot find id in img_links_map:", task);
+        increase_progress();
         download_next_image();
     }
 }
@@ -82,9 +83,9 @@ void image_downloader::download_small_img(image_downloader::img_links_map_value 
             !img_info.small_img_link_.isEmpty() && img_info.choice_ == link_choice::big){
         QLOG_INFO()<<"download small image:"<<img_info.small_img_link_;
         img_info.choice_ = link_choice::small;
-        img_info.retry_num_ = 0;
         download_image(std::move(img_info));
     }else{
+        increase_progress();
         download_next_image();
     }
 }
@@ -135,6 +136,7 @@ void image_downloader::process_download_image(image_downloader::download_img_tas
         }else{
             ++statistic_.small_img_download_;
         }
+        increase_progress();
         download_next_image();
     }else{
         remove_file("network error or cannot read img:", task);
@@ -143,10 +145,10 @@ void image_downloader::process_download_image(image_downloader::download_img_tas
             download_image(std::move(img_info));
         }else{
             img_info.retry_num_ = 0;
-        }
-        QLOG_INFO()<<"cannot save image choice:"<<(int)img_info.choice_;
-        if(img_info.choice_ == link_choice::big){
-            download_small_img(std::move(img_info));
+            QLOG_INFO()<<"cannot save image choice:"<<(int)img_info.choice_;
+            if(img_info.choice_ == link_choice::big){
+                download_small_img(std::move(img_info));
+            }
         }
     }
 }
@@ -183,7 +185,6 @@ void image_downloader::download_next_image()
         big_img_links_.pop_front();
         small_img_links_.pop_front();
         emit load_image(small_img);
-        increase_progress();
         start_download(big_img, small_img);
     }else{
         QLOG_INFO()<<__func__<<":reach download target";
