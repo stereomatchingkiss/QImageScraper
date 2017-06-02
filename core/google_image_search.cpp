@@ -42,7 +42,9 @@ void google_image_search::go_to_search_page()
 {
     state_ = state::to_search_page;
     img_page_links_.clear();
+    QLOG_INFO()<<__func__<<": before load";
     get_web_page().load(QUrl("https://images.google.com/"));
+    QLOG_INFO()<<__func__<<": after load";
 }
 
 void google_image_search::load(const QUrl &url)

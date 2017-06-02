@@ -38,7 +38,9 @@ void bing_image_search::go_to_search_page()
 {
     state_ = state::to_search_page;
     img_page_links_.clear();
+    QLOG_INFO()<<__func__<<": before load";
     get_web_page().load(QUrl("https://www.bing.com/?scope=images&nr=1&FORM=NOFORM"));
+    QLOG_INFO()<<__func__<<": after load";
 }
 
 void bing_image_search::load(const QUrl &url)
