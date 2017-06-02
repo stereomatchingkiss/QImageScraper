@@ -72,13 +72,7 @@ MainWindow::MainWindow(QWidget *parent) :
         ui->statusBar->showMessage(msg);
     });
     connect(img_downloader_, &image_downloader::refresh_window, this, &MainWindow::refresh_window);
-    connect(img_downloader_, &image_downloader::download_progress, this, &MainWindow::download_progress);
-    connect(img_downloader_, &image_downloader::load_image, [this](QString const &url)
-    {
-        if(img_search_){
-            img_search_->load(url);
-        }
-    });
+    connect(img_downloader_, &image_downloader::download_progress, this, &MainWindow::download_progress);    
 
     connect(general_settings_, &general_settings::cannot_create_save_dir,
             [this](QString const &dir, QString const &write_able_path)
@@ -129,10 +123,13 @@ void MainWindow::create_search_engine(const QString &target)
     }
 
     if(general_settings_->get_search_by() == global_constant::bing_search_name()){
+        QLOG_INFO()<<__func__<<":create bing engine";
         img_search_ = new bing_image_search(*ui->webView->page(), this);
     }else if(general_settings_->get_search_by() == global_constant::yahoo_search_name()){
+        QLOG_INFO()<<__func__<<":create yahoo engine";
         img_search_ = new yahoo_image_search(*ui->webView->page(), this);
     }else{
+        QLOG_INFO()<<__func__<<":create google engine";
         img_search_ = new google_image_search(*ui->webView->page(), this);
     }
 
@@ -144,9 +141,11 @@ void MainWindow::create_search_engine(const QString &target)
     if(target.isEmpty()){
         QLOG_INFO()<<"target is empty";
         img_search_->go_to_search_page();
+        QLOG_INFO()<<"go to serach page";
     }else{
         QLOG_INFO()<<"target is not empty:"<<target;
         img_search_->go_to_gallery_page(target);
+        QLOG_INFO()<<"go to gallery page";
     }
 }
 
@@ -162,18 +161,17 @@ bool MainWindow::is_download_finished() const
 
 void MainWindow::process_go_to_search_page()
 {
+    QLOG_INFO()<<__func__;
     ui->actionShowMoreImage->setEnabled(false);
     ui->actionDownload->setEnabled(false);
-    ui->actionStop->setEnabled(false);
-    ui->actionHome->setEnabled(false);
+    ui->actionStop->setEnabled(false);    
 }
 
 void MainWindow::process_go_to_gallery_page()
 {
     ui->actionShowMoreImage->setEnabled(true);
     ui->actionDownload->setEnabled(true);
-    ui->actionStop->setEnabled(false);
-    ui->actionHome->setEnabled(true);
+    ui->actionStop->setEnabled(false);    
 
     QSettings settings;
     bool show_tutorial = true;
