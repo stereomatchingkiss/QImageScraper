@@ -96,7 +96,7 @@ void image_downloader::download_image(image_downloader::img_links_map_value info
     QString const &img_link = choice == link_choice::big ?
                 info.big_img_link_ : info.small_img_link_;
     QNetworkRequest const request = create_img_download_request(img_link);
-    downloader_->set_proxy(proxy_list_[qrand() % proxy_list_.size()]);
+    //downloader_->set_proxy(proxy_list_[qrand() % proxy_list_.size()]);
     auto const unique_id = downloader_->append(request, save_at_,
                                                global_constant::network_reply_timeout());
     img_links_map_.emplace(unique_id, std::move(info));
@@ -215,7 +215,7 @@ void image_downloader::download_next_image()
         QLOG_INFO()<<__func__<<":need to download more image";
         big_img_links_.pop_front();
         small_img_links_.pop_front();
-        emit load_image(small_img);
+        //emit load_image(small_img);
         start_download(big_img, small_img);
     }else{
         QLOG_INFO()<<__func__<<":reach download target";
