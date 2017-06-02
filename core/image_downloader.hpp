@@ -3,6 +3,7 @@
 
 #include <qt_enhance/network/download_supervisor.hpp>
 
+#include <QNetworkProxy>
 #include <QObject>
 
 #include <memory>
@@ -69,6 +70,7 @@ private:
         QString small_img_link_;
     };
 
+    std::vector<QNetworkProxy> create_proxy() const;
     void download_finished(download_img_task task);
     void download_image(img_links_map_value info);
     void download_image_error(download_img_task task, QString const &error_msg);
@@ -80,10 +82,11 @@ private:
     bool remove_file(QString const &debug_msg, download_img_task task) const;
     void start_download(QString const &big_img_link, QString const &small_img_link);
 
-    QStringList big_img_links_;    
+    QStringList big_img_links_;
     download_state download_state_;
     qte::net::download_supervisor *downloader_;
     std::map<size_t, img_links_map_value> img_links_map_;
+    std::vector<QNetworkProxy> proxy_list_;
     QString save_at_;
     QStringList small_img_links_;
     download_statistic statistic_;    

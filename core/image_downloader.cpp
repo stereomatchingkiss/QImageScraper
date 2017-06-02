@@ -10,6 +10,7 @@
 
 #include <QFileInfo>
 #include <QImageReader>
+#include <QNetworkProxy>
 
 image_downloader::image_downloader(QObject *parent) :
     QObject(parent),
@@ -21,6 +22,9 @@ image_downloader::image_downloader(QObject *parent) :
     connect(downloader_, &download_supervisor::error, this, &image_downloader::download_image_error);
     connect(downloader_, &download_supervisor::download_finished, this, &image_downloader::download_finished);
     connect(downloader_, &download_supervisor::download_progress, this, &image_downloader::download_progress);
+
+    proxy_list_ = create_proxy();
+    proxy_list_.emplace_back(downloader_->get_network_manager()->proxy());
 }
 
 void image_downloader::set_download_request(QStringList big_image_links, QStringList small_image_links,
@@ -35,6 +39,32 @@ void image_downloader::set_download_request(QStringList big_image_links, QString
     download_state_ = download_state::normal;
     statistic_.total_download_ = std::min(static_cast<size_t>(big_img_links_.size()),
                                           max_download);
+}
+
+std::vector<QNetworkProxy> image_downloader::create_proxy() const
+{
+    return {
+        {QNetworkProxy::HttpProxy, "200.122.209.202", 53281}, //HTTPS, HA, response
+        {QNetworkProxy::HttpProxy, "138.68.167.66", 8118}, //HTTPS, HA, response
+        {QNetworkProxy::HttpProxy, "61.91.54.42", 8080}, //HTTPS, HA, respone
+        {QNetworkProxy::HttpProxy, "190.217.55.2", 3128}, //HTTPS, HA, response
+        {QNetworkProxy::HttpProxy, "109.121.161.192", 53281},//HTTPS, HA, response
+        {QNetworkProxy::HttpProxy, "87.197.145.202", 9999},//HTTPS, HA, response
+        {QNetworkProxy::HttpProxy, "187.121.245.18", 3128}, //HTTPS, HA, response
+        {QNetworkProxy::HttpProxy, "182.253.117.178", 53281}, //HTTPS, HA, response
+        {QNetworkProxy::HttpProxy, "123.231.65.170", 8080}, //HTTPS, HA, response
+        {QNetworkProxy::HttpProxy, "218.248.73.193", 808}, //HTTPS, HA, response
+        {QNetworkProxy::HttpProxy, "211.79.61.8", 3128}, //HTTPS, A, response
+        {QNetworkProxy::HttpProxy, "88.99.149.188", 31288}, //HTTPS, A, response
+        {QNetworkProxy::HttpProxy, "51.255.48.61", 9999}, //HTTPS, A, response
+        {QNetworkProxy::HttpProxy, "150.95.155.22", 3128}, //HTTPS, A, response
+        {QNetworkProxy::HttpProxy, "122.3.242.7", 3128}, //HTTPS, A, response
+        {QNetworkProxy::HttpProxy, "52.169.207.134", 3128}, //HTTPS, A, response
+        {QNetworkProxy::HttpProxy, "46.218.85.101", 3129}, //HTTPS, A, response
+        {QNetworkProxy::HttpProxy, "200.54.108.54", 80}, //HTTPS, A, response
+        {QNetworkProxy::HttpProxy, "170.55.15.175", 3128}, //HTTPS, A, response
+        {QNetworkProxy::HttpProxy, "142.165.19.133", 80}, //HTTPS, A, response
+    };
 }
 
 void image_downloader::download_finished(image_downloader::download_img_task task)
@@ -66,6 +96,7 @@ void image_downloader::download_image(image_downloader::img_links_map_value info
     QString const &img_link = choice == link_choice::big ?
                 info.big_img_link_ : info.small_img_link_;
     QNetworkRequest const request = create_img_download_request(img_link);
+    downloader_->set_proxy(proxy_list_[qrand() % proxy_list_.size()]);
     auto const unique_id = downloader_->append(request, save_at_,
                                                global_constant::network_reply_timeout());
     img_links_map_.emplace(unique_id, std::move(info));
