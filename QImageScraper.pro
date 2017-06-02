@@ -32,8 +32,8 @@ include(../3rdLibs/qslog/QsLog.pri)
 win32{
 
 RC_FILE = icons/QImageScraper.rc
-TARGET_SRC  = $${OUT_PWD}/release/$${TARGET}.app
-TARGET_DEST = $${PWD}/package/windows_installer/packages/main.component/data/QImageScraper.app
+TARGET_SRC  = $${OUT_PWD}/release/$${TARGET}
+TARGET_DEST = $${PWD}/package/windows_installer/packages/main.component/data/$${TARGET}
 
 }
 
