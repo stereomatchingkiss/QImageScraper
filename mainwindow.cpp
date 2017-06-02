@@ -211,10 +211,6 @@ void MainWindow::process_image_search_error(image_search_error::error error)
                 QLOG_INFO()<<"reload small img";
                 QTimer::singleShot(qrand() % 4000 + 2000,
                                    [this](){ img_search_->reload(); });
-            }else{
-                QLOG_INFO()<<"reload big img";
-                QTimer::singleShot(qrand() % 4000 + 2000,
-                                   [this](){ img_downloader_->download_web_view_img(); });
             }
         }else{
             img_search_->go_to_search_page();
@@ -284,6 +280,7 @@ void MainWindow::update_to_new_version()
 void MainWindow::refresh_window()
 {    
     if(is_download_finished() || img_downloader_->image_links_empty()){
+        QLOG_INFO()<<__func__<<":"<<ui->progressBar->value();
         ui->labelProgress->setVisible(false);
         ui->progressBar->setVisible(false);
         set_enabled_main_window_except_stop(true);
@@ -318,8 +315,7 @@ void MainWindow::download_progress(download_img_task task, qint64 bytesReceived,
 void MainWindow::on_actionDownload_triggered()
 {
     set_enabled_main_window_except_stop(false);
-    ui->actionStop->setEnabled(false);
-    ui->centralWidget->setEnabled(true);
+    ui->actionStop->setEnabled(false);    
     img_search_->get_imgs_link_from_gallery_page([this](QStringList const &big_img_link, QStringList const &small_img_link)
     {
         auto const total_download_ = std::min(static_cast<size_t>(big_img_link.size()),
