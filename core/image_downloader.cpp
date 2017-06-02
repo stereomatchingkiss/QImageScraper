@@ -243,10 +243,10 @@ image_downloader::img_links_map_value::img_links_map_value() :
 
 image_downloader::img_links_map_value::img_links_map_value(QString big_img_link, QString small_img_link,
                                                            image_downloader::link_choice choice, size_t retry_num) :
-    big_img_link_(std::move(big_img_link)),
-    small_img_link_(std::move(small_img_link)),
+    big_img_link_(std::move(big_img_link)),    
     choice_(choice),
-    retry_num_(retry_num)
+    retry_num_(retry_num),
+    small_img_link_(std::move(small_img_link))
 {
 
 }

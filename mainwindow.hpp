@@ -68,8 +68,8 @@ private:
     Ui::MainWindow *ui;
     QSize default_max_size_;
     QSize default_min_size_;
-    image_downloader *img_downloader_;        
     general_settings *general_settings_;
+    image_downloader *img_downloader_;            
     image_search *img_search_;            
 };
 
