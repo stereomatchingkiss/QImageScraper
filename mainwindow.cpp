@@ -72,7 +72,13 @@ MainWindow::MainWindow(QWidget *parent) :
         ui->statusBar->showMessage(msg);
     });
     connect(img_downloader_, &image_downloader::refresh_window, this, &MainWindow::refresh_window);
-    connect(img_downloader_, &image_downloader::download_progress, this, &MainWindow::download_progress);    
+    connect(img_downloader_, &image_downloader::download_progress, this, &MainWindow::download_progress);
+    connect(img_downloader_, &image_downloader::load_image, [this](QString const &url)
+    {
+        if(img_search_){
+            img_search_->load(url);
+        }
+    });
 
     connect(general_settings_, &general_settings::cannot_create_save_dir,
             [this](QString const &dir, QString const &write_able_path)
@@ -136,7 +142,7 @@ void MainWindow::create_search_engine(const QString &target)
     connect(img_search_, &image_search::go_to_search_page_done, this, &MainWindow::process_go_to_search_page);
     connect(img_search_, &image_search::go_to_gallery_page_done, this, &MainWindow::process_go_to_gallery_page);
     connect(img_search_, &image_search::show_more_images_done, this, &MainWindow::process_show_more_images_done);
-    connect(img_search_, &image_search::search_error, this, &MainWindow::process_image_search_error);    
+    connect(img_search_, &image_search::search_error, this, &MainWindow::process_image_search_error);
 
     if(target.isEmpty()){
         QLOG_INFO()<<"target is empty";
@@ -164,14 +170,14 @@ void MainWindow::process_go_to_search_page()
     QLOG_INFO()<<__func__;
     ui->actionShowMoreImage->setEnabled(false);
     ui->actionDownload->setEnabled(false);
-    ui->actionStop->setEnabled(false);    
+    ui->actionStop->setEnabled(false);
 }
 
 void MainWindow::process_go_to_gallery_page()
 {
     ui->actionShowMoreImage->setEnabled(true);
     ui->actionDownload->setEnabled(true);
-    ui->actionStop->setEnabled(false);    
+    ui->actionStop->setEnabled(false);
 
     QSettings settings;
     bool show_tutorial = true;
@@ -315,7 +321,7 @@ void MainWindow::download_progress(download_img_task task, qint64 bytesReceived,
 void MainWindow::on_actionDownload_triggered()
 {
     set_enabled_main_window_except_stop(false);
-    ui->actionStop->setEnabled(false);    
+    ui->actionStop->setEnabled(false);
     img_search_->get_imgs_link_from_gallery_page([this](QStringList const &big_img_link, QStringList const &small_img_link)
     {
         auto const total_download_ = std::min(static_cast<size_t>(big_img_link.size()),
