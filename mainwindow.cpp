@@ -165,6 +165,7 @@ void MainWindow::process_go_to_search_page()
     ui->actionShowMoreImage->setEnabled(false);
     ui->actionDownload->setEnabled(false);
     ui->actionStop->setEnabled(false);
+    ui->actionHome->setEnabled(false);
 }
 
 void MainWindow::process_go_to_gallery_page()
@@ -172,6 +173,7 @@ void MainWindow::process_go_to_gallery_page()
     ui->actionShowMoreImage->setEnabled(true);
     ui->actionDownload->setEnabled(true);
     ui->actionStop->setEnabled(false);
+    ui->actionHome->setEnabled(true);
 
     QSettings settings;
     bool show_tutorial = true;
