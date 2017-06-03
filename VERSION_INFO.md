@@ -1,3 +1,18 @@
+Version 1.3
+------------
+- [windows 32bits](
+https://mega.nz/#!U0UWxKJK!TfzSfYsgdIQBLkNoTbjCz1MXRrHD0O0-etF4i3hNvk4
+)
+- [mac os](
+https://mega.nz/#!Ig9wzBLS!exZzRMMKm7MEgkga5jVTl7nrNiXZKqzsJj0ExYGRFLg
+)
+
+**What changed**
+
+- Fix bug, cannot rename file when file suffix is weird(ex : smoke.jpg#$erty&)
+- Fix bug, do not load the setting of save at directory
+
+
 Version 1.2
 ------------
 - [windows 32bits](
@@ -32,10 +47,7 @@ https://mega.nz/#!Asc02BQJ!wDiaO_ldhU9mBRjjigCcNZWV8h_0BNJyiANa3vkRH3k
 Version 1.0
 ------------
 
-- [windows 32bits](
-https://mega.nz/#!w9M1UKCY!wAWzgu8jD3Xda6Jg8QGEsMPv2o5xcFsN7SrwdUhn7fE
-)
-
+This old version is removed since I do not have big space to store them
 
 **Features**
 
