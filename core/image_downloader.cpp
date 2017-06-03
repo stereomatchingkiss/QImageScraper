@@ -130,8 +130,9 @@ QString image_downloader::get_valid_image_name(QString const &save_as, QString c
     if(change_suffix){
         QString const new_name = file_info.absolutePath() + "/" +
                 file_info.completeBaseName() + "." + img_format;
-
-        return qte::utils::unique_file_name(QFileInfo(new_name).absolutePath(), file_info.fileName());
+        QFileInfo const new_info(new_name);
+        return new_info.absolutePath() + "/" +
+                qte::utils::unique_file_name(new_info.absolutePath(), new_info.fileName());
     }else{
         return save_as;
     }
