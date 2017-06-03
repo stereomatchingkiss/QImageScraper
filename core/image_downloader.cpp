@@ -131,7 +131,7 @@ QString image_downloader::get_valid_image_name(QString const &save_as, QString c
         QString const new_name = file_info.absolutePath() + "/" +
                 file_info.completeBaseName() + "." + img_format;
 
-        return new_name;
+        return qte::utils::unique_file_name(QFileInfo(new_name).absolutePath(), file_info.fileName());
     }else{
         return save_as;
     }
