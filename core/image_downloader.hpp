@@ -70,6 +70,7 @@ private:
         QString small_img_link_;
     };
 
+    bool can_download_image(download_img_task const &task, img_links_map_value const &img_info);
     std::vector<QNetworkProxy> create_proxy() const;
     void download_finished(download_img_task task);
     void download_image(img_links_map_value info);

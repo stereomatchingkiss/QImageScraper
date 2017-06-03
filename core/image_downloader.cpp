@@ -41,6 +41,35 @@ void image_downloader::set_download_request(QStringList big_image_links, QString
                                           max_download);
 }
 
+bool image_downloader::can_download_image(const download_img_task &task, img_links_map_value &img_info)
+{
+    bool img_can_read = true;
+    QByteArray format;
+    {
+        QImageReader img(task->get_save_as());
+        img.setDecideFormatFromContent(true);
+        img_can_read = img.canRead();
+        format = img.format();
+    }
+    if(task->get_network_error_code() == QNetworkReply::NoError && img_can_read){
+        QLOG_INFO()<<"can save image choice:"<<(int)img_info.choice_;
+        QString const &valid_name = get_valid_image_name(task->get_save_as(), format);
+        if(valid_name != task->get_save_as()){
+            bool const can_rename_img = QFile::rename(task->get_save_as(), valid_name);
+            QLOG_INFO()<<"QFile::rename, can rename image from:"<<task->get_save_as()<<", to:"<<
+                         valid_name<<":"<<format<<":"<<can_rename_img;
+        }
+        if(img_info.choice_ == link_choice::big){
+            ++statistic_.big_img_download_;
+        }else{
+            ++statistic_.small_img_download_;
+        }
+        return true;
+    }
+
+    return false;
+}
+
 std::vector<QNetworkProxy> image_downloader::create_proxy() const
 {
     return {
@@ -147,27 +176,7 @@ void image_downloader::increase_progress()
 void image_downloader::process_download_image(image_downloader::download_img_task task,
                                               image_downloader::img_links_map_value img_info)
 {
-    bool img_can_read = true;
-    QByteArray format;
-    {
-        QImageReader img(task->get_save_as());
-        img.setDecideFormatFromContent(true);
-        img_can_read = img.canRead();
-        format = img.format();
-    }
-    if(task->get_network_error_code() == QNetworkReply::NoError && img_can_read){
-        QLOG_INFO()<<"can save image choice:"<<(int)img_info.choice_;
-        QString const &valid_name = get_valid_image_name(task->get_save_as(), format);
-        if(valid_name != task->get_save_as()){
-            bool const can_rename_img = QFile::rename(task->get_save_as(), valid_name);
-            QLOG_INFO()<<"QFile::rename, can rename image from:"<<task->get_save_as()<<", to:"<<
-                         valid_name<<":"<<format<<":"<<can_rename_img;
-        }
-        if(img_info.choice_ == link_choice::big){
-            ++statistic_.big_img_download_;
-        }else{
-            ++statistic_.small_img_download_;
-        }
+    if(can_download_image(task, img_info)){
         increase_progress();
         download_next_image();
     }else{
