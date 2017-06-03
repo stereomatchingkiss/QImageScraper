@@ -41,7 +41,7 @@ void image_downloader::set_download_request(QStringList big_image_links, QString
                                           max_download);
 }
 
-bool image_downloader::can_download_image(const download_img_task &task, img_links_map_value &img_info)
+bool image_downloader::can_download_image(download_img_task const &task, img_links_map_value const &img_info)
 {
     bool img_can_read = true;
     QByteArray format;
