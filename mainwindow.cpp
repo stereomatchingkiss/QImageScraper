@@ -52,7 +52,7 @@ MainWindow::MainWindow(QWidget *parent) :
         restoreGeometry(settings.value("geometry").toByteArray());
     }
 
-    settings.setValue("version", "1.2");
+    settings.setValue("version", "1.3");
 
     qsrand(std::time(0));
 
