@@ -22,7 +22,7 @@ general_settings::general_settings(QWidget *parent) :
 
     QSettings settings;
     if(settings.contains("general/save_at")){
-        if(settings.value("general/save").toString().isEmpty()){
+        if(settings.value("general/save_at").toString().isEmpty()){
             ui->lineEditSaveAt->setText(write_able_path_);
         }else{
             ui->lineEditSaveAt->setText(settings.value("general/save_at").toString());
