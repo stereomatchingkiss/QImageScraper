@@ -54,9 +54,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     settings.setValue("version", "1.3");
 
-    qsrand(std::time(0));
-
-    setMinimumSize(size());
+    qsrand(std::time(0));    
 
     using namespace qte::net;
 
