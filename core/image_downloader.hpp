@@ -13,13 +13,7 @@ class image_downloader : public QObject
     Q_OBJECT
 
     using download_img_task = std::shared_ptr<qte::net::download_supervisor::download_task>;
-public:
-    enum class download_state
-    {
-        normal,
-        show_big_img_by_web_view
-    };
-
+public:    
     struct download_statistic
     {
         void clear();
@@ -82,8 +76,7 @@ private:
     bool remove_file(QString const &debug_msg, download_img_task task) const;
     void start_download(QString const &big_img_link, QString const &small_img_link);
 
-    QStringList big_img_links_;
-    download_state download_state_;
+    QStringList big_img_links_;    
     qte::net::download_supervisor *downloader_;
     std::map<size_t, img_links_map_value> img_links_map_;
     std::vector<QNetworkProxy> proxy_list_;
