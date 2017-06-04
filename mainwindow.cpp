@@ -51,12 +51,9 @@ MainWindow::MainWindow(QWidget *parent) :
     if(settings.contains("geometry")){
         restoreGeometry(settings.value("geometry").toByteArray());
     }
-
     settings.setValue("version", "1.3");
 
-    qsrand(std::time(0));    
-
-    using namespace qte::net;
+    qsrand(std::time(0));
 
     connect(general_settings_, &general_settings::ok_clicked, this, &MainWindow::general_settings_ok_clicked);
 
