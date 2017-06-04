@@ -133,8 +133,7 @@ signals:
 protected:
     QWebEnginePage& get_web_page();
 
-private:
-    void clipboard_data_changed();
+private:    
     virtual void load_web_page_finished(bool ok) = 0;
 
     QWebEnginePage &web_page_;
