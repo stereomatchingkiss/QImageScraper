@@ -213,11 +213,9 @@ void MainWindow::process_image_search_error(image_search_error::error error)
 {
     if(error == image_search_error::error::load_page_error){
         if(!is_download_finished()){
-            if(img_downloader_->get_download_state() == image_downloader::download_state::normal){
-                QLOG_INFO()<<"reload small img";
-                QTimer::singleShot(qrand() % 4000 + 2000,
-                                   [this](){ img_search_->reload(); });
-            }
+            QLOG_INFO()<<"reload small img";
+            QTimer::singleShot(qrand() % 4000 + 2000,
+                               [this](){ img_search_->reload(); });
         }else{
             img_search_->go_to_search_page();
         }

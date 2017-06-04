@@ -36,8 +36,7 @@ public:
     explicit image_downloader(QObject *parent = nullptr);
 
     void download_next_image();
-    void download_web_view_img();
-    download_state get_download_state() const;
+    void download_web_view_img();    
     QNetworkAccessManager* get_network_manager() const;
     download_statistic get_statistic() const;
     bool image_links_empty() const;    

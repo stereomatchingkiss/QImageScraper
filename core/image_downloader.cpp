@@ -13,8 +13,7 @@
 #include <QNetworkProxy>
 
 image_downloader::image_downloader(QObject *parent) :
-    QObject(parent),
-    download_state_{download_state::normal},
+    QObject(parent),    
     downloader_{new qte::net::download_supervisor(this)}
 {
     using namespace qte::net;
@@ -35,8 +34,7 @@ void image_downloader::set_download_request(QStringList big_image_links, QString
     QLOG_INFO()<<__func__<<":big img:"<<big_img_links_.size()<<",small img:"<<small_img_links_.size();
     statistic_.clear();
     img_links_map_.clear();
-    save_at_ = save_at;
-    download_state_ = download_state::normal;
+    save_at_ = save_at;    
     statistic_.total_download_ = std::min(static_cast<size_t>(big_img_links_.size()),
                                           max_download);
 }
@@ -235,11 +233,6 @@ void image_downloader::download_next_image()
             emit set_statusbar_msg(tr("Please wait a moment"));
         }
     }
-}
-
-image_downloader::download_state image_downloader::get_download_state() const
-{
-    return download_state_;
 }
 
 QNetworkAccessManager *image_downloader::get_network_manager() const
