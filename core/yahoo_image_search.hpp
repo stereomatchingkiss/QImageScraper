@@ -43,6 +43,7 @@ private:
     std::function<void(QString const&, QString const&)> parse_img_link_callback_;
     size_t scroll_count_;
     size_t scroll_limit_;
+    QString search_key_;
     state state_;
     bool stop_scroll_page_;
 };

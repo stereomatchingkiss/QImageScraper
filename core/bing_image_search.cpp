@@ -57,14 +57,22 @@ void bing_image_search::reload()
 
 void bing_image_search::show_more_images(size_t max_search_size)
 {
-    max_search_size_ = max_search_size;
-    if((int)max_search_size_ > img_page_links_.size()){
-        scroll_limit_ = (max_search_size_ - img_page_links_.size()) / 35 + 1;
-    }else{
-        scroll_limit_ = 4;
-    }
-    state_ = state::show_more_images;
-    scroll_web_page();
+    get_search_target([this, max_search_size](QString const &target)
+    {
+        if(target != search_key_){
+            img_page_links_.clear();
+        }
+
+        search_key_ = target;
+        max_search_size_ = max_search_size;
+        if((int)max_search_size_ > img_page_links_.size()){
+            scroll_limit_ = (max_search_size_ - img_page_links_.size()) / 35 + 1;
+        }else{
+            scroll_limit_ = 4;
+        }
+        state_ = state::show_more_images;
+        scroll_web_page();
+    });
 }
 
 void bing_image_search::stop_show_more_images()
@@ -80,7 +88,7 @@ void bing_image_search::load_web_page_finished(bool ok)
             state_ = state::to_gallery_page;
             emit go_to_gallery_page_done();
             return;
-        }
+        }                
 
         switch(state_){
         case state::load_url:{
@@ -157,7 +165,7 @@ void bing_image_search::get_search_target(std::function<void (const QString &)> 
     get_web_page().runJavaScript("function jscmd(){return document.getElementById(\"sb_form_q\").value} jscmd()",
                                  [this, callback](QVariant const &contents)
     {
-        QLOG_INFO()<<"gallery page target:"<<contents.toString();
+        QLOG_INFO()<<"gallery page target:"<<contents.toString();        
         callback(contents.toString());
     });
 }
@@ -250,7 +258,7 @@ void bing_image_search::scroll_web_page()
     //this may cause the page stop scrolling too early
     if(state_ == state::show_more_images){
         scroll_count_ = 0;
-        stop_scroll_page_ = false;
+        stop_scroll_page_ = false;        
         QTimer::singleShot(scroll_page_duration, [this](){scroll_web_page_impl();});
     }
 }

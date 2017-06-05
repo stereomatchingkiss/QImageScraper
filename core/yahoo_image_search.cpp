@@ -71,15 +71,23 @@ void yahoo_image_search::reload()
 }
 
 void yahoo_image_search::show_more_images(size_t max_search_size)
-{
-    max_search_size_ = max_search_size;
-    if((int)max_search_size_ > img_page_links_.size()){
-        scroll_limit_ = (max_search_size_ - img_page_links_.size()) / 48 + 1;
-    }else{
-        scroll_limit_ = 4;
-    }
-    state_ = state::show_more_images;
-    scroll_web_page();
+{        
+    get_search_target([this, max_search_size](QString const &target)
+    {
+        if(target != search_key_){
+            img_page_links_.clear();
+        }
+        search_key_ = target;
+
+        max_search_size_ = max_search_size;
+        if((int)max_search_size_ > img_page_links_.size()){
+            scroll_limit_ = (max_search_size_ - img_page_links_.size()) / 48 + 1;
+        }else{
+            scroll_limit_ = 4;
+        }
+        state_ = state::show_more_images;
+        scroll_web_page();
+    });
 }
 
 void yahoo_image_search::stop_show_more_images()

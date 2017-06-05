@@ -87,10 +87,8 @@ public:
 
     /**
      * @brief Asynchronous method, let second page of the search engine show more image.
-     * This function will emit signal "scroll_second_page_done" after scroll action
-     * are all done; Will emit signal "second_page_scrolled" everytime
-     * the page scroll(if oage scrolling action is trigger by scroll_second_page)
-     * @param max_search_size size of the images want to scrape
+     * This function will emit signal "show_more_images_done" after action
+     * are all done
      */
     virtual void show_more_images(size_t max_search_size) = 0;
 
