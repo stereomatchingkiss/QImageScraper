@@ -16,6 +16,10 @@ public:
     {
         return 2;
     }
+    static constexpr size_t timeout_retry_limit()
+    {
+        return 5;
+    }
 
     static QString yahoo_search_name();
 };
