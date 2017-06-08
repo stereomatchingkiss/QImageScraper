@@ -89,7 +89,10 @@ SOURCES += main.cpp\
     core/google_image_search.cpp \
     core/yahoo_image_search.cpp \
     ../qt_enhance/utility/qte_utility.cpp \
-    core/image_downloader.cpp
+    core/image_downloader.cpp \
+    ui/proxy_settings.cpp \
+    ui/settings_manager.cpp \
+    ui/proxy_delegate.cpp
 
 HEADERS  += mainwindow.hpp \
     core/bing_image_search.hpp \
@@ -105,11 +108,16 @@ HEADERS  += mainwindow.hpp \
     core/image_search_error.hpp \
     core/yahoo_image_search.hpp \
     ../qt_enhance/utility/qte_utility.hpp \
-    core/image_downloader.hpp
+    core/image_downloader.hpp \
+    ui/proxy_settings.hpp \
+    ui/settings_manager.hpp \
+    ui/proxy_delegate.hpp
 
 FORMS    += mainwindow.ui \
     ui/general_settings.ui \
-    ui/info_dialog.ui
+    ui/info_dialog.ui \
+    ui/proxy_settings.ui \
+    ui/settings_manager.ui
 
 RESOURCES += \
     icons.qrc
