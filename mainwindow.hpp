@@ -18,6 +18,7 @@ class MainWindow;
 class general_settings;
 class image_downloader;
 class image_search;
+class settings_manager;
 class QCheckBox;
 
 class MainWindow : public QMainWindow
@@ -53,7 +54,8 @@ private:
     void create_search_engine(QString const &target);
     void download_progress(download_img_task task,
                            qint64 bytesReceived, qint64 bytesTotal);    
-    void general_settings_ok_clicked();
+    void settings_manager_ok_clicked();
+    void init_connection();
     bool is_download_finished() const;    
     void process_go_to_gallery_page();
     void process_go_to_search_page();    
@@ -67,10 +69,10 @@ private:
 
     Ui::MainWindow *ui;
     QSize default_max_size_;
-    QSize default_min_size_;
-    general_settings *general_settings_;
+    QSize default_min_size_;    
     image_downloader *img_downloader_;            
-    image_search *img_search_;            
+    image_search *img_search_;
+    settings_manager *settings_manager_;
 };
 
 #endif // MAINWINDOW_HPP

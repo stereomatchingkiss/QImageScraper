@@ -5,6 +5,7 @@
 
 #include <QDir>
 #include <QFileDialog>
+#include <QMessageBox>
 #include <QSettings>
 #include <QStandardPaths>
 
@@ -50,6 +51,30 @@ general_settings::~general_settings()
     delete ui;
 }
 
+void general_settings::accept_settings()
+{
+    QSettings settings;
+    if(ui->comboBoxSearchBy->currentText() != settings.value("general/search_by").toString()){
+        search_by_changed_ = true;
+    }else{
+        search_by_changed_ = false;
+    }
+
+    settings.setValue("general/search_by", ui->comboBoxSearchBy->currentText());
+    settings.setValue("general/max_download_img", ui->spinBoxMaxDownloadImg->value());
+
+    QDir dir;
+    if(!dir.mkpath(ui->lineEditSaveAt->text())){
+        QMessageBox::warning(this, tr("Error"), tr("Cannot create directory to save image %1, please choose a new directory, "
+                                                   "if not the images will save at %2").
+                             arg(ui->lineEditSaveAt->text()).
+                             arg(write_able_path_));
+        ui->lineEditSaveAt->setText(write_able_path_);
+    }
+
+    settings.setValue("general/save_at", ui->lineEditSaveAt->text());
+}
+
 int general_settings::get_max_download_img() const
 {
     return ui->spinBoxMaxDownloadImg->value();
@@ -70,29 +95,9 @@ bool general_settings::search_by_changed() const
     return search_by_changed_;
 }
 
-void general_settings::on_buttonBox_accepted()
+void general_settings::reject_settings()
 {
-    QSettings settings;
-    if(ui->comboBoxSearchBy->currentText() != settings.value("general/search_by").toString()){
-        search_by_changed_ = true;
-    }else{
-        search_by_changed_ = false;
-    }
-
-    settings.setValue("general/search_by", ui->comboBoxSearchBy->currentText());
-    settings.setValue("general/max_download_img", ui->spinBoxMaxDownloadImg->value());
-
-    QDir dir;
-    if(!dir.mkpath(ui->lineEditSaveAt->text())){
-        emit cannot_create_save_dir(ui->lineEditSaveAt->text(), write_able_path_);
-        ui->lineEditSaveAt->setText(write_able_path_);
-    }
-
-    settings.setValue("general/save_at", ui->lineEditSaveAt->text());
-
-    emit ok_clicked();
-
-    close();
+    restore_value();
 }
 
 void general_settings::restore_value()
@@ -101,13 +106,6 @@ void general_settings::restore_value()
     ui->lineEditSaveAt->setText(settings.value("general/save_at").toString());
     ui->comboBoxSearchBy->setCurrentText(settings.value("general/search_by").toString());
     ui->spinBoxMaxDownloadImg->setValue(settings.value("general/max_download_img").toInt());
-}
-
-void general_settings::on_buttonBox_rejected()
-{
-    restore_value();
-
-    close();
 }
 
 void general_settings::closeEvent(QCloseEvent *event)

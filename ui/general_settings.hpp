@@ -15,20 +15,14 @@ public:
     explicit general_settings(QWidget *parent = nullptr);
     ~general_settings();
 
+    void accept_settings();
     int get_max_download_img() const;
     QString get_save_at() const;
     QString get_search_by() const;
     bool search_by_changed() const;
-
-signals:
-    void cannot_create_save_dir(QString const &dir, QString const &write_able_path);
-    void ok_clicked();
+    void reject_settings();
 
 private slots:
-    void on_buttonBox_accepted();
-
-    void on_buttonBox_rejected();
-
     void on_pushButtonSaveAt_clicked();
 
 private:

@@ -11,6 +11,7 @@
 #include "core/utility.hpp"
 
 #include "ui/info_dialog.hpp"
+#include "ui/settings_manager.hpp"
 
 #include <qt_enhance/utility/qte_utility.hpp>
 
@@ -33,12 +34,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow),
     default_max_size_{maximumSize()},
     default_min_size_{minimumSize()},
-    general_settings_{new general_settings(this)},
     img_downloader_{new image_downloader{this}},
-    img_search_{nullptr}
+    img_search_{nullptr},
+    settings_manager_{new settings_manager{this}}
 {    
     ui->setupUi(this);
-    general_settings_ok_clicked();
+    settings_manager_ok_clicked();
     ui->actionDownload->setEnabled(false);
     ui->actionShowMoreImage->setEnabled(false);
     ui->actionStop->setEnabled(false);
@@ -55,32 +56,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     qsrand(std::time(0));
 
-    connect(general_settings_, &general_settings::ok_clicked, this, &MainWindow::general_settings_ok_clicked);
-
-    connect(img_downloader_, &image_downloader::increment_progress, [this]()
-    {
-        ui->progressBar->setValue(ui->progressBar->value() + 1);
-        QLOG_INFO()<<"current progress:"<<ui->progressBar->value();
-    });
-    connect(img_downloader_, &image_downloader::set_statusbar_msg, [this](QString const &msg)
-    {
-        ui->statusBar->showMessage(msg);
-    });
-    connect(img_downloader_, &image_downloader::refresh_window, this, &MainWindow::refresh_window);
-    connect(img_downloader_, &image_downloader::download_progress, this, &MainWindow::download_progress);
-    connect(img_downloader_, &image_downloader::load_image, [this](QString const &url)
-    {
-        if(img_search_){
-            img_search_->load(url);
-        }
-    });
-
-    connect(general_settings_, &general_settings::cannot_create_save_dir,
-            [this](QString const &dir, QString const &write_able_path)
-    {
-        QMessageBox::warning(this, tr("Error"), tr("Cannot create directory to save image %1, please choose a new directory, "
-                                                   "if not the images will save at %2").arg(dir).arg(write_able_path));
-    });
+    init_connection();
 
     check_new_version();
 }
@@ -95,8 +71,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::change_search_engine()
 {            
+    QLOG_INFO()<<__func__;
     if(img_search_){
-        if(general_settings_->search_by_changed()){
+        if(settings_manager_->get_general_settings().search_by_changed()){
             img_search_->get_search_target([this](QString const &target)
             {
                 create_search_engine(target);
@@ -123,10 +100,10 @@ void MainWindow::create_search_engine(const QString &target)
         img_search_->deleteLater();
     }
 
-    if(general_settings_->get_search_by() == global_constant::bing_search_name()){
+    if(settings_manager_->get_general_settings().get_search_by() == global_constant::bing_search_name()){
         QLOG_INFO()<<__func__<<":create bing engine";
         img_search_ = new bing_image_search(*ui->webView->page(), this);
-    }else if(general_settings_->get_search_by() == global_constant::yahoo_search_name()){
+    }else if(settings_manager_->get_general_settings().get_search_by() == global_constant::yahoo_search_name()){
         QLOG_INFO()<<__func__<<":create yahoo engine";
         img_search_ = new yahoo_image_search(*ui->webView->page(), this);
     }else{
@@ -150,10 +127,34 @@ void MainWindow::create_search_engine(const QString &target)
     }
 }
 
-void MainWindow::general_settings_ok_clicked()
+void MainWindow::settings_manager_ok_clicked()
 {    
     change_search_engine();
 }
+
+void MainWindow::init_connection()
+{    
+    connect(settings_manager_, &settings_manager::ok_clicked, this, &MainWindow::settings_manager_ok_clicked);
+
+    connect(img_downloader_, &image_downloader::increment_progress, [this]()
+    {
+        ui->progressBar->setValue(ui->progressBar->value() + 1);
+        QLOG_INFO()<<"current progress:"<<ui->progressBar->value();
+    });
+    connect(img_downloader_, &image_downloader::set_statusbar_msg, [this](QString const &msg)
+    {
+        ui->statusBar->showMessage(msg);
+    });
+    connect(img_downloader_, &image_downloader::refresh_window, this, &MainWindow::refresh_window);
+    connect(img_downloader_, &image_downloader::download_progress, this, &MainWindow::download_progress);
+    connect(img_downloader_, &image_downloader::load_image, [this](QString const &url)
+    {
+        if(img_search_){
+            img_search_->load(url);
+        }
+    });
+}
+
 
 bool MainWindow::is_download_finished() const
 {
@@ -318,23 +319,24 @@ void MainWindow::on_actionDownload_triggered()
     img_search_->get_imgs_link_from_gallery_page([this](QStringList const &big_img_link, QStringList const &small_img_link)
     {
         auto const total_download_ = std::min(static_cast<size_t>(big_img_link.size()),
-                                              static_cast<size_t>(general_settings_->get_max_download_img()));
+                                              static_cast<size_t>(settings_manager_->get_general_settings().get_max_download_img()));
         QLOG_INFO()<<"big img links size:"<<big_img_link.size()<<",max download size:"
-                  <<general_settings_->get_max_download_img();
+                  <<settings_manager_->get_general_settings().get_max_download_img();
         ui->labelProgress->setVisible(true);
         ui->progressBar->setVisible(true);
         ui->progressBar->setRange(0, static_cast<int>(total_download_));
         ui->progressBar->setValue(0);
         QLOG_INFO()<<"progress bar min:"<<ui->progressBar->minimum()<<",max:"<<ui->progressBar->maximum();
         img_downloader_->set_download_request(big_img_link, small_img_link, total_download_,
-                                              general_settings_->get_save_at());
+                                              settings_manager_->get_general_settings().get_save_at());
         img_downloader_->download_next_image();
     });
 }
 
 void MainWindow::on_actionSettings_triggered()
 {
-    general_settings_->exec();
+    settings_manager_->exec();
+    //setup_manager_->get_general_settings().exec();
 }
 
 void MainWindow::on_actionRefresh_triggered()
@@ -361,7 +363,7 @@ void MainWindow::on_actionShowMoreImage_triggered()
 {
     set_enabled_main_window_except_stop(false);
     setMaximumSize(size());
-    img_search_->show_more_images(general_settings_->get_max_download_img());
+    img_search_->show_more_images(settings_manager_->get_general_settings().get_max_download_img());
 }
 
 void MainWindow::on_actionNew_triggered()
