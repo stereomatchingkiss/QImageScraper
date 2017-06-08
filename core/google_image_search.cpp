@@ -109,22 +109,10 @@ void google_image_search::go_to_gallery_page(const QString &target)
 
 void google_image_search::show_more_images(size_t max_search_size)
 {
-    get_search_target([this, max_search_size](QString const &target)
-    {
-        if(target != search_key_){
-            img_page_links_.clear();
-        }
-        search_key_ = target;
-
-        max_search_size_ = max_search_size;
-        if((int)max_search_size_ > img_page_links_.size()){
-            scroll_limit_ = (max_search_size_ - img_page_links_.size()) / 100 + 1;
-        }else{
-            scroll_limit_ = 4;
-        }
-        state_ = state::show_more_images;
-        scroll_web_page();
-    });
+    max_search_size_ = max_search_size;
+    scroll_limit_ = (max_search_size_ - img_page_links_.size()) / 100 + 1;
+    state_ = state::show_more_images;
+    scroll_web_page();
 }
 
 void google_image_search::stop_show_more_images()
