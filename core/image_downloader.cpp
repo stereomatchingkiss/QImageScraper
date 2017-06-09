@@ -21,13 +21,11 @@ image_downloader::image_downloader(QObject *parent) :
     connect(downloader_, &download_supervisor::error, this, &image_downloader::download_image_error);
     connect(downloader_, &download_supervisor::download_finished, this, &image_downloader::download_finished);
     connect(downloader_, &download_supervisor::download_progress, this, &image_downloader::download_progress);
-
-    proxy_list_ = create_proxy();
-    proxy_list_.emplace_back(downloader_->get_network_manager()->proxy());
 }
 
 void image_downloader::set_download_request(QStringList big_image_links, QStringList small_image_links,
-                                            size_t max_download, QString const &save_at)
+                                            size_t max_download, QString const &save_at,
+                                            std::vector<QNetworkProxy> const &proxy)
 {
     big_img_links_.swap(big_image_links);
     small_img_links_.swap(small_image_links);
@@ -35,6 +33,7 @@ void image_downloader::set_download_request(QStringList big_image_links, QString
     statistic_.clear();
     img_links_map_.clear();
     save_at_ = save_at;
+    proxy_list_ = proxy;
     statistic_.total_download_ = std::min(static_cast<size_t>(big_img_links_.size()),
                                           max_download);
 }
@@ -68,32 +67,6 @@ bool image_downloader::can_download_image(download_img_task const &task, img_lin
     return false;
 }
 
-std::vector<QNetworkProxy> image_downloader::create_proxy() const
-{
-    return {
-        {QNetworkProxy::HttpProxy, "200.122.209.202", 53281}, //HTTPS, HA, response
-        {QNetworkProxy::HttpProxy, "138.68.167.66", 8118}, //HTTPS, HA, response
-        {QNetworkProxy::HttpProxy, "61.91.54.42", 8080}, //HTTPS, HA, respone
-        {QNetworkProxy::HttpProxy, "190.217.55.2", 3128}, //HTTPS, HA, response
-        {QNetworkProxy::HttpProxy, "109.121.161.192", 53281},//HTTPS, HA, response
-        {QNetworkProxy::HttpProxy, "87.197.145.202", 9999},//HTTPS, HA, response
-        {QNetworkProxy::HttpProxy, "187.121.245.18", 3128}, //HTTPS, HA, response
-        {QNetworkProxy::HttpProxy, "182.253.117.178", 53281}, //HTTPS, HA, response
-        {QNetworkProxy::HttpProxy, "123.231.65.170", 8080}, //HTTPS, HA, response
-        {QNetworkProxy::HttpProxy, "218.248.73.193", 808}, //HTTPS, HA, response
-        {QNetworkProxy::HttpProxy, "211.79.61.8", 3128}, //HTTPS, A, response
-        {QNetworkProxy::HttpProxy, "88.99.149.188", 31288}, //HTTPS, A, response
-        {QNetworkProxy::HttpProxy, "51.255.48.61", 9999}, //HTTPS, A, response
-        {QNetworkProxy::HttpProxy, "150.95.155.22", 3128}, //HTTPS, A, response
-        {QNetworkProxy::HttpProxy, "122.3.242.7", 3128}, //HTTPS, A, response
-        {QNetworkProxy::HttpProxy, "52.169.207.134", 3128}, //HTTPS, A, response
-        {QNetworkProxy::HttpProxy, "46.218.85.101", 3129}, //HTTPS, A, response
-        {QNetworkProxy::HttpProxy, "200.54.108.54", 80}, //HTTPS, A, response
-        {QNetworkProxy::HttpProxy, "170.55.15.175", 3128}, //HTTPS, A, response
-        {QNetworkProxy::HttpProxy, "142.165.19.133", 80}, //HTTPS, A, response
-    };
-}
-
 void image_downloader::download_finished(image_downloader::download_img_task task)
 {
     QLOG_INFO()<<__func__<<":"<<task->get_unique_id()<<":"<<task->get_network_error_code();
@@ -102,13 +75,14 @@ void image_downloader::download_finished(image_downloader::download_img_task tas
     if(it != std::end(img_links_map_)){
         auto img_info = it->second;
         img_links_map_.erase(it);
-        if(task->get_is_timeout() && img_info.timeout_retry_num_ < global_constant::timeout_retry_limit()){
+        if(task->get_is_timeout() && img_info.retry_num_ < global_constant::timeout_retry_limit()){
             QLOG_INFO()<<__func__<<":"<<task->get_save_as()<<","<<task->get_url()<<": timeout";
             emit set_statusbar_msg(tr("Waiting reply from the server, please give some patient"));
             remove_file("time out issue:", task);
-            ++img_info.timeout_retry_num_;
+            ++img_info.retry_num_;
             download_image(std::move(img_info));
         }else{
+            img_info.retry_num_ = 0;
             process_download_image(task, std::move(img_info));
         }
     }else{
@@ -124,7 +98,11 @@ void image_downloader::download_image(image_downloader::img_links_map_value info
     QString const &img_link = choice == link_choice::big ?
                 info.big_img_link_ : info.small_img_link_;
     QNetworkRequest const request = create_img_download_request(img_link);
-    //downloader_->set_proxy(proxy_list_[qrand() % proxy_list_.size()]);
+    if(!proxy_list_.empty() && info.retry_num_ != 0){
+        downloader_->set_proxy(proxy_list_[qrand() % proxy_list_.size()]);
+    }else{
+        downloader_->set_proxy(QNetworkProxy());
+    }
     auto const unique_id = downloader_->append(request, save_at_,
                                                global_constant::network_reply_timeout());
     img_links_map_.emplace(unique_id, std::move(info));
@@ -271,20 +249,17 @@ size_t image_downloader::download_statistic::success() const
 
 image_downloader::img_links_map_value::img_links_map_value() :
     choice_{link_choice::big},
-    retry_num_{0},
-    timeout_retry_num_{0}
+    retry_num_{0}
 {
 
 }
 
 image_downloader::img_links_map_value::img_links_map_value(QString big_img_link, QString small_img_link,
-                                                           image_downloader::link_choice choice, size_t retry_num,
-                                                           size_t timeout_retry_num) :
+                                                           image_downloader::link_choice choice, size_t retry_num) :
     big_img_link_{std::move(big_img_link)},
     choice_{choice},
     retry_num_{retry_num},
-    small_img_link_{std::move(small_img_link)},
-    timeout_retry_num_{timeout_retry_num}
+    small_img_link_{std::move(small_img_link)}
 {
 
 }

@@ -35,7 +35,8 @@ public:
     download_statistic get_statistic() const;
     bool image_links_empty() const;    
     void set_download_request(QStringList big_image_links, QStringList small_image_links,
-                              size_t max_download, QString const &save_at);    
+                              size_t max_download, QString const &save_at,
+                              std::vector<QNetworkProxy> const &proxy = {});
 
 signals:
     void download_progress(download_img_task task,
@@ -56,16 +57,14 @@ private:
     {
         img_links_map_value();
         img_links_map_value(QString big_img_link, QString small_img_link, link_choice choice,
-                            size_t retry_num = 0, size_t timeout_retry_num = 0);
+                            size_t retry_num = 0);
         QString big_img_link_;
         link_choice choice_;
         size_t retry_num_;        
-        QString small_img_link_;
-        size_t timeout_retry_num_;
+        QString small_img_link_;        
     };
 
-    bool can_download_image(download_img_task const &task, img_links_map_value const &img_info);
-    std::vector<QNetworkProxy> create_proxy() const;
+    bool can_download_image(download_img_task const &task, img_links_map_value const &img_info);    
     void download_finished(download_img_task task);
     void download_image(img_links_map_value info);
     void download_image_error(download_img_task task, QString const &error_msg);

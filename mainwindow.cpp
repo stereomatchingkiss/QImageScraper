@@ -1,8 +1,6 @@
 #include "mainwindow.hpp"
 #include "ui_mainwindow.h"
 
-#include "general_settings.hpp"
-
 #include "core/bing_image_search.hpp"
 #include "core/google_image_search.hpp"
 #include "core/image_downloader.hpp"
@@ -11,6 +9,8 @@
 #include "core/utility.hpp"
 
 #include "ui/info_dialog.hpp"
+#include "ui/general_settings.hpp"
+#include "ui/proxy_settings.hpp"
 #include "ui/settings_manager.hpp"
 
 #include <qt_enhance/utility/qte_utility.hpp>
@@ -327,8 +327,17 @@ void MainWindow::on_actionDownload_triggered()
         ui->progressBar->setRange(0, static_cast<int>(total_download_));
         ui->progressBar->setValue(0);
         QLOG_INFO()<<"progress bar min:"<<ui->progressBar->minimum()<<",max:"<<ui->progressBar->maximum();
+        std::vector<QNetworkProxy> proxies;
+        if(settings_manager_->get_proxy_settings().has_proxy()){
+            proxies = settings_manager_->get_proxy_settings().get_proxies();
+            QLOG_INFO()<<__func__;
+            for(auto const &proxy: proxies){
+                QLOG_INFO()<<proxy;
+            }
+        }
         img_downloader_->set_download_request(big_img_link, small_img_link, total_download_,
-                                              settings_manager_->get_general_settings().get_save_at());
+                                              settings_manager_->get_general_settings().get_save_at(),
+                                              proxies);
         img_downloader_->download_next_image();
     });
 }

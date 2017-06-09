@@ -31,6 +31,7 @@ public:
 
     void accept_settings();
     std::vector<QNetworkProxy> get_proxies() const;
+    bool has_proxy() const;
     void reject_settings();
 
 private slots:

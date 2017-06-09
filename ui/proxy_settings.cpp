@@ -64,6 +64,11 @@ std::vector<QNetworkProxy> proxy_settings::get_proxies() const
     return proxies;
 }
 
+bool proxy_settings::has_proxy() const
+{
+    return ui->radioButtonManualProxy->isChecked();
+}
+
 void proxy_settings::init_settings()
 {
     QSettings settings;
