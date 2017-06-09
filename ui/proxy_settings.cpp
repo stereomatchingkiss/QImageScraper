@@ -13,6 +13,7 @@
 #include <QSpinBox>
 
 #include <set>
+#include <map>
 
 proxy_settings::proxy_settings(QWidget *parent) :
     QDialog(parent),
@@ -41,14 +42,23 @@ void proxy_settings::accept_settings()
 std::vector<QNetworkProxy> proxy_settings::get_proxies() const
 {
     std::vector<QNetworkProxy> proxies;
+    std::map<QString, QNetworkProxy::ProxyType> mapper
+    {
+        {"DefaultProxy", QNetworkProxy::DefaultProxy},
+        {"Socks5Proxy", QNetworkProxy::Socks5Proxy},
+        {"HttpProxy", QNetworkProxy::HttpProxy},
+        {"HttpCachingProxy", QNetworkProxy::HttpCachingProxy},
+        {"FtpCachingProxy", QNetworkProxy::FtpCachingProxy}
+    };
     for(int i = 0; i != ui->tableWidgetPoxyTable->rowCount(); ++i){
-        auto const type = get_table_data(i, proxy_field::type).value<qint32>();
+        auto *combo_box = qobject_cast<QComboBox*>(ui->tableWidgetPoxyTable->cellWidget(i, static_cast<int>(proxy_field::type)));
+        auto *spin_box = qobject_cast<QSpinBox*>(ui->tableWidgetPoxyTable->cellWidget(i, static_cast<int>(proxy_field::port)));
         auto const host = get_table_data(i, proxy_field::host).value<QString>();
-        auto const port = get_table_data(i, proxy_field::port).value<quint16>();
         auto const user_name = get_table_data(i, proxy_field::user_name).value<QString>();
         auto const password = get_table_data(i, proxy_field::password).value<QString>();
-        proxies.emplace_back(static_cast<QNetworkProxy::ProxyType>(type), host,
-                             port, user_name, password);
+        proxies.emplace_back(mapper[combo_box->currentText()], host,
+                             static_cast<quint16>(spin_box->value()),
+                             user_name, password);
     }
 
     return proxies;
