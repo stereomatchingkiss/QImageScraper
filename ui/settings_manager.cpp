@@ -58,10 +58,12 @@ void settings_manager::on_settings_accepted()
 {
     QLOG_INFO()<<__func__;
     get_pri_general_settings().accept_settings();
+    get_pri_proxy_settings().accept_settings();
     emit ok_clicked();
 }
 
 void settings_manager::on_settings_rejected()
 {
     get_pri_general_settings().reject_settings();
+    get_pri_proxy_settings().reject_settings();
 }
