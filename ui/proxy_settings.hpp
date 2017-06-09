@@ -45,9 +45,15 @@ private slots:
     void on_pushButtonDeleteProxy_clicked();
 
 private:
+    void add_proxy(QString const &type, QString const &host,
+                   quint16 port, QString const &user_name,
+                   QString const &password);
     QVariant get_table_data(int row, proxy_field col) const;
+    void read_proxy_data();
+    void init_settings();
+    void write_proxy_data();
 
-    Ui::proxy_settings *ui;
+    Ui::proxy_settings *ui;    
 };
 
 #endif // PROXY_SETTINGS_HPP
