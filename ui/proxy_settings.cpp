@@ -9,6 +9,7 @@
 #include <QDataStream>
 #include <QFile>
 #include <QMessageBox>
+#include <QSaveFile>
 #include <QSettings>
 #include <QSpinBox>
 
@@ -57,8 +58,8 @@ std::vector<QNetworkProxy> proxy_settings::get_proxies() const
         auto const user_name = get_table_data(i, proxy_field::user_name).value<QString>();
         auto const password = get_table_data(i, proxy_field::password).value<QString>();
         proxies.emplace_back(mapper[combo_box->currentText()], host,
-                             static_cast<quint16>(spin_box->value()),
-                             user_name, password);
+                static_cast<quint16>(spin_box->value()),
+                user_name, password);
     }
 
     return proxies;
@@ -200,27 +201,36 @@ void proxy_settings::read_proxy_data()
 
 void proxy_settings::write_proxy_data()
 {
-    QFile file("proxy_settings.dat");
-    if(!file.open(QIODevice::WriteOnly)){
+    QSaveFile file("proxy_settings.dat");
+    auto const cannot_write = []()
+    {
         QMessageBox::warning(nullptr, tr("Error"), tr("Cannot write proxy data into file, your settings "
                                                       "of the proxies cannot be saved"));
-        return;
+    };
+
+    if(!file.open(QIODevice::WriteOnly)){
+        cannot_write();
+    }else{
+        QDataStream stream(&file);
+        for(int i = 0; i != ui->tableWidgetPoxyTable->rowCount(); ++i){
+            auto *combo_box = qobject_cast<QComboBox*>(ui->tableWidgetPoxyTable->cellWidget(i, static_cast<int>(proxy_field::type)));
+            if(!combo_box){
+                QLOG_INFO()<<__func__<<":combo box is empty";
+            }
+            QString const type = combo_box->currentText();
+            QString const host = get_table_data(i, proxy_field::host).toString();
+            auto *spin_box = qobject_cast<QSpinBox*>(ui->tableWidgetPoxyTable->cellWidget(i, static_cast<int>(proxy_field::port)));
+            if(!spin_box){
+                QLOG_INFO()<<__func__<<":spinbox box is empty";
+            }
+            quint16 const port = static_cast<quint16>(spin_box->value());
+            QString const user_name = get_table_data(i, proxy_field::user_name).toString();
+            QString const password = get_table_data(i, proxy_field::password).toString();
+            stream<<type<<host<<port<<user_name<<password;
+        }
     }
-    QDataStream stream(&file);
-    for(int i = 0; i != ui->tableWidgetPoxyTable->rowCount(); ++i){
-        auto *combo_box = qobject_cast<QComboBox*>(ui->tableWidgetPoxyTable->cellWidget(i, static_cast<int>(proxy_field::type)));
-        if(!combo_box){
-            QLOG_INFO()<<__func__<<":combo box is empty";
-        }
-        QString const type = combo_box->currentText();
-        QString const host = get_table_data(i, proxy_field::host).toString();
-        auto *spin_box = qobject_cast<QSpinBox*>(ui->tableWidgetPoxyTable->cellWidget(i, static_cast<int>(proxy_field::port)));
-        if(!spin_box){
-            QLOG_INFO()<<__func__<<":spinbox box is empty";
-        }
-        quint16 const port = static_cast<quint16>(spin_box->value());
-        QString const user_name = get_table_data(i, proxy_field::user_name).toString();
-        QString const password = get_table_data(i, proxy_field::password).toString();
-        stream<<type<<host<<port<<user_name<<password;
+
+    if(!file.commit()){
+        cannot_write();
     }
 }
