@@ -57,11 +57,12 @@ private:
     {
         img_links_map_value();
         img_links_map_value(QString big_img_link, QString small_img_link, link_choice choice,
-                            size_t retry_num = 0);
+                            size_t retry_num = 0, size_t timeout_retry_num_ = 0);
         QString big_img_link_;
         link_choice choice_;
         size_t retry_num_;        
         QString small_img_link_;        
+        size_t timeout_retry_num_;
     };
 
     bool can_download_image(download_img_task const &task, img_links_map_value const &img_info);    

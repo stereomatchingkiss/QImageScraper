@@ -75,14 +75,13 @@ void image_downloader::download_finished(image_downloader::download_img_task tas
     if(it != std::end(img_links_map_)){
         auto img_info = it->second;
         img_links_map_.erase(it);
-        if(task->get_is_timeout() && img_info.retry_num_ < global_constant::timeout_retry_limit()){
+        if(task->get_is_timeout() && img_info.timeout_retry_num_ << global_constant::timeout_retry_limit()){
             QLOG_INFO()<<__func__<<":"<<task->get_save_as()<<","<<task->get_url()<<": timeout";
             emit set_statusbar_msg(tr("Waiting reply from the server, please give some patient"));
             remove_file("time out issue:", task);
-            ++img_info.retry_num_;
+            ++img_info.timeout_retry_num_;
             download_image(std::move(img_info));
         }else{
-            img_info.retry_num_ = 0;
             process_download_image(task, std::move(img_info));
         }
     }else{
@@ -99,8 +98,11 @@ void image_downloader::download_image(image_downloader::img_links_map_value info
                 info.big_img_link_ : info.small_img_link_;
     QNetworkRequest const request = create_img_download_request(img_link);
     if(!proxy_list_.empty() && info.retry_num_ != 0){
-        downloader_->set_proxy(proxy_list_[qrand() % proxy_list_.size()]);
+        auto const proxy = proxy_list_[qrand() % proxy_list_.size()];
+        QLOG_INFO()<<__func__<<":set proxy:"<<proxy;
+        downloader_->set_proxy(proxy);
     }else{
+        QLOG_INFO()<<__func__<<":set proxy:"<<QNetworkProxy();
         downloader_->set_proxy(QNetworkProxy());
     }
     auto const unique_id = downloader_->append(request, save_at_,
@@ -160,6 +162,7 @@ void image_downloader::process_download_image(image_downloader::download_img_tas
         remove_file("network error or cannot read img:", task);
         if(task->get_network_error_code() != QNetworkReply::NoError &&
                 img_info.retry_num_++ < global_constant::download_retry_limit()){
+            QLOG_INFO()<<__func__<<": network error or cannot read img retry num:"<<img_info.retry_num_;
             download_image(std::move(img_info));
         }else{
             img_info.retry_num_ = 0;
@@ -249,17 +252,20 @@ size_t image_downloader::download_statistic::success() const
 
 image_downloader::img_links_map_value::img_links_map_value() :
     choice_{link_choice::big},
-    retry_num_{0}
+    retry_num_{0},
+    timeout_retry_num_{0}
 {
 
 }
 
 image_downloader::img_links_map_value::img_links_map_value(QString big_img_link, QString small_img_link,
-                                                           image_downloader::link_choice choice, size_t retry_num) :
+                                                           image_downloader::link_choice choice, size_t retry_num,
+                                                           size_t timeout_retry_num) :
     big_img_link_{std::move(big_img_link)},
     choice_{choice},
     retry_num_{retry_num},
-    small_img_link_{std::move(small_img_link)}
+    small_img_link_{std::move(small_img_link)},
+    timeout_retry_num_{timeout_retry_num}
 {
 
 }
