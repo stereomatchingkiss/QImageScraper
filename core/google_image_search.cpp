@@ -72,19 +72,24 @@ void google_image_search::get_imgs_link_from_gallery_page(std::function<void (co
     state_ = state::get_img_link_from_gallery_page;
     get_web_page().toHtml([this, callback](QString const &contents)
     {
-        QRegularExpression const reg("<div class=\"rg_meta\">{[^}]*}");
-        auto iter = reg.globalMatch(contents);
-        QStringList big_im, small_im;
-        while(iter.hasNext()){
-            auto const match = iter.next();
-            QRegularExpression const link_big("\"ou\":\"([^\"]*)");
-            QRegularExpression const link_small("\"tu\":\"([^\"]*)");
-            auto const bm = link_big.match(match.captured(0));
-            auto const sm = link_small.match(match.captured(0));
-            big_im.push_back(bm.captured(1));
-            small_im.push_back(sm.captured(1).replace("\\u003d","="));
+        auto global_parser = [&contents](QRegularExpression const &re)
+        {
+            auto iter = re.globalMatch(contents);
+            QStringList result;
+            while(iter.hasNext()){
+                QRegularExpressionMatch const match = iter.next();
+                result.push_back(match.captured(1));
+            }
+
+            return result;
+        };
+
+        auto big_img = global_parser(QRegularExpression("\"ou\":\"([^\"]*)"));
+        auto small_img = global_parser(QRegularExpression("\"tu\":\"([^\"]*)"));
+        for(auto &img : small_img){
+            img.replace("\\u003d","=");
         }
-        callback(big_im, small_im);
+        callback(big_img, small_img);
     });
 }
 
