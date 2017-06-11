@@ -34,12 +34,9 @@ private:
     };
 
     void load_web_page_finished(bool ok) override;
-    void parse_page_link(QString const &contents);
+    QStringList parse_page_link(QString const &contents);
     void scroll_web_page();
-    void scroll_web_page_impl();
 
-    QStringList img_page_links_;
-    size_t max_search_size_;
     std::function<void(QString const&, QString const&)> parse_img_link_callback_;
     size_t scroll_count_;
     size_t scroll_limit_;    
