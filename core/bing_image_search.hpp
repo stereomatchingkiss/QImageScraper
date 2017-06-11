@@ -37,7 +37,6 @@ private:
     QStringList parse_page_link(QString const &contents);
     void scroll_web_page();
 
-    size_t max_search_size_;
     std::function<void(QStringList const&, QStringList const&)> parse_img_link_callback_;
     size_t scroll_count_;
     size_t scroll_limit_;    
