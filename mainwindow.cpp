@@ -294,8 +294,8 @@ void MainWindow::refresh_window()
                                                  arg(statistic.big_img_download_).arg(statistic.small_img_download_));
 
         if(ret == QMessageBox::Ok){
-            statusBar()->showMessage("");
-            img_search_->go_to_search_page();
+            statusBar()->showMessage("");            
+            ui->webView->page()->runJavaScript("window.scrollTo(0,0)");
         }
     }
 }
