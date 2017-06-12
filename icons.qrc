@@ -11,5 +11,7 @@
         <file>icons/add.png</file>
         <file>icons/delete.png</file>
         <file>icons/help.png</file>
+        <file>icons/browser_down.png</file>
+        <file>icons/browser_top.png</file>
     </qresource>
 </RCC>

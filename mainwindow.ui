@@ -80,6 +80,8 @@
    <addaction name="actionStop"/>
    <addaction name="actionRefresh"/>
    <addaction name="actionHome"/>
+   <addaction name="actionBrowserTop"/>
+   <addaction name="actionBrowserBottom"/>
    <addaction name="separator"/>
    <addaction name="actionSettings"/>
    <addaction name="actionNew"/>
@@ -119,7 +121,7 @@
     <string>ShowMoreImage</string>
    </property>
    <property name="toolTip">
-    <string>show more image</string>
+    <string>Show more image</string>
    </property>
    <property name="shortcut">
     <string>Alt+S</string>
@@ -133,6 +135,9 @@
    <property name="text">
     <string>Download</string>
    </property>
+   <property name="toolTip">
+    <string>Download images</string>
+   </property>
    <property name="shortcut">
     <string>Ctrl+D</string>
    </property>
@@ -144,6 +149,9 @@
    </property>
    <property name="text">
     <string>Refresh</string>
+   </property>
+   <property name="toolTip">
+    <string>Refresh current web page</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+R</string>
@@ -157,6 +165,9 @@
    <property name="text">
     <string>Home</string>
    </property>
+   <property name="toolTip">
+    <string>Back to search engine page</string>
+   </property>
    <property name="shortcut">
     <string>Ctrl+H</string>
    </property>
@@ -168,6 +179,9 @@
    </property>
    <property name="text">
     <string>New</string>
+   </property>
+   <property name="toolTip">
+    <string>Update to new version</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+N</string>
@@ -181,8 +195,41 @@
    <property name="text">
     <string>Stop</string>
    </property>
+   <property name="toolTip">
+    <string>Stop show more image</string>
+   </property>
    <property name="shortcut">
     <string>F1</string>
+   </property>
+  </action>
+  <action name="actionBrowserTop">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/browser_top.png</normaloff>:/icons/browser_top.png</iconset>
+   </property>
+   <property name="text">
+    <string>BrowserTop</string>
+   </property>
+   <property name="toolTip">
+    <string>To the top of the browser</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Up</string>
+   </property>
+  </action>
+  <action name="actionBrowserBottom">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/browser_down.png</normaloff>:/icons/browser_down.png</iconset>
+   </property>
+   <property name="text">
+    <string>BrowserBottom</string>
+   </property>
+   <property name="toolTip">
+    <string>To the bottom of the browser</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Down</string>
    </property>
   </action>
  </widget>

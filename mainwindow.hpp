@@ -46,6 +46,10 @@ private slots:
 
     void on_actionNew_triggered();
 
+    void on_actionBrowserTop_triggered();
+
+    void on_actionBrowserBottom_triggered();
+
 private:
     using download_img_task = std::shared_ptr<qte::net::download_supervisor::download_task>;
 

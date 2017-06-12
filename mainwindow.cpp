@@ -231,11 +231,13 @@ void MainWindow::process_show_more_images_done()
                                      tr("Found %1 images<br>"
                                         "Press %2 to scroll the page automatic<br>"
                                         "press %3 if you want to download the images<br> "
-                                        "press %4 if you want to configure your options").
+                                        "press %4 if you want to configure your options"
+                                        "press %5 if you want to go to the top of the page").
                                      arg(links.size()).
                                      arg("<img src = ':/icons/show_more_image.png' style='vertical-align:middle' />").
                                      arg("<img src = ':/icons/download.png' style='vertical-align:middle' />").
-                                     arg("<img src = ':/icons/settings.png' style='vertical-align:middle' />"));
+                                     arg("<img src = ':/icons/settings.png' style='vertical-align:middle' />").
+                                     arg("<img src = ':/icons/browser_top.png' style='vertical-align:middle' />"));
         });
     }
 }
@@ -378,4 +380,14 @@ void MainWindow::on_actionShowMoreImage_triggered()
 void MainWindow::on_actionNew_triggered()
 {
     QDesktopServices::openUrl(QUrl("https://github.com/stereomatchingkiss/QImageScraper/blob/master/VERSION_INFO.md"));
+}
+
+void MainWindow::on_actionBrowserTop_triggered()
+{
+    ui->webView->page()->runJavaScript("window.scrollTo(0,0)");
+}
+
+void MainWindow::on_actionBrowserBottom_triggered()
+{
+    ui->webView->page()->runJavaScript("window.scrollTo(0, document.body.scrollHeight)");
 }
