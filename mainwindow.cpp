@@ -253,6 +253,8 @@ void MainWindow::set_enabled_main_window_except_stop(bool value)
     ui->actionShowMoreImage->setEnabled(value);
     ui->actionSettings->setEnabled(value);
     ui->actionStop->setEnabled(!value);
+    ui->actionBrowserTop->setEnabled(value);
+    ui->actionBrowserBottom->setEnabled(value);
 }
 
 void MainWindow::set_show_gallery_tutorial(int state)
