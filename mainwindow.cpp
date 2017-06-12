@@ -231,7 +231,7 @@ void MainWindow::process_show_more_images_done()
                                      tr("Found %1 images<br>"
                                         "Press %2 to scroll the page automatic<br>"
                                         "press %3 if you want to download the images<br> "
-                                        "press %4 if you want to configure your options"
+                                        "press %4 if you want to configure your options<br>"
                                         "press %5 if you want to go to the top of the page").
                                      arg(links.size()).
                                      arg("<img src = ':/icons/show_more_image.png' style='vertical-align:middle' />").
