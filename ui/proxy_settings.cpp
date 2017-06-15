@@ -181,21 +181,23 @@ QVariant proxy_settings::get_table_data(int row, proxy_field col) const
 
 void proxy_settings::read_proxy_data()
 {
-    QFile file("proxy_settings.dat");
-    if(file.open(QIODevice::ReadOnly)){
-        ui->tableWidgetPoxyTable->model()->removeRows(0, ui->tableWidgetPoxyTable->rowCount());
-        QDataStream stream(&file);
-        while(!stream.atEnd()){
-            QString type;
-            QString host;
-            quint16 port;
-            QString user_name;
-            QString password;
-            stream>>type>>host>>port>>user_name>>password;
-            add_proxy(type, host, port, user_name, password);
+    if(ui->radioButtonManualProxy->isChecked()){
+        QFile file("proxy_settings.dat");
+        if(file.open(QIODevice::ReadOnly)){
+            ui->tableWidgetPoxyTable->model()->removeRows(0, ui->tableWidgetPoxyTable->rowCount());
+            QDataStream stream(&file);
+            while(!stream.atEnd()){
+                QString type;
+                QString host;
+                quint16 port;
+                QString user_name;
+                QString password;
+                stream>>type>>host>>port>>user_name>>password;
+                add_proxy(type, host, port, user_name, password);
+            }
+        }else{
+            QMessageBox::warning(nullptr, tr("QImageScraper"), tr("Cannot read proxy settings"));
         }
-    }else{
-        QMessageBox::warning(nullptr, tr("Error"), tr("Cannot read proxy settings"));
     }
 }
 
