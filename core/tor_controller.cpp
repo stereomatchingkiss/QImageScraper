@@ -8,7 +8,8 @@
 tor_controller::tor_controller(QObject *parent) :
     QObject(parent),
     socket_(new QTcpSocket(this)),
-    state_(tor_state::authenticate)
+    state_(tor_state::authenticate),
+    timer_(new QTimer(this))
 {
     connect(socket_, &QTcpSocket::connected, [this]()
     {
