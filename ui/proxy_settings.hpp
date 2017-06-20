@@ -10,6 +10,7 @@ namespace Ui {
 class proxy_settings;
 }
 
+class tor_controller;
 class QTableWidgetItem;
 
 class proxy_settings : public QDialog
@@ -57,6 +58,8 @@ private slots:
 
     void on_radioButtonTorProxy_clicked();
 
+    void on_pushButtonTestTorValidation_clicked();
+
 private:
     void add_proxy(QString const &type, QString const &host,
                    quint16 port, QString const &user_name,
@@ -67,6 +70,8 @@ private:
     void write_proxy_data();
 
     Ui::proxy_settings *ui;
+
+    tor_controller *tor_controller_;
 };
 
 #endif // PROXY_SETTINGS_HPP

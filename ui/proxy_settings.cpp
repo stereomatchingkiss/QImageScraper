@@ -3,6 +3,8 @@
 
 #include <QsLog.h>
 
+#include "../core/tor_controller.hpp"
+
 #include "proxy_delegate.hpp"
 
 #include <QComboBox>
@@ -18,11 +20,23 @@
 
 proxy_settings::proxy_settings(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::proxy_settings)
+    ui(new Ui::proxy_settings),
+    tor_controller_{new tor_controller(this)}
 {
     ui->setupUi(this);
     ui->tableWidgetPoxyTable->setItemDelegate(new proxy_delegate(this));
     ui->tableWidgetPoxyTable->setSelectionMode(QAbstractItemView::ExtendedSelection);
+
+    connect(tor_controller_, &tor_controller::error_happen, [this](QString const &error)
+    {
+       QMessageBox::warning(this, tr("QImageScraper"), error);
+       setEnabled(true);
+    });
+    connect(tor_controller_, &tor_controller::renew_ip_success, [this]()
+    {
+        QMessageBox::information(this, tr("QImageScraper"), tr("You are good to go"));
+        setEnabled(true);
+    });
 
     init_settings();
 }
@@ -150,19 +164,19 @@ void proxy_settings::reject_settings()
 
 void proxy_settings::on_radioButtonNoProxy_clicked()
 {
-    ui->tableWidgetPoxyTable->setVisible(false);
+    ui->groupBoxManualProxy->setVisible(false);
     ui->groupBoxTorProxy->setVisible(false);
 }
 
 void proxy_settings::on_radioButtonManualProxy_clicked()
-{
-    ui->tableWidgetPoxyTable->setVisible(true);
+{    
+    ui->groupBoxManualProxy->setVisible(true);
     ui->groupBoxTorProxy->setVisible(false);
 }
 
 void proxy_settings::on_radioButtonTorProxy_clicked()
 {
-   ui->tableWidgetPoxyTable->setVisible(false);
+   ui->groupBoxManualProxy->setVisible(false);
    ui->groupBoxTorProxy->setVisible(true);
 }
 
@@ -282,4 +296,11 @@ void proxy_settings::write_proxy_data()
     if(!file.commit()){
         cannot_write();
     }
+}
+
+void proxy_settings::on_pushButtonTestTorValidation_clicked()
+{
+    tor_controller_->renew_ip(ui->lineEditTorHost->text(), ui->spinBoxTorPort->value(),
+                              ui->lineEditTorPassword->text());
+    setEnabled(false);
 }
