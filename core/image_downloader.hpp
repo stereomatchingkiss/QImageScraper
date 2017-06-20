@@ -31,8 +31,21 @@ public:
 
     explicit image_downloader(QObject *parent = nullptr);
 
-    void download_next_image();
-    void download_web_view_img();    
+    /**
+     * @This api will begin to download the image, before you call this api, remember to
+     * set_download_request and proxy state.
+     * @code
+     * downloader->set_download_request(big_img_link, small_img_link, 1, save_at);
+     * downloader->set_proxy_state(proxy_state);
+     * if(proxy_state == proxy_settings::proxy_state::tor_proxy){
+     *     downloader->set_tor_proxy(host, control_port, port, your_password);
+     * }else if(proxy_state == proxy_settings::proxy_state::manual_proxy){
+     *     downloader->set_manual_proxy(proxies);
+     * }
+     * downloader->download_next_image();
+     * @endcode
+     */
+    void download_next_image();       
     QNetworkAccessManager* get_network_manager() const;
     download_statistic get_statistic() const;
     bool image_links_empty() const;    
