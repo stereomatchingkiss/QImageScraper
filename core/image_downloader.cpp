@@ -1,6 +1,8 @@
 #include "image_downloader.hpp"
 
 #include "global_constant.hpp"
+#include "proxy_settings.hpp"
+#include "tor_controller.hpp"
 #include "utility.hpp"
 
 #include <qt_enhance/network/download_supervisor.hpp>
@@ -14,18 +16,40 @@
 
 image_downloader::image_downloader(QObject *parent) :
     QObject(parent),
-    downloader_{new qte::net::download_supervisor(this)}
+    downloader_{new qte::net::download_supervisor(this)},
+    proxy_state_{static_cast<int>(proxy_settings::proxy_state::no_proxy)},
+    tor_controller_{new tor_controller(this)}
 {
     using namespace qte::net;
 
     connect(downloader_, &download_supervisor::error, this, &image_downloader::download_image_error);
     connect(downloader_, &download_supervisor::download_finished, this, &image_downloader::download_finished);
     connect(downloader_, &download_supervisor::download_progress, this, &image_downloader::download_progress);
+
+    connect(tor_controller_, &tor_controller::error_happen, [this](QString const &error)
+    {
+        QLOG_ERROR()<<"tor controller error:"<<error;
+        if(img_info_.retry_num_++ < global_constant::download_retry_limit()){
+            QLOG_ERROR()<<"tor controller error retry big image again";
+            download_image(img_info_);
+        }else{
+            QLOG_ERROR()<<"tor controller error try small image";
+            img_info_.retry_num_ = 0;
+            if(img_info_.choice_ == link_choice::big){
+                download_small_img(img_info_);
+            }
+        }
+    });
+    connect(tor_controller_, &tor_controller::renew_ip_success,
+            [this]()
+    {
+        QLOG_INFO()<<"renew tor ip success";
+        spawn_download_request(img_info_);
+    });//*/
 }
 
 void image_downloader::set_download_request(QStringList big_image_links, QStringList small_image_links,
-                                            size_t max_download, QString const &save_at,
-                                            std::vector<QNetworkProxy> const &proxy)
+                                            size_t max_download, QString const &save_at)
 {
     big_img_links_.swap(big_image_links);
     small_img_links_.swap(small_image_links);
@@ -33,9 +57,25 @@ void image_downloader::set_download_request(QStringList big_image_links, QString
     statistic_.clear();
     img_links_map_.clear();
     save_at_ = save_at;
-    proxy_list_ = proxy;
     statistic_.total_download_ = std::min(static_cast<size_t>(big_img_links_.size()),
                                           max_download);
+}
+
+void image_downloader::set_manual_proxy(const std::vector<QNetworkProxy> &proxy)
+{
+    proxy_list_ = proxy;
+}
+
+void image_downloader::set_proxy_state(int state)
+{
+    proxy_state_ = state;
+}
+
+void image_downloader::set_tor_proxy(const QString &host, quint16 port, const QString &password)
+{
+    tor_info_.host_ = host;
+    tor_info_.port_ = port;
+    tor_info_.password_ = password;
 }
 
 bool image_downloader::can_download_image(download_img_task const &task, img_links_map_value const &img_info)
@@ -92,23 +132,28 @@ void image_downloader::download_finished(image_downloader::download_img_task tas
 }
 
 void image_downloader::download_image(image_downloader::img_links_map_value info)
-{
-    auto const choice = info.choice_;
-    QString const &img_link = choice == link_choice::big ?
-                info.big_img_link_ : info.small_img_link_;
-    QNetworkRequest const request = create_img_download_request(img_link);
-    if(!proxy_list_.empty() && info.retry_num_ != 0){
+{    
+    proxy_settings::proxy_state const pstate = static_cast<proxy_settings::proxy_state>(proxy_state_);
+    if(pstate == proxy_settings::proxy_state::manual_proxy && info.retry_num_ != 0){
         auto const proxy = proxy_list_[qrand() % proxy_list_.size()];
-        QLOG_INFO()<<__func__<<":set proxy:"<<proxy;
+        QLOG_INFO()<<__func__<<":manual proxy:"<<proxy;
         downloader_->set_proxy(proxy);
-    }else{
+    }else if(pstate == proxy_settings::proxy_state::tor_proxy && info.retry_num_ != 0){
         QLOG_INFO()<<__func__<<":set proxy:"<<QNetworkProxy();
+        QNetworkProxy const proxy(QNetworkProxy::Socks5Proxy, tor_info_.host_,
+                                  tor_info_.port_, tor_info_.password_);
+        downloader_->set_proxy(proxy);
+        tor_controller_->renew_ip(tor_info_.host_, tor_info_.port_, tor_info_.password_);
+    }else if(pstate == proxy_settings::proxy_state::no_proxy){
+        QLOG_INFO()<<__func__<<":no proxy:"<<QNetworkProxy();
         downloader_->set_proxy(QNetworkProxy());
     }
-    auto const unique_id = downloader_->append(request, save_at_,
-                                               global_constant::network_reply_timeout());
-    img_links_map_.emplace(unique_id, std::move(info));
-    QTimer::singleShot(qrand() % 1000 + 500, [this, unique_id](){downloader_->start_download_task(unique_id);});
+
+    if(pstate == proxy_settings::proxy_state::tor_proxy){
+        img_info_ = info;
+    }else{
+        spawn_download_request(std::move(info));
+    }
 }
 
 void image_downloader::download_image_error(download_img_task task, const QString &error_msg)
@@ -185,6 +230,18 @@ bool image_downloader::remove_file(const QString &debug_msg, image_downloader::d
     QLOG_INFO()<<__func__<<":"<<debug_msg<<task->get_save_as()<<":can remove file:"<<can_remove;
 
     return can_remove;
+}
+
+void image_downloader::spawn_download_request(image_downloader::img_links_map_value info)
+{
+    auto const choice = info.choice_;
+    QString const &img_link = choice == link_choice::big ?
+                info.big_img_link_ : info.small_img_link_;
+    QNetworkRequest const request = create_img_download_request(img_link);
+    auto const unique_id = downloader_->append(request, save_at_,
+                                               global_constant::network_reply_timeout());
+    img_links_map_.emplace(unique_id, std::move(info));
+    QTimer::singleShot(qrand() % 1000 + 500, [this, unique_id](){downloader_->start_download_task(unique_id);});
 }
 
 void image_downloader::start_download(const QString &big_img_link, const QString &small_img_link)

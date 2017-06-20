@@ -57,7 +57,6 @@ MainWindow::MainWindow(QWidget *parent) :
     qsrand(std::time(0));
 
     init_connection();
-
     check_new_version();
 }
 
@@ -332,24 +331,25 @@ void MainWindow::on_actionDownload_triggered()
         ui->progressBar->setValue(0);
         QLOG_INFO()<<"progress bar min:"<<ui->progressBar->minimum()<<",max:"<<ui->progressBar->maximum();
         std::vector<QNetworkProxy> proxies;
-        if(settings_manager_->get_proxy_settings().has_proxy()){
-            proxies = settings_manager_->get_proxy_settings().get_proxies();
-            QLOG_INFO()<<__func__;
-            for(auto const &proxy: proxies){
-                QLOG_INFO()<<proxy;
-            }
+        proxy_settings::proxy_state const pstate = settings_manager_->get_proxy_settings().state();
+        if(pstate == proxy_settings::proxy_state::manual_proxy){
+            proxies = settings_manager_->get_proxy_settings().get_proxies();            
+            img_downloader_->set_manual_proxy(proxies);
+        }else if(pstate == proxy_settings::proxy_state::tor_proxy){
+            img_downloader_->set_tor_proxy(settings_manager_->get_proxy_settings().tor_host(),
+                                           settings_manager_->get_proxy_settings().tor_port(),
+                                           settings_manager_->get_proxy_settings().tor_password());
         }
+        img_downloader_->set_proxy_state(static_cast<int>(pstate));
         img_downloader_->set_download_request(big_img_link, small_img_link, total_download_,
-                                              settings_manager_->get_general_settings().get_save_at(),
-                                              proxies);
+                                              settings_manager_->get_general_settings().get_save_at());
         img_downloader_->download_next_image();
     });
 }
 
 void MainWindow::on_actionSettings_triggered()
 {
-    settings_manager_->exec();
-    //setup_manager_->get_general_settings().exec();
+    settings_manager_->exec();    
 }
 
 void MainWindow::on_actionRefresh_triggered()

@@ -8,6 +8,8 @@
 
 #include <memory>
 
+class tor_controller;
+
 class image_downloader : public QObject
 {
     Q_OBJECT
@@ -35,12 +37,14 @@ public:
     download_statistic get_statistic() const;
     bool image_links_empty() const;    
     void set_download_request(QStringList big_image_links, QStringList small_image_links,
-                              size_t max_download, QString const &save_at,
-                              std::vector<QNetworkProxy> const &proxy = {});
+                              size_t max_download, QString const &save_at);
+    void set_manual_proxy(std::vector<QNetworkProxy> const &proxy);
+    void set_proxy_state(int state);
+    void set_tor_proxy(QString const &host, quint16 port, QString const &password);
 
 signals:
     void download_progress(download_img_task task,
-                           qint64 bytesReceived, qint64 bytesTotal);
+                           qint64 bytesReceived, qint64 bytesTotal);    
     void increment_progress();
     void load_image(QString const &link);
     void set_statusbar_msg(QString const &msg);
@@ -65,6 +69,13 @@ private:
         size_t timeout_retry_num_;
     };
 
+    struct tor_info
+    {
+        QString host_ = "127.0.0.1";
+        quint16 port_ = 9151;
+        QString password_;
+    };
+
     bool can_download_image(download_img_task const &task, img_links_map_value const &img_info);    
     void download_finished(download_img_task task);
     void download_image(img_links_map_value info);
@@ -75,15 +86,20 @@ private:
     void process_download_image(download_img_task task, img_links_map_value img_info);
     bool reach_download_target() const;
     bool remove_file(QString const &debug_msg, download_img_task task) const;
+    void spawn_download_request(img_links_map_value info);
     void start_download(QString const &big_img_link, QString const &small_img_link);
 
     QStringList big_img_links_;    
     qte::net::download_supervisor *downloader_;
+    image_downloader::img_links_map_value img_info_;
     std::map<size_t, img_links_map_value> img_links_map_;
     std::vector<QNetworkProxy> proxy_list_;
+    int proxy_state_;
     QString save_at_;
     QStringList small_img_links_;
-    download_statistic statistic_;    
+    download_statistic statistic_;
+    tor_controller *tor_controller_;
+    tor_info tor_info_;
 };
 
 #endif // IMG_DOWNLOADER_HPP
