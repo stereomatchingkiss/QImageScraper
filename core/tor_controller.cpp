@@ -15,7 +15,7 @@ tor_controller::tor_controller(QObject *parent) :
     {
         QLOG_INFO()<<"connect to tor";
         QString const contents(QString("AUTHENTICATE \"%1\"\r\n").arg(password_));
-        //socket_->write(contents.toLatin1());
+        socket_->write(contents.toLatin1());
     });
     connect(socket_, static_cast<void(QTcpSocket::*)(QAbstractSocket::SocketError)>(&QTcpSocket::error),
             this, &tor_controller::handle_error);
@@ -23,6 +23,7 @@ tor_controller::tor_controller(QObject *parent) :
     connect(timer_, &QTimer::timeout, [this]()
     {
         emit error_happen("Tor server do not give any response");
+        socket_->abort();
     });
 }
 
