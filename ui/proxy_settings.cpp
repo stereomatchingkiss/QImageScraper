@@ -37,6 +37,7 @@ void proxy_settings::accept_settings()
     QSettings settings;
     settings.setValue("proxy_settings/no_proxy", ui->radioButtonNoProxy->isChecked());
     settings.setValue("proxy_settings/manual_proxy", ui->radioButtonManualProxy->isChecked());
+    settings.setValue("proxy_settings/tor_proxy", ui->radioButtonTorProxy->isChecked());
     write_proxy_data();
 }
 
@@ -65,9 +66,30 @@ std::vector<QNetworkProxy> proxy_settings::get_proxies() const
     return proxies;
 }
 
-bool proxy_settings::has_proxy() const
+proxy_settings::proxy_state proxy_settings::state() const
 {
-    return ui->radioButtonManualProxy->isChecked();
+    if(ui->radioButtonNoProxy->isChecked()){
+        return proxy_state::no_proxy;
+    }else if(ui->radioButtonTorProxy->isChecked()){
+        return proxy_state::tor_proxy;
+    }else{
+        return proxy_state::manual_proxy;
+    }
+}
+
+QString proxy_settings::tor_host() const
+{
+    return ui->lineEditTorHost->text();
+}
+
+quint16 proxy_settings::tor_port() const
+{
+    return ui->spinBoxTorPort->value();
+}
+
+QString proxy_settings::tor_password() const
+{
+    return ui->lineEditTorPassword->text();
 }
 
 void proxy_settings::init_settings()
@@ -76,25 +98,37 @@ void proxy_settings::init_settings()
     if(settings.contains("proxy_settings/manual_proxy")){
         if(settings.value("proxy_settings/manual_proxy").toBool()){
             ui->radioButtonManualProxy->setChecked(true);
-        }else{
-            ui->radioButtonNoProxy->setChecked(true);
-            ui->tableWidgetPoxyTable->setEnabled(false);
+            on_radioButtonManualProxy_clicked();
         }
     }else{
-        settings.setValue("proxy_settings/manual_proxy", false);
-        ui->radioButtonNoProxy->setChecked(true);
-        ui->tableWidgetPoxyTable->setEnabled(false);
+        settings.setValue("proxy_settings/manual_proxy", false);        
     }
 
     if(settings.contains("proxy_settings/no_proxy")){
         if(settings.value("proxy_settings/no_proxy").toBool()){
             ui->radioButtonNoProxy->setChecked(true);
-            ui->tableWidgetPoxyTable->setEnabled(false);
+            on_radioButtonNoProxy_clicked();
         }
     }else{
         settings.setValue("proxy_settings/no_proxy", true);
         ui->radioButtonNoProxy->setChecked(true);
-        ui->tableWidgetPoxyTable->setEnabled(false);
+        ui->tableWidgetPoxyTable->setVisible(false);
+        ui->groupBoxTorProxy->setVisible(false);
+    }
+
+    if(settings.contains("proxy_settings/tor_proxy")){
+        if(settings.value("proxy_settings/tor_proxy").toBool()){
+            ui->radioButtonTorProxy->setChecked(true);
+            on_radioButtonTorProxy_clicked();
+            ui->lineEditTorHost->setText(settings.value("proxy_settings/tor_proxy/host").toString());
+            ui->lineEditTorPassword->setText(settings.value("proxy_settings/tor_proxy/password").toString());
+            ui->spinBoxTorPort->setValue((settings.value("proxy_settings/tor_proxy/port").toUInt()));
+        }
+    }else{
+        settings.setValue("proxy_settings/no_proxy", true);
+        settings.setValue("proxy_settings/tor_proxy/host", ui->lineEditTorHost->text());
+        settings.setValue("proxy_settings/tor_proxy/password", ui->lineEditTorPassword->text());
+        settings.setValue("proxy_settings/tor_proxy/port", ui->spinBoxTorPort->value());
     }
 
     read_proxy_data();
@@ -105,18 +139,31 @@ void proxy_settings::reject_settings()
     QSettings settings;
     ui->radioButtonNoProxy->setChecked(settings.value("proxy_settings/no_proxy").toBool());
     ui->radioButtonManualProxy->setChecked(settings.value("proxy_settings/manual_proxy").toBool());
-    ui->tableWidgetPoxyTable->setEnabled(ui->radioButtonManualProxy->isChecked());
+    ui->radioButtonTorProxy->setChecked(settings.value("proxy_settings/tor_proxy").toBool());
+    ui->tableWidgetPoxyTable->setVisible(ui->radioButtonManualProxy->isChecked());
+    ui->groupBoxTorProxy->setVisible(true);
+    ui->lineEditTorHost->setText(settings.value("proxy_settings/tor_proxy/host").toString());
+    ui->lineEditTorPassword->setText(settings.value("proxy_settings/tor_proxy/password").toString());
+    ui->spinBoxTorPort->setValue((settings.value("proxy_settings/tor_proxy/port").toUInt()));
     read_proxy_data();
 }
 
 void proxy_settings::on_radioButtonNoProxy_clicked()
 {
-    ui->tableWidgetPoxyTable->setEnabled(false);
+    ui->tableWidgetPoxyTable->setVisible(false);
+    ui->groupBoxTorProxy->setVisible(false);
 }
 
 void proxy_settings::on_radioButtonManualProxy_clicked()
 {
-    ui->tableWidgetPoxyTable->setEnabled(true);
+    ui->tableWidgetPoxyTable->setVisible(true);
+    ui->groupBoxTorProxy->setVisible(false);
+}
+
+void proxy_settings::on_radioButtonTorProxy_clicked()
+{
+   ui->tableWidgetPoxyTable->setVisible(false);
+   ui->groupBoxTorProxy->setVisible(true);
 }
 
 void proxy_settings::on_pushButtonHelp_clicked()

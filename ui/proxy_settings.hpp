@@ -26,13 +26,23 @@ public:
         type
     };
 
+    enum class proxy_state
+    {
+        no_proxy,
+        manual_proxy,
+        tor_proxy
+    };
+
     explicit proxy_settings(QWidget *parent = 0);
     ~proxy_settings();
 
     void accept_settings();
     std::vector<QNetworkProxy> get_proxies() const;
-    bool has_proxy() const;
     void reject_settings();
+    proxy_state state() const;
+    QString tor_host() const;
+    quint16 tor_port() const;
+    QString tor_password() const;
 
 private slots:
     void on_radioButtonNoProxy_clicked();
@@ -45,6 +55,8 @@ private slots:
 
     void on_pushButtonDeleteProxy_clicked();
 
+    void on_radioButtonTorProxy_clicked();
+
 private:
     void add_proxy(QString const &type, QString const &host,
                    quint16 port, QString const &user_name,
@@ -54,7 +66,7 @@ private:
     void init_settings();
     void write_proxy_data();
 
-    Ui::proxy_settings *ui;    
+    Ui::proxy_settings *ui;
 };
 
 #endif // PROXY_SETTINGS_HPP
