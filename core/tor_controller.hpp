@@ -23,7 +23,7 @@ signals:
 private:
     enum class tor_state{
         authenticate,
-        new_ip
+        renew_ip
     };
 
     void handle_error(QAbstractSocket::SocketError error);

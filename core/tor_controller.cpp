@@ -37,6 +37,7 @@ void tor_controller::handle_error(QAbstractSocket::SocketError error)
 {
     timer_->stop();
     QLOG_INFO()<<"connect to tor error occur:"<<error;
+    state_ = tor_state::authenticate;
     emit error_happen(socket_->errorString());
 }
 
@@ -47,6 +48,7 @@ void tor_controller::handle_ready_read()
         if(socket_->readAll().startsWith("250")){
             if(state_ == tor_state::authenticate){
                 emit authenticate_success();
+                state_ = tor_state::renew_ip;
                 socket_->write("SIGNAL NEWNYM\r\n");
             }else{
                 emit renew_ip_success();
