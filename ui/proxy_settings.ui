@@ -6,32 +6,21 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>617</width>
-    <height>407</height>
+    <width>943</width>
+    <height>544</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
+  <layout class="QGridLayout" name="gridLayout_3">
    <item row="0" column="0">
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
       <string>Configure proxies to access internet</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout_2">
-      <item row="3" column="0">
-       <widget class="QPushButton" name="pushButtonAddProxy">
-        <property name="text">
-         <string/>
-        </property>
-        <property name="icon">
-         <iconset resource="../icons.qrc">
-          <normaloff>:/icons/add.png</normaloff>:/icons/add.png</iconset>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0" colspan="2">
        <widget class="QRadioButton" name="radioButtonNoProxy">
         <property name="text">
          <string>No proxy</string>
@@ -41,36 +30,14 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
+      <item row="1" column="0" colspan="2">
        <widget class="QRadioButton" name="radioButtonManualProxy">
         <property name="text">
          <string>Manual proxy</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="1">
-       <widget class="QPushButton" name="pushButtonDeleteProxy">
-        <property name="text">
-         <string/>
-        </property>
-        <property name="icon">
-         <iconset resource="../icons.qrc">
-          <normaloff>:/icons/delete.png</normaloff>:/icons/delete.png</iconset>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="2">
-       <widget class="QPushButton" name="pushButtonHelp">
-        <property name="text">
-         <string/>
-        </property>
-        <property name="icon">
-         <iconset resource="../icons.qrc">
-          <normaloff>:/icons/help.png</normaloff>:/icons/help.png</iconset>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0" colspan="3">
+      <item row="2" column="0" colspan="4">
        <widget class="QTableWidget" name="tableWidgetPoxyTable">
         <column>
          <property name="text">
@@ -99,7 +66,94 @@
         </column>
        </widget>
       </item>
+      <item row="3" column="0">
+       <widget class="QPushButton" name="pushButtonAddProxy">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../icons.qrc">
+          <normaloff>:/icons/add.png</normaloff>:/icons/add.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" colspan="2">
+       <widget class="QRadioButton" name="radioButtonTorProxy">
+        <property name="text">
+         <string>Tor proxy</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0" colspan="4">
+       <widget class="QGroupBox" name="groupBox_2">
+        <property name="title">
+         <string/>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_2">
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>Control port</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>Password</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLineEdit" name="lineEditTorPassword"/>
+         </item>
+         <item row="1" column="1">
+          <widget class="QSpinBox" name="spinBoxTorPort">
+           <property name="maximum">
+            <number>65535</number>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>Host</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="lineEditTorHost">
+           <property name="text">
+            <string>127.0.0.1</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QPushButton" name="pushButtonDeleteProxy">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../icons.qrc">
+          <normaloff>:/icons/delete.png</normaloff>:/icons/delete.png</iconset>
+        </property>
+       </widget>
+      </item>
      </layout>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QPushButton" name="pushButtonHelp">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../icons.qrc">
+       <normaloff>:/icons/help.png</normaloff>:/icons/help.png</iconset>
+     </property>
     </widget>
    </item>
   </layout>
