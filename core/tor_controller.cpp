@@ -30,9 +30,9 @@ tor_controller::tor_controller(QObject *parent) :
 void tor_controller::renew_ip(const QString &host, quint16 port, const QString &password)
 {
     socket_->abort();
-    socket_->connectToHost(host, port);
-    timer_->start(5000);
     password_ = password;
+    socket_->connectToHost(host, port);
+    timer_->start(5000);    
 }
 
 void tor_controller::handle_error(QAbstractSocket::SocketError error)
