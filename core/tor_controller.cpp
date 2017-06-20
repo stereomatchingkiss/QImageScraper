@@ -44,8 +44,8 @@ void tor_controller::handle_error(QAbstractSocket::SocketError error)
 }
 
 void tor_controller::handle_ready_read()
-{
-    timer_->stop();
+{    
+    timer_->start();
     if(socket_->bytesAvailable() >= 3){
         if(socket_->readAll().startsWith("250")){
             if(state_ == tor_state::authenticate){
@@ -53,6 +53,7 @@ void tor_controller::handle_ready_read()
                 state_ = tor_state::renew_ip;
                 socket_->write("SIGNAL NEWNYM\r\n");
             }else{
+                timer_->stop();
                 emit renew_ip_success();
             }
         }
