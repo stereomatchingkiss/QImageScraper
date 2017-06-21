@@ -136,9 +136,11 @@ void image_downloader::download_image(image_downloader::img_links_map_value info
 {    
     proxy_settings::proxy_state const pstate = static_cast<proxy_settings::proxy_state>(proxy_state_);
     if(pstate == proxy_settings::proxy_state::manual_proxy && info.retry_num_ != 0){
-        auto const proxy = proxy_list_[qrand() % proxy_list_.size()];
-        QLOG_INFO()<<__func__<<":manual proxy:"<<proxy;
-        downloader_->set_proxy(proxy);
+        if(!proxy_list_.empty()){
+            auto const proxy = proxy_list_[qrand() % proxy_list_.size()];
+            QLOG_INFO()<<__func__<<":manual proxy:"<<proxy;
+            downloader_->set_proxy(proxy);
+        }
     }else if(pstate == proxy_settings::proxy_state::tor_proxy && info.retry_num_ != 0){
         QLOG_INFO()<<__func__<<":set proxy:"<<QNetworkProxy();
         QNetworkProxy const proxy(QNetworkProxy::Socks5Proxy, tor_info_.host_,
