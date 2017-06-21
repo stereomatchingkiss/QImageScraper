@@ -103,6 +103,7 @@ void tor_controller::handle_network_finished()
     reply_ = qobject_cast<QNetworkReply*>(sender());
     if(reply_){
         if(reply_->error() == QNetworkReply::NoError){
+            timer_->stop();
             emit validate_tor_success();
         }else{
             emit validate_tor_fail(reply_->errorString());
