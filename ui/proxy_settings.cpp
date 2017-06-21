@@ -55,7 +55,12 @@ proxy_settings::proxy_settings(QWidget *parent) :
         QMessageBox::warning(this, tr("QImageScraper"), error);
         setEnabled(true);
     });
-    connect(tor_controller_, &tor_controller::renew_ip_success, [this]()
+    connect(tor_controller_, &tor_controller::validate_tor_fail, [this](QString const &error)
+    {
+        QMessageBox::warning(this, tr("QImageScraper"), error);
+        setEnabled(true);
+    });
+    connect(tor_controller_, &tor_controller::validate_tor_success, [this]()
     {
         QMessageBox::information(this, tr("QImageScraper"), tr("You are good to go"));
         setEnabled(true);
@@ -333,7 +338,9 @@ void proxy_settings::write_proxy_data()
 
 void proxy_settings::on_pushButtonTestTorValidation_clicked()
 {
-    tor_controller_->renew_ip(ui->lineEditTorHost->text(), ui->spinBoxTorControlPort->value(),
-                              ui->lineEditTorPassword->text());
+    tor_controller_->check_tor_validation(ui->lineEditTorHost->text(),
+                                          ui->spinBoxTorPort->value(),
+                                          ui->spinBoxTorControlPort->value(),
+                                          ui->lineEditTorPassword->text());
     setEnabled(false);
 }

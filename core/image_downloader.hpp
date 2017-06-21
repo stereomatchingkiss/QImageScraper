@@ -48,11 +48,37 @@ public:
     void download_next_image();       
     QNetworkAccessManager* get_network_manager() const;
     download_statistic get_statistic() const;
-    bool image_links_empty() const;    
+    bool image_links_empty() const;
+
+    /**
+     * @brief setup images links, desire max download target and where to save the images
+     * @param big_image_links links of the big image(image with original size) scraped by search engine
+     * @param small_image_links thumbnails of big imag
+     * @param max_download maximum image want to download, even big_image_links.size() > max_download,
+     * downloader would download at most max_download size of image only
+     * @param save_at self explained
+     * @warning big_image_links.size() must equal to small_image_links.size()
+     */
     void set_download_request(QStringList big_image_links, QStringList small_image_links,
                               size_t max_download, QString const &save_at);
+    /**
+     * @brief set the proxies info of manual proxies
+     * @param proxy self explained
+     */
     void set_manual_proxy(std::vector<QNetworkProxy> const &proxy);
+    /**
+     * @brief there are three states to set, please refer to enum class
+     * proxy_settings::proxy_state(no_proxy, manual_proxy, tor_proxy)
+     * @param state self explain, remmeber to cast the enum class to interger
+     */
     void set_proxy_state(int state);
+    /**
+     * @brief setup information of tor porxy
+     * @param host host of tor
+     * @param port this is the port use to connect with world wide web
+     * @param control_port this is the port use to control tor browser
+     * @param password password to control tor browser
+     */
     void set_tor_proxy(QString const &host, quint16 port, quint16 control_port, QString const &password);
 
 signals:
