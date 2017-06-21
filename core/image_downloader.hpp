@@ -53,7 +53,7 @@ public:
                               size_t max_download, QString const &save_at);
     void set_manual_proxy(std::vector<QNetworkProxy> const &proxy);
     void set_proxy_state(int state);
-    void set_tor_proxy(QString const &host, quint16 port, QString const &password);
+    void set_tor_proxy(QString const &host, quint16 port, quint16 control_port, QString const &password);
 
 signals:
     void download_progress(download_img_task task,
@@ -84,8 +84,9 @@ private:
 
     struct tor_info
     {
+        quint16 control_port_ = 9151;
         QString host_ = "127.0.0.1";
-        quint16 port_ = 9151;
+        quint16 port_ = 9150;
         QString password_;
     };
 

@@ -45,7 +45,7 @@ image_downloader::image_downloader(QObject *parent) :
     {
         QLOG_INFO()<<"renew tor ip success";
         spawn_download_request(img_info_);
-    });//*/
+    });
 }
 
 void image_downloader::set_download_request(QStringList big_image_links, QStringList small_image_links,
@@ -71,10 +71,11 @@ void image_downloader::set_proxy_state(int state)
     proxy_state_ = state;
 }
 
-void image_downloader::set_tor_proxy(const QString &host, quint16 port, const QString &password)
+void image_downloader::set_tor_proxy(QString const &host, quint16 port, quint16 control_port, QString const &password)
 {
     tor_info_.host_ = host;
     tor_info_.port_ = port;
+    tor_info_.control_port_ = control_port;
     tor_info_.password_ = password;
 }
 
@@ -143,7 +144,7 @@ void image_downloader::download_image(image_downloader::img_links_map_value info
         QNetworkProxy const proxy(QNetworkProxy::Socks5Proxy, tor_info_.host_,
                                   tor_info_.port_, tor_info_.password_);
         downloader_->set_proxy(proxy);
-        tor_controller_->renew_ip(tor_info_.host_, tor_info_.port_, tor_info_.password_);
+        tor_controller_->renew_ip(tor_info_.host_, tor_info_.control_port_, tor_info_.password_);
     }else if(pstate == proxy_settings::proxy_state::no_proxy){
         QLOG_INFO()<<__func__<<":no proxy:"<<QNetworkProxy();
         downloader_->set_proxy(QNetworkProxy());
