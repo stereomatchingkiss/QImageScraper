@@ -74,11 +74,12 @@ void tor_controller::handle_error(QAbstractSocket::SocketError error)
 {
     timer_->stop();
     QLOG_INFO()<<"connect to tor error occur:"<<error;
-    emit error_happen(socket_->errorString());
+    //emit error_happen(socket_->errorString());
 }
 
 void tor_controller::handle_ready_read()
 {    
+    QLOG_INFO()<<__func__;
     timer_->start();
     if(socket_->bytesAvailable() >= 3){
         if(socket_->readAll().startsWith("250")){
@@ -88,10 +89,11 @@ void tor_controller::handle_ready_read()
             if(state_ == tor_state::check_tor_validation){
                 timer_->start();
                 QLOG_INFO()<<__func__<<":access network by tor";
-                access_network_by_tor("https://duckduckgo.com/");
+                access_network_by_tor("https://google.com/");
             }
         }else{
             timer_->stop();
+            QLOG_INFO()<<__func__<<": emit error string";
             emit error_happen(socket_->errorString());
         }
     }
