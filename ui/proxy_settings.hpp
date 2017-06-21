@@ -41,6 +41,7 @@ public:
     std::vector<QNetworkProxy> get_proxies() const;
     void reject_settings();
     proxy_state state() const;
+    quint16 tor_control_port() const;
     QString tor_host() const;
     quint16 tor_port() const;
     QString tor_password() const;
