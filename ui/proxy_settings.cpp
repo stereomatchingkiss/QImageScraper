@@ -163,7 +163,6 @@ void proxy_settings::init_settings()
     }else{
         settings.setValue(settings_key::no_proxy, true);
         ui->radioButtonNoProxy->setChecked(true);
-        ui->tableWidgetPoxyTable->setVisible(false);
         ui->groupBoxTorProxy->setVisible(false);
     }
 
