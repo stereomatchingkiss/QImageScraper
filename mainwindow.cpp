@@ -297,7 +297,7 @@ void MainWindow::refresh_window()
                                                  arg(statistic.big_img_download_).arg(statistic.small_img_download_));
 
         if(ret == QMessageBox::Ok){
-            statusBar()->showMessage("");            
+            statusBar()->showMessage("");
             ui->webView->page()->runJavaScript("window.scrollTo(0,0)");
         }
     }
@@ -333,11 +333,12 @@ void MainWindow::on_actionDownload_triggered()
         std::vector<QNetworkProxy> proxies;
         proxy_settings::proxy_state const pstate = settings_manager_->get_proxy_settings().state();
         if(pstate == proxy_settings::proxy_state::manual_proxy){
-            proxies = settings_manager_->get_proxy_settings().get_proxies();            
+            proxies = settings_manager_->get_proxy_settings().get_proxies();
             img_downloader_->set_manual_proxy(proxies);
         }else if(pstate == proxy_settings::proxy_state::tor_proxy){
             img_downloader_->set_tor_proxy(settings_manager_->get_proxy_settings().tor_host(),
                                            settings_manager_->get_proxy_settings().tor_port(),
+                                           settings_manager_->get_proxy_settings().tor_control_port(),
                                            settings_manager_->get_proxy_settings().tor_password());
         }
         img_downloader_->set_proxy_state(static_cast<int>(pstate));
@@ -349,7 +350,7 @@ void MainWindow::on_actionDownload_triggered()
 
 void MainWindow::on_actionSettings_triggered()
 {
-    settings_manager_->exec();    
+    settings_manager_->exec();
 }
 
 void MainWindow::on_actionRefresh_triggered()
