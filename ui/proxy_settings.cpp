@@ -107,7 +107,8 @@ void proxy_settings::init_settings()
         }
     }else{
         settings.setValue(settings_key::no_proxy, true);
-        ui->radioButtonNoProxy->setChecked(true);        
+        ui->radioButtonNoProxy->setChecked(true);
+        on_radioButtonNoProxy_clicked();
     }    
 }
 
