@@ -8,6 +8,7 @@
 #include <QComboBox>
 #include <QDataStream>
 #include <QFile>
+#include <QLineEdit>
 #include <QMessageBox>
 #include <QSaveFile>
 #include <QSettings>
@@ -177,18 +178,20 @@ void proxy_settings::add_proxy(const QString &type, const QString &host, quint16
     combo_box->setCurrentText(type);
 
     auto *spin_box = qobject_cast<QSpinBox*>(ui->tableWidgetPoxyTable->cellWidget(row, static_cast<int>(proxy_field::port)));
-    spin_box->setValue(port);
+    spin_box->setValue(port);        
 
     auto *model = ui->tableWidgetPoxyTable->model();
     model->setData(model->index(row, static_cast<int>(proxy_field::host)), host, Qt::DisplayRole);
     model->setData(model->index(row, static_cast<int>(proxy_field::user_name)), user_name, Qt::DisplayRole);
-    model->setData(model->index(row, static_cast<int>(proxy_field::password)), password, Qt::DisplayRole);
+    qDebug()<<__func__<<":password of user role:"<<password;
+    model->setData(model->index(row, static_cast<int>(proxy_field::password)), "****", Qt::DisplayRole);
+    model->setData(model->index(row, static_cast<int>(proxy_field::password)), password, Qt::UserRole + 1);
 }
 
-QVariant proxy_settings::get_table_data(int row, proxy_field col) const
+QVariant proxy_settings::get_table_data(int row, proxy_field col, int role) const
 {   
     auto const index = ui->tableWidgetPoxyTable->model()->index(row, static_cast<int>(col));
-    return ui->tableWidgetPoxyTable->model()->data(index);
+    return ui->tableWidgetPoxyTable->model()->data(index, role);
 }
 
 void proxy_settings::read_proxy_data()
@@ -203,8 +206,9 @@ void proxy_settings::read_proxy_data()
                 QString host;
                 quint16 port;
                 QString user_name;
-                QString password;
+                QString password;                
                 stream>>type>>host>>port>>user_name>>password;
+                qDebug()<<__func__<<":password="<<password;
                 add_proxy(type, host, port, user_name, password);
             }
         }else{
@@ -239,7 +243,8 @@ void proxy_settings::write_proxy_data()
             }
             quint16 const port = static_cast<quint16>(spin_box->value());
             QString const user_name = get_table_data(i, proxy_field::user_name).toString();
-            QString const password = get_table_data(i, proxy_field::password).toString();
+            QString const password = get_table_data(i, proxy_field::password, Qt::UserRole + 1).toString();
+            QLOG_INFO()<<__func__<<":password of user role:"<<password;
             stream<<type<<host<<port<<user_name<<password;
         }
     }

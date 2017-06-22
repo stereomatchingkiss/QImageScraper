@@ -56,7 +56,7 @@ private:
     void add_proxy(QString const &type, QString const &host,
                    quint16 port, QString const &user_name,
                    QString const &password);
-    QVariant get_table_data(int row, proxy_field col) const;
+    QVariant get_table_data(int row, proxy_field col, int role = Qt::DisplayRole) const;
     void read_proxy_data();
     void init_settings();
     void write_proxy_data();
