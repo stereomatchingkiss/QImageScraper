@@ -2,7 +2,6 @@
 
 #include "global_constant.hpp"
 #include "proxy_settings.hpp"
-#include "tor_controller.hpp"
 #include "utility.hpp"
 
 #include <qt_enhance/network/download_supervisor.hpp>
@@ -17,35 +16,13 @@
 image_downloader::image_downloader(QObject *parent) :
     QObject(parent),
     downloader_{new qte::net::download_supervisor(this)},
-    proxy_state_{static_cast<int>(proxy_settings::proxy_state::no_proxy)},
-    tor_controller_{new tor_controller(this)}
+    proxy_state_{static_cast<int>(proxy_settings::proxy_state::no_proxy)}
 {
     using namespace qte::net;
 
     connect(downloader_, &download_supervisor::error, this, &image_downloader::download_image_error);
     connect(downloader_, &download_supervisor::download_finished, this, &image_downloader::download_finished);
     connect(downloader_, &download_supervisor::download_progress, this, &image_downloader::download_progress);
-
-    connect(tor_controller_, &tor_controller::error_happen, [this](QString const &error)
-    {
-        QLOG_ERROR()<<"tor controller error:"<<error;
-        if(img_info_.retry_num_++ < global_constant::download_retry_limit()){
-            QLOG_ERROR()<<"tor controller error retry big image again";
-            download_image(img_info_);
-        }else{
-            QLOG_ERROR()<<"tor controller error try small image";
-            img_info_.retry_num_ = 0;
-            if(img_info_.choice_ == link_choice::big){
-                download_small_img(img_info_);
-            }
-        }
-    });
-    connect(tor_controller_, &tor_controller::renew_ip_success,
-            [this]()
-    {
-        QLOG_INFO()<<"renew tor ip success";
-        spawn_download_request(img_info_);
-    });
 }
 
 void image_downloader::set_download_request(QStringList big_image_links, QStringList small_image_links,
@@ -69,14 +46,6 @@ void image_downloader::set_manual_proxy(const std::vector<QNetworkProxy> &proxy)
 void image_downloader::set_proxy_state(int state)
 {
     proxy_state_ = state;
-}
-
-void image_downloader::set_tor_proxy(QString const &host, quint16 port, quint16 control_port, QString const &password)
-{
-    tor_info_.host_ = host;
-    tor_info_.port_ = port;
-    tor_info_.control_port_ = control_port;
-    tor_info_.password_ = password;
 }
 
 bool image_downloader::can_download_image(download_img_task const &task, img_links_map_value const &img_info)
@@ -135,28 +104,16 @@ void image_downloader::download_finished(image_downloader::download_img_task tas
 void image_downloader::download_image(image_downloader::img_links_map_value info)
 {    
     proxy_settings::proxy_state const pstate = static_cast<proxy_settings::proxy_state>(proxy_state_);
-    if(pstate == proxy_settings::proxy_state::manual_proxy && info.retry_num_ != 0){
-        if(!proxy_list_.empty()){
-            auto const proxy = proxy_list_[qrand() % proxy_list_.size()];
-            QLOG_INFO()<<__func__<<":manual proxy:"<<proxy;
-            downloader_->set_proxy(proxy);
-        }
-    }else if(pstate == proxy_settings::proxy_state::tor_proxy && info.retry_num_ != 0){
-        QLOG_INFO()<<__func__<<":set proxy:"<<QNetworkProxy();
-        QNetworkProxy const proxy(QNetworkProxy::Socks5Proxy, tor_info_.host_,
-                                  tor_info_.port_, tor_info_.password_);
+    if(pstate == proxy_settings::proxy_state::manual_proxy && info.retry_num_ != 0 && !proxy_list_.empty()){
+        auto const proxy = proxy_list_[qrand() % proxy_list_.size()];
+        QLOG_INFO()<<__func__<<":manual proxy:"<<proxy;
         downloader_->set_proxy(proxy);
-        tor_controller_->renew_ip(tor_info_.host_, tor_info_.control_port_, tor_info_.password_);
     }else if(pstate == proxy_settings::proxy_state::no_proxy){
         QLOG_INFO()<<__func__<<":no proxy:"<<QNetworkProxy();
         downloader_->set_proxy(QNetworkProxy());
     }
 
-    if(pstate == proxy_settings::proxy_state::tor_proxy){
-        img_info_ = info;
-    }else{
-        spawn_download_request(std::move(info));
-    }
+    spawn_download_request(std::move(info));
 }
 
 void image_downloader::download_image_error(download_img_task task, const QString &error_msg)

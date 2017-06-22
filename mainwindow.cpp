@@ -335,11 +335,6 @@ void MainWindow::on_actionDownload_triggered()
         if(pstate == proxy_settings::proxy_state::manual_proxy){
             proxies = settings_manager_->get_proxy_settings().get_proxies();
             img_downloader_->set_manual_proxy(proxies);
-        }else if(pstate == proxy_settings::proxy_state::tor_proxy){
-            img_downloader_->set_tor_proxy(settings_manager_->get_proxy_settings().tor_host(),
-                                           settings_manager_->get_proxy_settings().tor_port(),
-                                           settings_manager_->get_proxy_settings().tor_control_port(),
-                                           settings_manager_->get_proxy_settings().tor_password());
         }
         img_downloader_->set_proxy_state(static_cast<int>(pstate));
         img_downloader_->set_download_request(big_img_link, small_img_link, total_download_,

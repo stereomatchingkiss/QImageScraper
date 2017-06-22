@@ -71,15 +71,7 @@ public:
      * proxy_settings::proxy_state(no_proxy, manual_proxy, tor_proxy)
      * @param state self explain, remmeber to cast the enum class to interger
      */
-    void set_proxy_state(int state);
-    /**
-     * @brief setup information of tor porxy
-     * @param host host of tor
-     * @param port this is the port use to connect with world wide web
-     * @param control_port this is the port use to control tor browser
-     * @param password password to control tor browser
-     */
-    void set_tor_proxy(QString const &host, quint16 port, quint16 control_port, QString const &password);
+    void set_proxy_state(int state);    
 
 signals:
     void download_progress(download_img_task task,
@@ -106,15 +98,7 @@ private:
         size_t retry_num_;        
         QString small_img_link_;        
         size_t timeout_retry_num_;
-    };
-
-    struct tor_info
-    {
-        quint16 control_port_ = 9151;
-        QString host_ = "127.0.0.1";
-        quint16 port_ = 9150;
-        QString password_;
-    };
+    };    
 
     bool can_download_image(download_img_task const &task, img_links_map_value const &img_info);    
     void download_finished(download_img_task task);
@@ -137,9 +121,7 @@ private:
     int proxy_state_;
     QString save_at_;
     QStringList small_img_links_;
-    download_statistic statistic_;
-    tor_controller *tor_controller_;
-    tor_info tor_info_;
+    download_statistic statistic_;        
 };
 
 #endif // IMG_DOWNLOADER_HPP

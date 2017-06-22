@@ -92,8 +92,7 @@ SOURCES += main.cpp\
     core/image_downloader.cpp \
     ui/proxy_settings.cpp \
     ui/settings_manager.cpp \
-    ui/proxy_delegate.cpp \
-    core/tor_controller.cpp
+    ui/proxy_delegate.cpp
 
 HEADERS  += mainwindow.hpp \
     core/bing_image_search.hpp \
@@ -112,8 +111,7 @@ HEADERS  += mainwindow.hpp \
     core/image_downloader.hpp \
     ui/proxy_settings.hpp \
     ui/settings_manager.hpp \
-    ui/proxy_delegate.hpp \
-    core/tor_controller.hpp
+    ui/proxy_delegate.hpp
 
 FORMS    += mainwindow.ui \
     ui/general_settings.ui \
