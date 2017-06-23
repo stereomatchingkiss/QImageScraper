@@ -45,9 +45,6 @@ void proxy_delegate::setModelData(QWidget *widget, QAbstractItemModel *model, co
 {
     if(index.column() == static_cast<int>(proxy_settings::proxy_field::password)){
         model->setData(index, QString(4, QChar('*')), Qt::DisplayRole);
-        model->setData(index, qobject_cast<QLineEdit*>(widget)->text(), Qt::UserRole + 1);
-        qDebug()<<__func__<<":display role="<<model->data(index, Qt::DisplayRole).value<QString>();
-        qDebug()<<__func__<<":eidt role="<<model->data(index, Qt::EditRole).value<QString>();
-        qDebug()<<__func__<<":user role="<<model->data(index, Qt::UserRole + 1).value<QString>();
+        model->setData(index, qobject_cast<QLineEdit*>(widget)->text(), Qt::UserRole + 1);        
     }
 }
