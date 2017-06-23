@@ -4,6 +4,7 @@
 #include <QsLog.h>
 
 #include "proxy_delegate.hpp"
+#include "proxy_password_delegate.hpp"
 
 #include <QComboBox>
 #include <QDataStream>
@@ -34,8 +35,9 @@ proxy_settings::proxy_settings(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::proxy_settings)
 {
-    ui->setupUi(this);
-    ui->tableWidgetPoxyTable->setItemDelegate(new proxy_delegate(this));
+    ui->setupUi(this);    
+    ui->tableWidgetPoxyTable->setItemDelegateForColumn(static_cast<int>(proxy_field::user_name), new proxy_delegate(this));
+    ui->tableWidgetPoxyTable->setItemDelegateForColumn(static_cast<int>(proxy_field::password), new proxy_password_delegate(this));
     ui->tableWidgetPoxyTable->setSelectionMode(QAbstractItemView::ExtendedSelection);    
 
     init_settings();
