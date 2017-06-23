@@ -8,6 +8,7 @@
 
 #include <QComboBox>
 #include <QDataStream>
+#include <QDesktopServices>
 #include <QFile>
 #include <QLineEdit>
 #include <QMessageBox>
@@ -136,7 +137,7 @@ void proxy_settings::on_radioButtonManualProxy_clicked()
 
 void proxy_settings::on_pushButtonHelp_clicked()
 {
-
+    QDesktopServices::openUrl(QUrl("https://github.com/stereomatchingkiss/QImageScraper/blob/master/proxy_tutorial.md"));
 }
 
 void proxy_settings::on_pushButtonAddProxy_clicked()
@@ -184,8 +185,7 @@ void proxy_settings::add_proxy(const QString &type, const QString &host, quint16
 
     auto *model = ui->tableWidgetPoxyTable->model();
     model->setData(model->index(row, static_cast<int>(proxy_field::host)), host, Qt::DisplayRole);
-    model->setData(model->index(row, static_cast<int>(proxy_field::user_name)), user_name, Qt::DisplayRole);
-    qDebug()<<__func__<<":password of user role:"<<password;
+    model->setData(model->index(row, static_cast<int>(proxy_field::user_name)), user_name, Qt::DisplayRole);    
     model->setData(model->index(row, static_cast<int>(proxy_field::password)), "****", Qt::DisplayRole);
     model->setData(model->index(row, static_cast<int>(proxy_field::password)), password, Qt::UserRole + 1);
 }
@@ -209,8 +209,7 @@ void proxy_settings::read_proxy_data()
                 quint16 port;
                 QString user_name;
                 QString password;                
-                stream>>type>>host>>port>>user_name>>password;
-                qDebug()<<__func__<<":password="<<password;
+                stream>>type>>host>>port>>user_name>>password;                
                 add_proxy(type, host, port, user_name, password);
             }
         }else{
