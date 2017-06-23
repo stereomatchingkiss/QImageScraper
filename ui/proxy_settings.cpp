@@ -248,9 +248,9 @@ void proxy_settings::write_proxy_data()
             QLOG_INFO()<<__func__<<":password of user role:"<<password;
             stream<<type<<host<<port<<user_name<<password;
         }
-    }
 
-    if(!file.commit()){
-        cannot_write();
-    }
+        if(!file.commit()){
+            cannot_write();
+        }
+    }    
 }
