@@ -41,14 +41,6 @@ QWidget *proxy_delegate::createEditor(QWidget *parent, const QStyleOptionViewIte
     return parent;
 }
 
-/*void proxy_delegate::setEditorData(QWidget *editor, const QModelIndex &index) const
-{
-    if(index.column() == static_cast<int>(proxy_settings::proxy_field::password)){
-        QLineEdit *edit = qobject_cast<QLineEdit*>(editor);
-        edit->setText(index.model()->data(index).value<QString>());
-    }
-}//*/
-
 void proxy_delegate::setModelData(QWidget *widget, QAbstractItemModel *model, const QModelIndex &index) const
 {
     if(index.column() == static_cast<int>(proxy_settings::proxy_field::password)){
