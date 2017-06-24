@@ -102,12 +102,7 @@ void bing_image_search::load_web_page_finished(bool ok)
         case state::show_more_images:{
             QLOG_INFO()<<"state show_more_images";
             break;
-        }
-        case state::parse_img_link:{
-            QLOG_INFO()<<"state parse_img_link";
-            parse_imgs_link_content();
-            break;
-        }
+        }        
         case state::get_img_link_from_gallery_page:{
             QLOG_INFO()<<"state get_img_link_from_gallery_page";
             return;
@@ -119,14 +114,6 @@ void bing_image_search::load_web_page_finished(bool ok)
     }else{
         emit search_error(image_search_error::error::load_page_error);
     }
-}
-
-void bing_image_search::get_imgs_link(const QString &page_link,
-                                      std::function<void(QStringList const&, QStringList const&)> callback)
-{
-    parse_img_link_callback_ = callback;
-    state_ = state::parse_img_link;
-    get_web_page().load(page_link);
 }
 
 void bing_image_search::get_imgs_link_from_gallery_page(std::function<void(const QStringList &, const QStringList &)> callback)
@@ -164,22 +151,6 @@ void bing_image_search::go_to_gallery_page(const QString &target)
     if(!target.isEmpty()){
         get_web_page().load("https://www.bing.com/images/search?q=" + target);
     }
-}
-
-void bing_image_search::parse_imgs_link_content()
-{
-    get_web_page().toHtml([this](QString const &contents)
-    {
-        QRegularExpression const reg("<img class=\"mainImage\" src=\"([^\"]*)\" src2=\"([^\"]*)");
-        auto const match = reg.match(contents);
-        if(match.hasMatch()){
-            QLOG_INFO()<<"img link:"<<match.captured(1)<<"\n"<<match.captured(2);
-        }else{
-            QLOG_INFO()<<"cannot capture img link";
-        }
-        parse_img_link_callback_({match.captured(2).replace("&amp;", "&")},
-        {match.captured(1).replace("&amp;", "&")});
-    });
 }
 
 void bing_image_search::scroll_web_page()

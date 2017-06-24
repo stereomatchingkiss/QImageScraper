@@ -56,14 +56,6 @@ void google_image_search::reload()
     get_web_page().load(get_web_page().url());
 }
 
-void google_image_search::get_imgs_link(const QString &page_link,
-                                        std::function<void(QStringList const&, QStringList const&)> callback)
-{
-    parse_img_link_callback_ = callback;
-    state_ = state::parse_img_link;
-    get_web_page().load(page_link);
-}
-
 void google_image_search::get_imgs_link_from_gallery_page(std::function<void (const QStringList &, const QStringList &)> callback)
 {
     state_ = state::get_img_link_from_gallery_page;
@@ -169,12 +161,7 @@ void google_image_search::load_web_page_finished(bool ok)
         case state::show_more_images:{
             QLOG_INFO()<<"state scroll page";
             break;
-        }
-        case state::parse_img_link:{
-            QLOG_INFO()<<"state parse img link";
-            parse_imgs_link_content();
-            break;
-        }
+        }        
         case state::get_img_link_from_gallery_page:{
             QLOG_INFO()<<"state get_img_link_from_sec_page";
             return;
@@ -186,25 +173,6 @@ void google_image_search::load_web_page_finished(bool ok)
     }else{
         emit search_error(image_search_error::error::load_page_error);
     }
-}
-
-void google_image_search::parse_imgs_link_content()
-{
-    get_web_page().toHtml([this](QString const &contents){
-        QRegularExpression const reg("\\[\"image_group\",(null,){4}\\[null,\"\\[{3}"
-                                     "[^\"]*\"[^\"]*\",\\[\\\\\"([^\"]*)\""
-                                     "[^\\[]*\\[\\\\\"([^\"]*)\"");
-        auto const match = reg.match(contents);
-        if(match.hasMatch()){
-            QLOG_INFO()<<"img link:"<<decode_link_char(match.captured(2))<<"\n"
-                      <<decode_link_char(match.captured(3));
-        }else{
-            QLOG_INFO()<<"cannot capture img link";
-        }
-
-        parse_img_link_callback_({decode_link_char(match.captured(3))},
-        {decode_link_char(match.captured(2))});
-    });
 }
 
 QStringList google_image_search::parse_page_link(const QString &contents) const

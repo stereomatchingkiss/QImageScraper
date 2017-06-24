@@ -33,17 +33,6 @@ public:
     virtual void get_page_link(std::function<void(QStringList const&)> callback) = 0;
 
     /**
-     * @brief Asynchronous method to get image links by page link(this page
-     * contain image links). Upon completion, result callback is called with the
-     * image links.
-     * @param page_link link of page which contain image links
-     * @param callback Upon completion, result callback is called with the
-     * image links(big image link, small image link).
-     */
-    virtual void get_imgs_link(QString const &page_link,
-                               std::function<void(QStringList const&, QStringList const&)> callback) = 0;
-
-    /**
      * @brief Asynchronous method to parse all of the image links from gallery page. Upon
      * completion, result callback is called with the image links
      * @param callback callback Upon completion, result callback is called with the

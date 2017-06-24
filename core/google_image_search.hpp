@@ -10,8 +10,6 @@ public:
     explicit google_image_search(QWebEnginePage &page, QObject *parent = nullptr);
 
     void get_page_link(std::function<void(QStringList const&)> callback) override;
-    void get_imgs_link(QString const &page_link,
-                       std::function<void(QStringList const&, QStringList const&)> callback) override;
     void get_imgs_link_from_gallery_page(std::function<void(QStringList const&, QStringList const&)> callback) override;
     void get_search_target(std::function<void(QString const &)> callback) override;
     void go_to_gallery_page(QString const &target) override;
@@ -22,8 +20,7 @@ public:
     void stop_show_more_images() override;
 
 private:
-    enum class state{
-        parse_img_link,
+    enum class state{        
         reload_url,
         load_url,
         to_search_page,
@@ -33,12 +30,10 @@ private:
     };
 
     QString decode_link_char(QString link);
-    void load_web_page_finished(bool ok) override;
-    void parse_imgs_link_content();
+    void load_web_page_finished(bool ok) override;    
     QStringList parse_page_link(QString const &contents) const;
     void scroll_web_page();
 
-    std::function<void(QStringList const&, QStringList const&)> parse_img_link_callback_;
     size_t scroll_count_;
     size_t scroll_limit_;
     state state_;
