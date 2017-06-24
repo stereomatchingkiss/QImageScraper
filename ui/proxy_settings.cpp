@@ -24,7 +24,7 @@ namespace{
 struct settings_key
 {
     static QString const no_proxy;
-    static QString const manual_proxy;    
+    static QString const manual_proxy;
 };
 
 QString const settings_key::no_proxy("proxy_settings/no_proxy");
@@ -36,10 +36,10 @@ proxy_settings::proxy_settings(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::proxy_settings)
 {
-    ui->setupUi(this);    
+    ui->setupUi(this);
     ui->tableWidgetPoxyTable->setItemDelegateForColumn(static_cast<int>(proxy_field::user_name), new proxy_delegate(this));
     ui->tableWidgetPoxyTable->setItemDelegateForColumn(static_cast<int>(proxy_field::password), new proxy_password_delegate(this));
-    ui->tableWidgetPoxyTable->setSelectionMode(QAbstractItemView::ExtendedSelection);    
+    ui->tableWidgetPoxyTable->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
     init_settings();
 }
@@ -113,26 +113,26 @@ void proxy_settings::init_settings()
         settings.setValue(settings_key::no_proxy, true);
         ui->radioButtonNoProxy->setChecked(true);
         on_radioButtonNoProxy_clicked();
-    }    
+    }
 }
 
 void proxy_settings::reject_settings()
 {
     QSettings settings;
     ui->radioButtonNoProxy->setChecked(settings.value(settings_key::no_proxy).toBool());
-    ui->radioButtonManualProxy->setChecked(settings.value(settings_key::manual_proxy).toBool());    
+    ui->radioButtonManualProxy->setChecked(settings.value(settings_key::manual_proxy).toBool());
     ui->groupBoxManualProxy->setVisible(ui->radioButtonManualProxy->isChecked());
     read_proxy_data();
 }
 
 void proxy_settings::on_radioButtonNoProxy_clicked()
 {
-    ui->groupBoxManualProxy->setVisible(false);    
+    ui->groupBoxManualProxy->setVisible(false);
 }
 
 void proxy_settings::on_radioButtonManualProxy_clicked()
 {    
-    ui->groupBoxManualProxy->setVisible(true);    
+    ui->groupBoxManualProxy->setVisible(true);
 }
 
 void proxy_settings::on_pushButtonHelp_clicked()
@@ -181,11 +181,11 @@ void proxy_settings::add_proxy(const QString &type, const QString &host, quint16
     combo_box->setCurrentText(type);
 
     auto *spin_box = qobject_cast<QSpinBox*>(ui->tableWidgetPoxyTable->cellWidget(row, static_cast<int>(proxy_field::port)));
-    spin_box->setValue(port);        
+    spin_box->setValue(port);
 
     auto *model = ui->tableWidgetPoxyTable->model();
     model->setData(model->index(row, static_cast<int>(proxy_field::host)), host, Qt::DisplayRole);
-    model->setData(model->index(row, static_cast<int>(proxy_field::user_name)), user_name, Qt::DisplayRole);    
+    model->setData(model->index(row, static_cast<int>(proxy_field::user_name)), user_name, Qt::DisplayRole);
     model->setData(model->index(row, static_cast<int>(proxy_field::password)), "****", Qt::DisplayRole);
     model->setData(model->index(row, static_cast<int>(proxy_field::password)), password, Qt::UserRole + 1);
 }
@@ -208,12 +208,14 @@ void proxy_settings::read_proxy_data()
                 QString host;
                 quint16 port;
                 QString user_name;
-                QString password;                
-                stream>>type>>host>>port>>user_name>>password;                
+                QString password;
+                stream>>type>>host>>port>>user_name>>password;
                 add_proxy(type, host, port, user_name, password);
             }
         }else{
-            QMessageBox::warning(nullptr, tr("QImageScraper"), tr("Cannot read proxy settings"));
+            if(QFile::exists("proxy_settgins.dat")){
+                QMessageBox::warning(nullptr, tr("QImageScraper"), tr("Cannot read proxy settings"));
+            }
         }
     }
 }
@@ -252,5 +254,5 @@ void proxy_settings::write_proxy_data()
         if(!file.commit()){
             cannot_write();
         }
-    }    
+    }
 }
