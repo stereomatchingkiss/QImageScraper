@@ -15,6 +15,7 @@
 #include <QSaveFile>
 #include <QSettings>
 #include <QSpinBox>
+#include <QStandardPaths>
 
 #include <set>
 #include <map>
@@ -29,6 +30,9 @@ struct settings_key
 
 QString const settings_key::no_proxy("proxy_settings/no_proxy");
 QString const settings_key::manual_proxy = "proxy_settings/manual_proxy";
+
+QString const proxy_setting_path(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) +
+                                 "/qimage_scraper_proxy_settings.dat");
 
 }
 
@@ -199,7 +203,7 @@ QVariant proxy_settings::get_table_data(int row, proxy_field col, int role) cons
 void proxy_settings::read_proxy_data()
 {
     if(ui->radioButtonManualProxy->isChecked()){
-        QFile file("proxy_settings.dat");
+        QFile file(proxy_setting_path);
         if(file.open(QIODevice::ReadOnly)){
             ui->tableWidgetPoxyTable->model()->removeRows(0, ui->tableWidgetPoxyTable->rowCount());
             QDataStream stream(&file);
@@ -222,7 +226,7 @@ void proxy_settings::read_proxy_data()
 
 void proxy_settings::write_proxy_data()
 {
-    QSaveFile file("proxy_settings.dat");
+    QSaveFile file(proxy_setting_path);
     auto const cannot_write = []()
     {
         QMessageBox::warning(nullptr, tr("Error"), tr("Cannot write proxy data into file, your settings "
