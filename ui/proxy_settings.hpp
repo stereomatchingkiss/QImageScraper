@@ -10,7 +10,6 @@ namespace Ui {
 class proxy_settings;
 }
 
-class tor_controller;
 class QTableWidgetItem;
 
 class proxy_settings : public QDialog
