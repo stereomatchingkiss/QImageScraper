@@ -1,3 +1,19 @@
+Version 1.4
+------------
+- [windows 32bits](
+https://mega.nz/#!B0tRAQTL!w3x7SvpVMY6NmfmVxEN4ftRoHJINRM4A21lDuntwvEI
+)
+- [mac os](
+https://mega.nz/#!UpEyBZqS!0fFoWZqjoLr8XbT-ln8vB2U0DfwMFUoS88eqRB8dQ0A
+)
+
+**What changed**
+
+- Fix broken Google image search due to some minor change from Google
+- Support proxy
+- Add top and bottom buttons to scroll web page
+- Back to the top of Gallery page rather than back to the first page of the search engine, this could avoid the need of reset search settings again and again
+
 Version 1.3
 ------------
 - [windows 32bits](
@@ -15,12 +31,7 @@ https://mega.nz/#!Ig9wzBLS!exZzRMMKm7MEgkga5jVTl7nrNiXZKqzsJj0ExYGRFLg
 
 Version 1.2
 ------------
-- [windows 32bits](
-https://mega.nz/#!40131DKR!J_4nAOBcrSSTJi1KRl3lMIJJf86pywRVpSyX-iYW93k
-)
-- [mac os](
-https://mega.nz/#!Yh9n1BQC!YPQ90Z-OyIV3qt3XyMItVMuUytWJwHQ4OCem7jaw22w
-)
+This version is removed since I do not have big space to store them
 
 **What changed**
 
@@ -29,12 +40,7 @@ https://mega.nz/#!Yh9n1BQC!YPQ90Z-OyIV3qt3XyMItVMuUytWJwHQ4OCem7jaw22w
 
 Version 1.1
 ------------
-- [windows 32bits](
-https://mega.nz/#!d58E2JjR!KaoYjm_WnJr6ejWKcDhSublzYXAt9WiEJmeQxGuy64g
-)
-- [mac os](
-https://mega.nz/#!Asc02BQJ!wDiaO_ldhU9mBRjjigCcNZWV8h_0BNJyiANa3vkRH3k
-)
+This version is removed since I do not have big space to store them
 
 **What changed**
 
@@ -47,7 +53,7 @@ https://mega.nz/#!Asc02BQJ!wDiaO_ldhU9mBRjjigCcNZWV8h_0BNJyiANa3vkRH3k
 Version 1.0
 ------------
 
-This old version is removed since I do not have big space to store them
+This version is removed since I do not have big space to store them
 
 **Features**
 
