@@ -26,13 +26,14 @@ struct settings_key
 {
     static QString const no_proxy;
     static QString const manual_proxy;
+    static QString const proxy_setting_path;
 };
 
 QString const settings_key::no_proxy("proxy_settings/no_proxy");
 QString const settings_key::manual_proxy = "proxy_settings/manual_proxy";
 
-QString const proxy_setting_path(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) +
-                                 "/qimage_scraper_proxy_settings.dat");
+QString const settings_key::proxy_setting_path(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) +
+                                               "/qimage_scraper_proxy_settings.dat");
 
 }
 
@@ -203,7 +204,7 @@ QVariant proxy_settings::get_table_data(int row, proxy_field col, int role) cons
 void proxy_settings::read_proxy_data()
 {
     if(ui->radioButtonManualProxy->isChecked()){
-        QFile file(proxy_setting_path);
+        QFile file(settings_key::proxy_setting_path);
         if(file.open(QIODevice::ReadOnly)){
             ui->tableWidgetPoxyTable->model()->removeRows(0, ui->tableWidgetPoxyTable->rowCount());
             QDataStream stream(&file);
@@ -217,7 +218,7 @@ void proxy_settings::read_proxy_data()
                 add_proxy(type, host, port, user_name, password);
             }
         }else{
-            if(QFile::exists("proxy_settgins.dat")){
+            if(QFile::exists(settings_key::proxy_setting_path)){
                 QMessageBox::warning(nullptr, tr("QImageScraper"), tr("Cannot read proxy settings"));
             }
         }
@@ -226,7 +227,7 @@ void proxy_settings::read_proxy_data()
 
 void proxy_settings::write_proxy_data()
 {
-    QSaveFile file(proxy_setting_path);
+    QSaveFile file(settings_key::proxy_setting_path);
     auto const cannot_write = []()
     {
         QMessageBox::warning(nullptr, tr("Error"), tr("Cannot write proxy data into file, your settings "
