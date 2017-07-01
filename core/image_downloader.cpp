@@ -170,13 +170,17 @@ void image_downloader::process_download_image(image_downloader::download_img_tas
             QLOG_INFO()<<__func__<<": network error or cannot read img retry num:"<<img_info.retry_num_;
             download_image(std::move(img_info));
         }else{
-            img_info.retry_num_ = 0;
             QLOG_INFO()<<"cannot save image choice:"<<(int)img_info.choice_;
             if(img_info.choice_ == link_choice::big){
+                img_info.retry_num_ = 0;
                 download_small_img(std::move(img_info));
             }else{
-                increase_progress();
-                download_next_image();
+                if(img_info_.retry_num_++ < global_constant::download_retry_limit()){
+                    download_small_img(std::move(img_info));
+                }else{
+                    increase_progress();
+                    download_next_image();
+                }
             }
         }
     }
