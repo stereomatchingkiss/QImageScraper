@@ -174,6 +174,9 @@ void image_downloader::process_download_image(image_downloader::download_img_tas
             QLOG_INFO()<<"cannot save image choice:"<<(int)img_info.choice_;
             if(img_info.choice_ == link_choice::big){
                 download_small_img(std::move(img_info));
+            }else{
+                increase_progress();
+                download_next_image();
             }
         }
     }
