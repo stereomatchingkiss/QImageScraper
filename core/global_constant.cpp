@@ -12,6 +12,11 @@ QString global_constant::google_search_name()
     return QObject::tr("Google");
 }
 
+QString global_constant::shutter_stock_name()
+{
+    return QObject::tr("ShutterStock");
+}
+
 QString global_constant::yahoo_search_name()
 {
     return QObject::tr("Yahoo");

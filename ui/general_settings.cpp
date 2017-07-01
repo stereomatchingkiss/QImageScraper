@@ -34,7 +34,8 @@ general_settings::general_settings(QWidget *parent) :
 
     ui->comboBoxSearchBy->addItem(global_constant::bing_search_name());
     ui->comboBoxSearchBy->addItem(global_constant::google_search_name());
-    ui->comboBoxSearchBy->addItem(global_constant::yahoo_search_name());
+    ui->comboBoxSearchBy->addItem(global_constant::shutter_stock_name());
+    ui->comboBoxSearchBy->addItem(global_constant::yahoo_search_name());    
 
     QSettings settings;
     if(settings.contains(setting_keys::general_save_at)){

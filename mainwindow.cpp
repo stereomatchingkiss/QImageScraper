@@ -4,6 +4,7 @@
 #include "core/bing_image_search.hpp"
 #include "core/google_image_search.hpp"
 #include "core/image_downloader.hpp"
+#include "core/shutter_stock_image_search.hpp"
 #include "core/yahoo_image_search.hpp"
 #include "core/global_constant.hpp"
 #include "core/utility.hpp"
@@ -99,12 +100,16 @@ void MainWindow::create_search_engine(const QString &target)
         img_search_->deleteLater();
     }
 
-    if(settings_manager_->get_general_settings().get_search_by() == global_constant::bing_search_name()){
+    QString const search_engine = settings_manager_->get_general_settings().get_search_by();
+    if(search_engine == global_constant::bing_search_name()){
         QLOG_INFO()<<__func__<<":create bing engine";
         img_search_ = new bing_image_search(*ui->webView->page(), this);
-    }else if(settings_manager_->get_general_settings().get_search_by() == global_constant::yahoo_search_name()){
+    }else if(search_engine == global_constant::yahoo_search_name()){
         QLOG_INFO()<<__func__<<":create yahoo engine";
         img_search_ = new yahoo_image_search(*ui->webView->page(), this);
+    }else if(search_engine == global_constant::shutter_stock_name()){
+        QLOG_INFO()<<__func__<<":create shutter stock engine";
+        img_search_ = new shutter_stock_image_search(*ui->webView->page(), this);
     }else{
         QLOG_INFO()<<__func__<<":create google engine";
         img_search_ = new google_image_search(*ui->webView->page(), this);
@@ -269,7 +274,7 @@ void MainWindow::update_to_new_version()
     auto *reply = qobject_cast<QNetworkReply*>(sender());
     if(reply){
         QLOG_INFO()<<"check new version:"<<reply->error();
-        QByteArray const results = reply->readAll();
+        QString const results = QString(reply->readAll()).trimmed();
         QLOG_INFO()<<"version number:"<<results<<","<<QSettings().value("version").toString();
         if(results > QSettings().value("version").toString()){
             ui->actionNew->setVisible(true);

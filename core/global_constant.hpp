@@ -21,6 +21,8 @@ public:
         return 5;
     }
 
+    static QString shutter_stock_name();
+
     static QString yahoo_search_name();
 };
 

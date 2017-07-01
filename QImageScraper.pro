@@ -93,7 +93,8 @@ SOURCES += main.cpp\
     ui/proxy_settings.cpp \
     ui/settings_manager.cpp \
     ui/proxy_delegate.cpp \
-    ui/proxy_password_delegate.cpp
+    ui/proxy_password_delegate.cpp \
+    core/shutter_stock_image_search.cpp
 
 HEADERS  += mainwindow.hpp \
     core/bing_image_search.hpp \
@@ -113,7 +114,8 @@ HEADERS  += mainwindow.hpp \
     ui/proxy_settings.hpp \
     ui/settings_manager.hpp \
     ui/proxy_delegate.hpp \
-    ui/proxy_password_delegate.hpp
+    ui/proxy_password_delegate.hpp \
+    core/shutter_stock_image_search.hpp
 
 FORMS    += mainwindow.ui \
     ui/general_settings.ui \
