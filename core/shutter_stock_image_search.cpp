@@ -52,7 +52,7 @@ void shutter_stock_image_search::reload()
 void shutter_stock_image_search::show_more_images(size_t max_search_size)
 {
     big_img_links_.clear();
-    page_num_ = 1;
+    page_num_ = get_current_page_num();
     small_img_links_.clear();
     show_more_limit_ = (max_search_size) / 103 + 1;
     state_ = state::show_more_images;
@@ -66,6 +66,18 @@ void shutter_stock_image_search::show_more_images(size_t max_search_size)
 void shutter_stock_image_search::stop_show_more_images()
 {
     stop_show_more_image_ = true;
+}
+
+size_t shutter_stock_image_search::get_current_page_num()
+{
+    QUrl const url = get_web_page().url();
+    QRegularExpression const reg("page=(\\d+)");
+    auto const match = reg.match(url.toString());
+    if(match.hasMatch()){
+        return match.captured(1).toInt();
+    }
+
+    return 1;
 }
 
 void shutter_stock_image_search::load_web_page_finished(bool ok)

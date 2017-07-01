@@ -29,6 +29,7 @@ private:
         get_img_link_from_gallery_page
     };
 
+    size_t get_current_page_num();
     void load_web_page_finished(bool ok) override;
     void parse_img_link(std::function<void(QString const&)> callback);
     void show_more_page();
