@@ -9,7 +9,7 @@ public:
     explicit yahoo_image_search(QWebEnginePage &page, QObject *parent = nullptr);
 
     void get_imgs_link_from_gallery_page(std::function<void(QStringList const&, QStringList const&)> callback) override;
-    void get_page_link(std::function<void(QStringList const&)> callback) override;
+    void get_search_image_size(std::function<void(size_t)> callback) override;
     void get_search_target(std::function<void(QString const &)> callback) override;
     void go_to_gallery_page(QString const &target) override;
     void go_to_search_page() override;

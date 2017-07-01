@@ -24,21 +24,20 @@ public:
     explicit image_search(QWebEnginePage &page, QObject *parent = nullptr);
 
     /**
-     * @brief Asynchronous method to get page links of second page(these pages
-     * contain image links). Upon completion, result callback is called with the
-     * page links.
-     * @param callback Upon completion, result callback is called with the
-     * page links.
-     */
-    virtual void get_page_link(std::function<void(QStringList const&)> callback) = 0;
-
-    /**
      * @brief Asynchronous method to parse all of the image links from gallery page. Upon
      * completion, result callback is called with the image links
      * @param callback callback Upon completion, result callback is called with the
      * image links(big image links, small image links).
      */
     virtual void get_imgs_link_from_gallery_page(std::function<void(QStringList const&, QStringList const&)> callback) = 0;
+
+    /**
+     * @brief Asynchronous method to searched image size of gallery page(s).
+     * Upon completion, result callback is called with the page links.
+     * @param callback Upon completion, result callback is called with the
+     * page links.
+     */
+    virtual void get_search_image_size(std::function<void(size_t)> callback) = 0;
 
     /**
      * @brief Asynchronous method to get the search target. Upon

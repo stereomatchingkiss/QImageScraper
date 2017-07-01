@@ -24,11 +24,11 @@ yahoo_image_search::yahoo_image_search(QWebEnginePage &page, QObject *parent) :
 
 }
 
-void yahoo_image_search::get_page_link(std::function<void (const QStringList&)> callback)
+void yahoo_image_search::get_search_image_size(std::function<void (size_t)> callback)
 {
     get_web_page().toHtml([this, callback](QString const &contents)
     {
-        callback(parse_page_link(contents));
+        callback(parse_page_link(contents).size());
     });
 }
 

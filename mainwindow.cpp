@@ -221,7 +221,7 @@ void MainWindow::process_show_more_images_done()
 {
     if(img_search_){
         QLOG_INFO()<<__func__<<":get_page_link start";
-        img_search_->get_page_link([this](QStringList const &links)
+        img_search_->get_search_image_size([this](size_t search_img_size)
         {
             set_enabled_main_window_except_stop(true);
             setMaximumSize(default_max_size_);
@@ -232,7 +232,7 @@ void MainWindow::process_show_more_images_done()
                                         "press %3 if you want to download the images<br> "
                                         "press %4 if you want to configure your options<br>"
                                         "press %5 if you want to go to the top of the page").
-                                     arg(links.size()).
+                                     arg(search_img_size).
                                      arg("<img src = ':/icons/show_more_image.png' style='vertical-align:middle' />").
                                      arg("<img src = ':/icons/download.png' style='vertical-align:middle' />").
                                      arg("<img src = ':/icons/settings.png' style='vertical-align:middle' />").
