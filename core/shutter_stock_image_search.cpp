@@ -16,7 +16,7 @@ constexpr int show_more_duration = 2000;
 
 shutter_stock_image_search::shutter_stock_image_search(QWebEnginePage &page, QObject *parent) :
     image_search{page, parent},
-    page_num_{0},
+    page_num_{1},
     show_more_count_{0},
     show_more_limit_{2},
     state_{state::to_search_page},
@@ -52,7 +52,7 @@ void shutter_stock_image_search::reload()
 void shutter_stock_image_search::show_more_images(size_t max_search_size)
 {
     big_img_links_.clear();
-    page_num_ = 0;
+    page_num_ = 1;
     small_img_links_.clear();
     show_more_limit_ = (max_search_size) / 103 + 1;
     state_ = state::show_more_images;
@@ -139,7 +139,16 @@ void shutter_stock_image_search::get_imgs_link_from_gallery_page(std::function<v
                                                                                     const QStringList &)> callback)
 {
     state_ = state::get_img_link_from_gallery_page;
-    callback(big_img_links_, small_img_links_);
+    if(page_num_== 1){
+        parse_img_link([this, callback](QString const &)
+        {
+            callback(big_img_links_, small_img_links_);
+        });
+    }else{
+        big_img_links_.removeDuplicates();
+        small_img_links_.removeDuplicates();
+        callback(big_img_links_, small_img_links_);
+    }
 }
 
 void shutter_stock_image_search::get_search_target(std::function<void (const QString &)> callback)
@@ -189,19 +198,17 @@ void shutter_stock_image_search::show_more_page()
             QString temp = get_web_page().url().toString();
             QUrl url;
             if(temp.contains("page=")){
-                url = QUrl(temp.replace(QRegularExpression("page=\\d"), QString("page=%1").arg(++page_num_)));
+                url = QUrl(temp.replace(QRegularExpression("page=\\d+"), QString("page=%1").arg(++page_num_)));
             }else{
                 url = temp + QString("&page=%1").arg(++page_num_);
             }
             QLOG_INFO()<<__func__<<":next page url:"<<url;
             get_web_page().load(url);
-            //get_web_page().runJavaScript("document.getElementById(\"mosaic-next-button\").click()");
         }else{
             QLOG_INFO()<<"Reach the end of page";
             stop_show_more_image_ = true;
         }
         ++show_more_count_;
-        //QTimer::singleShot(show_more_duration, [this](){show_more_page();});
     });
 }
 
