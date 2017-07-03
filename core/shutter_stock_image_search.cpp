@@ -200,7 +200,8 @@ void shutter_stock_image_search::show_more_page()
         return;
     }
 
-    if(show_more_count_ == show_more_limit_ || big_img_links_.size() >= max_search_size_){
+    if(show_more_count_ == show_more_limit_ ||
+            static_cast<size_t>(big_img_links_.size()) >= max_search_size_){
         emit show_more_images_done();
         return;
     }
@@ -220,7 +221,7 @@ void shutter_stock_image_search::show_more_page()
             get_web_page().load(url);
         }else{
             QLOG_INFO()<<"Reach the end of page";
-            stop_show_more_image_ = true;
+            emit show_more_images_done();
         }
         ++show_more_count_;
     });
