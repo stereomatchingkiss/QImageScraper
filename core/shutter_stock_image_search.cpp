@@ -16,6 +16,7 @@ constexpr int show_more_duration = 2000;
 
 shutter_stock_image_search::shutter_stock_image_search(QWebEnginePage &page, QObject *parent) :
     image_search{page, parent},
+    max_search_size_{0},
     page_num_{1},
     show_more_count_{0},
     show_more_limit_{2},
@@ -52,6 +53,7 @@ void shutter_stock_image_search::reload()
 void shutter_stock_image_search::show_more_images(size_t max_search_size)
 {
     big_img_links_.clear();
+    max_search_size_ = max_search_size;
     page_num_ = get_current_page_num();
     small_img_links_.clear();
     show_more_limit_ = (max_search_size) / 103 + 1;
@@ -151,7 +153,7 @@ void shutter_stock_image_search::get_imgs_link_from_gallery_page(std::function<v
                                                                                     const QStringList &)> callback)
 {
     state_ = state::get_img_link_from_gallery_page;
-    if(page_num_== 1){
+    if(big_img_links_.empty()){
         parse_img_link([this, callback](QString const &)
         {
             callback(big_img_links_, small_img_links_);
@@ -198,7 +200,7 @@ void shutter_stock_image_search::show_more_page()
         return;
     }
 
-    if(show_more_count_ == show_more_limit_){
+    if(show_more_count_ == show_more_limit_ || big_img_links_.size() >= max_search_size_){
         emit show_more_images_done();
         return;
     }

@@ -35,6 +35,7 @@ private:
     void show_more_page();
 
     QStringList big_img_links_;
+    size_t max_search_size_;
     size_t page_num_;
     size_t show_more_count_;
     size_t show_more_limit_;
