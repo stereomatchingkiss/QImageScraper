@@ -2,6 +2,11 @@
 
 #include <QObject>
 
+QString global_constant::adobe_stock_name()
+{
+    return QObject::tr("AdobeStock");
+}
+
 QString global_constant::bing_search_name()
 {
     return QObject::tr("Bing");

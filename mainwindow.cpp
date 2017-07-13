@@ -1,6 +1,7 @@
 #include "mainwindow.hpp"
 #include "ui_mainwindow.h"
 
+#include "core/adobe_stock_image_search.hpp"
 #include "core/bing_image_search.hpp"
 #include "core/google_image_search.hpp"
 #include "core/image_downloader.hpp"
@@ -101,7 +102,10 @@ void MainWindow::create_search_engine(const QString &target)
     }
 
     QString const search_engine = settings_manager_->get_general_settings().get_search_by();
-    if(search_engine == global_constant::bing_search_name()){
+    if(search_engine == global_constant::adobe_stock_name()){
+        QLOG_INFO()<<__func__<<":create bing engine";
+        img_search_ = new adobe_stock_image_search(*ui->webView->page(), this);
+    }else if(search_engine == global_constant::bing_search_name()){
         QLOG_INFO()<<__func__<<":create bing engine";
         img_search_ = new bing_image_search(*ui->webView->page(), this);
     }else if(search_engine == global_constant::yahoo_search_name()){
