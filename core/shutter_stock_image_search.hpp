@@ -37,8 +37,6 @@ private:
     QStringList big_img_links_;
     size_t max_search_size_;
     size_t page_num_;
-    size_t show_more_count_;
-    size_t show_more_limit_;
     QStringList small_img_links_;
     state state_;
     bool stop_show_more_image_;

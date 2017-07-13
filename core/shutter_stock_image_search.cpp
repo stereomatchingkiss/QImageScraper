@@ -18,8 +18,6 @@ shutter_stock_image_search::shutter_stock_image_search(QWebEnginePage &page, QOb
     image_search{page, parent},
     max_search_size_{0},
     page_num_{1},
-    show_more_count_{0},
-    show_more_limit_{2},
     state_{state::to_search_page},
     stop_show_more_image_{false}
 {
@@ -55,12 +53,10 @@ void shutter_stock_image_search::show_more_images(size_t max_search_size)
     big_img_links_.clear();
     max_search_size_ = max_search_size;
     page_num_ = get_current_page_num();
-    small_img_links_.clear();
-    show_more_limit_ = (max_search_size) / 103 + 1;
+    small_img_links_.clear();    
     state_ = state::show_more_images;
     //we need to setup timer because web view may not able to update in time,
-    //this may cause the page stop loading next page too early
-    show_more_count_ = 0;
+    //this may cause the page stop loading next page too early    
     stop_show_more_image_ = false;
     QTimer::singleShot(show_more_duration, [this](){show_more_page();});
 }
@@ -188,8 +184,7 @@ void shutter_stock_image_search::go_to_gallery_page(const QString &target)
 }
 
 void shutter_stock_image_search::show_more_page()
-{
-    QLOG_INFO()<<__func__<<":show more count:"<<show_more_count_;
+{    
     if(state_ != state::show_more_images){
         return;
     }
@@ -200,8 +195,7 @@ void shutter_stock_image_search::show_more_page()
         return;
     }
 
-    if(show_more_count_ == show_more_limit_ ||
-            static_cast<size_t>(big_img_links_.size()) >= max_search_size_){
+    if(static_cast<size_t>(big_img_links_.size()) >= max_search_size_){
         emit show_more_images_done();
         return;
     }
@@ -222,8 +216,7 @@ void shutter_stock_image_search::show_more_page()
         }else{
             QLOG_INFO()<<"Reach the end of page";
             emit show_more_images_done();
-        }
-        ++show_more_count_;
+        }        
     });
 }
 
