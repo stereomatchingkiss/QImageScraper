@@ -51,6 +51,7 @@ void shutter_stock_image_search::reload()
 void shutter_stock_image_search::show_more_images(size_t max_search_size)
 {
     big_img_links_.clear();
+    small_img_links_.clear();
     max_search_size_ = max_search_size;
     page_num_ = get_current_page_num();
     small_img_links_.clear();    
