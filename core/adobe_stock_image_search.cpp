@@ -18,6 +18,8 @@ adobe_stock_image_search::adobe_stock_image_search(QWebEnginePage &page, QObject
     image_search{page, parent},
     max_search_size_{0},
     page_num_{1},
+    show_more_count_{0},
+    show_more_limit_{0},
     state_{state::to_search_page},
     stop_show_more_image_{false}
 {
@@ -51,10 +53,13 @@ void adobe_stock_image_search::reload()
 void adobe_stock_image_search::show_more_images(size_t max_search_size)
 {
     big_img_links_.clear();
+    small_img_links_.clear();
     max_search_size_ = max_search_size;
     page_num_ = get_current_page_num();
     small_img_links_.clear();
     state_ = state::show_more_images;
+    show_more_limit_ = (max_search_size) / 101 + 1;
+    show_more_count_ = 0;
     //we need to setup timer because web view may not able to update in time,
     //this may cause the page stop loading next page too early
     stop_show_more_image_ = false;
@@ -81,7 +86,6 @@ size_t adobe_stock_image_search::get_current_page_num()
 void adobe_stock_image_search::load_web_page_finished(bool ok)
 {
     QLOG_INFO()<<"load web page finished:"<<ok<<", url:"<<get_web_page().url().toString();
-    QLOG_INFO()<<"default state";
     if(state_ != state::show_more_images &&
             get_web_page().url().toString().contains("https://stock.adobe.com/search?")){
         QLOG_INFO()<<__func__<<":go to gallery page done";
@@ -201,14 +205,18 @@ void adobe_stock_image_search::show_more_page()
 
     if(stop_show_more_image_){
         stop_show_more_image_ = false;
+        state_ = state::load_url;
         emit show_more_images_done();
         return;
     }
 
-    if(static_cast<size_t>(big_img_links_.size()) >= max_search_size_){
+    if(show_more_count_ >= show_more_limit_){
+        QLOG_INFO()<<"show_more_count_ >= show_more_limit_";
+        state_ = state::load_url;
         emit show_more_images_done();
-        return;
     }
+
+    QLOG_INFO()<<"found "<<big_img_links_.size()<<" image";
 
     parse_img_link([this](QString const &contents)
     {
@@ -223,10 +231,8 @@ void adobe_stock_image_search::show_more_page()
             }
             QLOG_INFO()<<__func__<<":next page url:"<<url;
             get_web_page().load(url);
-        }else{
-            QLOG_INFO()<<"Reach the end of page";
-            emit show_more_images_done();
         }
+        ++show_more_count_;
     });
 }
 
