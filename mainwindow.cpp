@@ -3,6 +3,7 @@
 
 #include "core/adobe_stock_image_search.hpp"
 #include "core/bing_image_search.hpp"
+#include "core/deposit_photo_image_search.hpp"
 #include "core/google_image_search.hpp"
 #include "core/image_downloader.hpp"
 #include "core/shutter_stock_image_search.hpp"
@@ -108,6 +109,8 @@ void MainWindow::create_search_engine(const QString &target)
     }else if(search_engine == global_constant::bing_search_name()){
         QLOG_INFO()<<__func__<<":create bing engine";
         img_search_ = new bing_image_search(*ui->webView->page(), this);
+    }else if(search_engine == global_constant::deposit_photo_name()){
+        img_search_ = new deposit_photo_image_search(*ui->webView->page(), this);
     }else if(search_engine == global_constant::yahoo_search_name()){
         QLOG_INFO()<<__func__<<":create yahoo engine";
         img_search_ = new yahoo_image_search(*ui->webView->page(), this);
