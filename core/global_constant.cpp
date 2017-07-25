@@ -12,6 +12,11 @@ QString global_constant::deposit_photo_name()
     return QObject::tr("DepositPhoto");
 }
 
+QString global_constant::dream_time_name()
+{
+    return QObject::tr("DreamTime");
+}
+
 QString global_constant::bing_search_name()
 {
     return QObject::tr("Bing");
