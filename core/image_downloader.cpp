@@ -59,7 +59,7 @@ bool image_downloader::can_download_image(download_img_task const &task, img_lin
         format = img.format();
     }
     if(task->get_network_error_code() == QNetworkReply::NoError && img_can_read){
-        QLOG_INFO()<<"can save image choice:"<<(int)img_info.choice_;
+        QLOG_INFO()<<"can save image choice:"<<static_cast<int>(img_info.choice_);
         QString const &valid_name = get_valid_image_name(task->get_save_as(), format);
         if(valid_name != task->get_save_as()){
             bool const can_rename_img = QFile::rename(task->get_save_as(), valid_name);
@@ -105,7 +105,7 @@ void image_downloader::download_image(image_downloader::img_links_map_value info
 {    
     proxy_settings::proxy_state const pstate = static_cast<proxy_settings::proxy_state>(proxy_state_);
     if(pstate == proxy_settings::proxy_state::manual_proxy && info.retry_num_ != 0 && !proxy_list_.empty()){
-        auto const proxy = proxy_list_[qrand() % proxy_list_.size()];
+        auto const proxy = proxy_list_[static_cast<size_t>(qrand() % static_cast<int>(proxy_list_.size()))];
         QLOG_INFO()<<__func__<<":manual proxy:"<<proxy;
         downloader_->set_proxy(proxy);
     }else if(pstate == proxy_settings::proxy_state::no_proxy){
@@ -170,7 +170,7 @@ void image_downloader::process_download_image(image_downloader::download_img_tas
             QLOG_INFO()<<__func__<<": network error or cannot read img retry num:"<<img_info.retry_num_;
             download_image(std::move(img_info));
         }else{
-            QLOG_INFO()<<"cannot save image choice:"<<(int)img_info.choice_;
+            QLOG_INFO()<<"cannot save image choice:"<<static_cast<size_t>(img_info.choice_);
             if(img_info.choice_ == link_choice::big){
                 img_info.retry_num_ = 0;
                 download_small_img(std::move(img_info));
