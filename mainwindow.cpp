@@ -58,7 +58,7 @@ MainWindow::MainWindow(QWidget *parent) :
     }
     settings.setValue("version", "1.4");
 
-    qsrand(std::time(0));
+    qsrand(std::time(nullptr));
 
     init_connection();
     check_new_version();
