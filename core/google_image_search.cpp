@@ -19,7 +19,7 @@ constexpr int scroll_page_duration = 1500;
 }
 
 google_image_search::google_image_search(QWebEnginePage &page, QObject *parent) :
-    image_search{page, parent},    
+    image_search{page, parent},
     scroll_count_{0},
     scroll_limit_{2},
     state_{state::to_search_page},
@@ -31,14 +31,14 @@ google_image_search::google_image_search(QWebEnginePage &page, QObject *parent) 
 void google_image_search::get_search_image_size(std::function<void (size_t)> callback)
 {
     get_web_page().toHtml([this, callback](QString const &contents)
-    {        
+    {
         callback(parse_page_link(contents).size());
     });
 }
 
 void google_image_search::go_to_search_page()
 {
-    state_ = state::to_search_page;    
+    state_ = state::to_search_page;
     QLOG_INFO()<<__func__<<": before load";
     get_web_page().load(QUrl("https://images.google.com/"));
     QLOG_INFO()<<__func__<<": after load";
@@ -56,10 +56,11 @@ void google_image_search::reload()
     get_web_page().load(get_web_page().url());
 }
 
-void google_image_search::get_imgs_link_from_gallery_page(std::function<void (const QStringList &, const QStringList &)> callback)
+void google_image_search::
+get_imgs_link_from_gallery_page(std::function<void (const QStringList &, const QStringList &)> callback)
 {
     state_ = state::get_img_link_from_gallery_page;
-    get_web_page().toHtml([this, callback](QString const &contents)
+    get_web_page().toHtml([callback](QString const &contents)
     {
         auto global_parser = [&contents](QRegularExpression const &re)
         {
@@ -161,14 +162,11 @@ void google_image_search::load_web_page_finished(bool ok)
         case state::show_more_images:{
             QLOG_INFO()<<"state scroll page";
             break;
-        }        
+        }
         case state::get_img_link_from_gallery_page:{
             QLOG_INFO()<<"state get_img_link_from_sec_page";
             return;
         }
-        default:
-            QLOG_INFO()<<"default state";
-            break;
         }
     }else{
         emit search_error(image_search_error::error::load_page_error);
