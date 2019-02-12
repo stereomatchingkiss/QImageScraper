@@ -32,7 +32,7 @@ void google_image_search::get_search_image_size(std::function<void (size_t)> cal
 {
     get_web_page().toHtml([this, callback](QString const &contents)
     {
-        callback(parse_page_link(contents).size());
+        callback(static_cast<size_t>(parse_page_link(contents).size()));
     });
 }
 
@@ -86,7 +86,7 @@ get_imgs_link_from_gallery_page(std::function<void (const QStringList &, const Q
 void google_image_search::get_search_target(std::function<void (const QString &)> callback)
 {
     get_web_page().runJavaScript("function jscmd(){return document.getElementById(\"lst-ib\").value} jscmd()",
-                                 [this, callback](QVariant const &contents)
+                                 [callback](QVariant const &contents)
     {
         QLOG_INFO()<<"gallery page target:"<<contents.toString();
         callback(contents.toString());
