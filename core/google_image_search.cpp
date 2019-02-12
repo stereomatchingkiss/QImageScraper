@@ -16,6 +16,14 @@ namespace{
 
 constexpr int scroll_page_duration = 1500;
 
+void decode_url(QStringList &inout)
+{
+    for(auto &img : inout){
+        img.replace("\\u003d","=");
+        img.replace("\\u0026", "&");
+    }
+}
+
 }
 
 google_image_search::google_image_search(QWebEnginePage &page, QObject *parent) :
@@ -76,9 +84,8 @@ get_imgs_link_from_gallery_page(std::function<void (const QStringList &, const Q
 
         auto big_img = global_parser(QRegularExpression("\"ou\":\"([^\"]*)"));
         auto small_img = global_parser(QRegularExpression("\"tu\":\"([^\"]*)"));
-        for(auto &img : small_img){
-            img.replace("\\u003d","=");
-        }
+        decode_url(big_img);
+        decode_url(small_img);
         callback(big_img, small_img);
     });
 }
