@@ -121,16 +121,25 @@ void bing_image_search::get_imgs_link_from_gallery_page(std::function<void(const
     state_ = state::get_img_link_from_gallery_page;
     get_web_page().toHtml([this, callback](QString const &contents)
     {
-        QRegularExpression const reg("m=\"{[^,]*([^;]*;){7}([^&]*)[^\"]*\" "
-                                     "mad=\"{([^;]*;){3}([^;]*;)");
+        //<a class="iusc" style="height:180px;width:239px"
+        //m="{&quot;cid&quot;:&quot;S0tIsNfh&quot;,&quot;purl&quot;:&quot;
+        //https://whiteglovechimney.com/causing-smoke/&quot;,&quot;murl&quot;:&quot;
+        //https://whiteglovechimney.com/wp-content/uploads/2014/01/What-is-Causing-the-Smoke-Chico-CA-Flue-Season.jpg
+        //&quot;,&quot;turl&quot;:&quot;https://tse4.mm.bing.net/th?
+        //QRegularExpression const reg("m=\"{[^,]*([^;]*;){7}([^&]*)[^\"]*\" "
+        //                             "src=\"{([^;]*;){3}([^;]*;)");
+        QRegularExpression const reg("<a class=\"iusc\" style=\"[^\"]*\" "
+                                     "m=\"{.+?(?=http)http(.+?(?=http)(http[s]?[^&]*)"
+                                     ".+?(?=src=)src=\"([^\"]*))");
         auto iter = reg.globalMatch(contents);
         QStringList big_img, small_img;
         while(iter.hasNext()){
             QRegularExpressionMatch const match = iter.next();
-            QLOG_INFO()<<"parse_imgs_link_from_second_page:"<<match.captured(2)<<","<<match.captured(4);
+            QLOG_INFO()<<"parse_imgs_link_from_second_page:"<<match.captured(2)<<","<<match.captured(3);
             big_img.push_back(match.captured(2).replace("&amp;", "&"));
-            small_img.push_back(match.captured(4).replace("&amp;", "&"));
+            small_img.push_back(match.captured(3).replace("&amp;", "&"));
         }
+        QLOG_INFO()<<__func__<<" big img size = "<<big_img.size()<<", small img url = "<<small_img.size();
         callback(big_img, small_img);
     });
 }
