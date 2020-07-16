@@ -70,7 +70,7 @@ win32 {
     }
     TARGET_SRC  ~= s,/,\\,g # fix slashes
     TARGET_DEST ~= s,/,\\,g # fix slashes
-    QMAKE_POST_LINK +=$$quote(cmd /c copy /y $${TARGET_SRC} $${TARGET_DEST}$$escape_expand(\n\t))
+    #QMAKE_POST_LINK +=$$quote(cmd /c copy /y $${TARGET_SRC} $${TARGET_DEST}$$escape_expand(\n\t))
 }
 
 message("Will copy $${TARGET_SRC} to $${TARGET_DEST}")
