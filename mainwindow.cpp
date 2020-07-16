@@ -389,7 +389,9 @@ void MainWindow::on_actionShowMoreImage_triggered()
 {
     set_enabled_main_window_except_stop(false);
     setMaximumSize(size());
-    img_search_->show_more_images(settings_manager_->get_general_settings().get_max_download_img());
+    img_search_->show_more_images(static_cast<size_t>(
+                                      settings_manager_->get_general_settings().get_max_download_img())
+                                  );
 }
 
 void MainWindow::on_actionNew_triggered()
