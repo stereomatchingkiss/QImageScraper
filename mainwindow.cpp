@@ -339,7 +339,8 @@ void MainWindow::on_actionDownload_triggered()
     img_search_->get_imgs_link_from_gallery_page([this](QStringList const &big_img_link, QStringList const &small_img_link)
     {
         auto const total_download_ = std::min(static_cast<size_t>(big_img_link.size()),
-                                              static_cast<size_t>(settings_manager_->get_general_settings().get_max_download_img()));
+                                              static_cast<size_t>(settings_manager_->get_general_settings().
+                                                                  get_max_download_img()));
         QLOG_INFO()<<"big img links size:"<<big_img_link.size()<<",max download size:"
                   <<settings_manager_->get_general_settings().get_max_download_img();
         ui->labelProgress->setVisible(true);
