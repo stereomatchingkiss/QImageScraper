@@ -81,9 +81,8 @@ get_imgs_link_from_gallery_page(std::function<void (const QStringList &, const Q
 
             return result;
         };
-
-        auto big_img = global_parser(QRegularExpression("\"ou\":\"([^\"]*)"));
-        auto small_img = global_parser(QRegularExpression("\"tu\":\"([^\"]*)"));
+        auto big_img = global_parser(QRegularExpression(",\\[\\\"(http[^\\\"]*)\\\",\\d+,\\d+\\]\\n,null"));
+        auto small_img = global_parser(QRegularExpression("\\[\\\"(http[^\\\"]*)\\\",\\d+,\\d+\\]\\n,\\["));
         decode_url(big_img);
         decode_url(small_img);
         callback(big_img, small_img);
