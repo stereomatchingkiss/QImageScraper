@@ -28,7 +28,7 @@ void bing_image_search::get_search_image_size(std::function<void (size_t)> callb
 {
     get_web_page().toHtml([this, callback](QString const &contents)
     {        
-        callback(parse_page_link(contents).size());
+        callback(static_cast<size_t>(parse_page_link(contents).size()));
     });
 }
 
@@ -106,10 +106,7 @@ void bing_image_search::load_web_page_finished(bool ok)
         case state::get_img_link_from_gallery_page:{
             QLOG_INFO()<<"state get_img_link_from_gallery_page";
             return;
-        }
-        default:
-            QLOG_INFO()<<"default state";
-            break;
+        }        
         }
     }else{
         emit search_error(image_search_error::error::load_page_error);
@@ -119,7 +116,7 @@ void bing_image_search::load_web_page_finished(bool ok)
 void bing_image_search::get_imgs_link_from_gallery_page(std::function<void(const QStringList &, const QStringList &)> callback)
 {
     state_ = state::get_img_link_from_gallery_page;
-    get_web_page().toHtml([this, callback](QString const &contents)
+    get_web_page().toHtml([callback](QString const &contents)
     {
         //<a class="iusc" style="height:180px;width:239px"
         //m="{&quot;cid&quot;:&quot;S0tIsNfh&quot;,&quot;purl&quot;:&quot;
@@ -147,7 +144,7 @@ void bing_image_search::get_imgs_link_from_gallery_page(std::function<void(const
 void bing_image_search::get_search_target(std::function<void (const QString &)> callback)
 {
     get_web_page().runJavaScript("function jscmd(){return document.getElementById(\"sb_form_q\").value} jscmd()",
-                                 [this, callback](QVariant const &contents)
+                                 [callback](QVariant const &contents)
     {
         QLOG_INFO()<<"gallery page target:"<<contents.toString();        
         callback(contents.toString());
