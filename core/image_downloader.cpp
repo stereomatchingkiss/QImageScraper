@@ -36,6 +36,7 @@ void image_downloader::set_download_request(QStringList big_image_links, QString
     save_at_ = save_at;
     statistic_.total_download_ = std::min(static_cast<size_t>(big_img_links_.size()),
                                           max_download);
+    downloader_->reset_file_index();
 }
 
 void image_downloader::set_manual_proxy(const std::vector<QNetworkProxy> &proxy)
@@ -138,14 +139,13 @@ QString image_downloader::get_valid_image_name(QString const &save_as, QString c
 {
     QFileInfo const file_info(save_as);
     QString const suffix = file_info.suffix() == "jpg" ? "jpeg" : file_info.suffix();
-
     bool const change_suffix = suffix != img_format;
     if(change_suffix){
         QString const new_name = file_info.absolutePath() + "/" +
                 file_info.completeBaseName() + "." + img_format;
         QFileInfo const new_info(new_name);
         return new_info.absolutePath() + "/" +
-                qte::utils::unique_file_name(new_info.absolutePath(), new_info.fileName());
+                qte::utils::unique_file_name(new_info.absolutePath(), new_info.fileName(), 0);
     }else{
         return save_as;
     }

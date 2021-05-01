@@ -116,7 +116,7 @@ private:
     QStringList big_img_links_;    
     qte::net::download_supervisor *downloader_;
     image_downloader::img_links_map_value img_info_;
-    std::map<size_t, img_links_map_value> img_links_map_;
+    std::map<size_t, img_links_map_value> img_links_map_;    
     std::vector<QNetworkProxy> proxy_list_;
     int proxy_state_;
     QString save_at_;
