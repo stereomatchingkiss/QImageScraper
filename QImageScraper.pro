@@ -78,6 +78,7 @@ win32 {
 message("Will copy $${TARGET_SRC} to $${TARGET_DEST}")
 
 SOURCES += main.cpp\
+    core/pexels_image_search.cpp \
         mainwindow.cpp \
     core/bing_image_search.cpp \
     core/image_search.cpp \
@@ -104,7 +105,8 @@ SOURCES += main.cpp\
 HEADERS  += mainwindow.hpp \
     core/bing_image_search.hpp \
     core/image_search.hpp \
-    core/js_function.hpp \    
+    core/js_function.hpp \
+    core/pexels_image_search.hpp    \
     ui/web_view.hpp \
     ../qt_enhance/network/download_supervisor.hpp \
     core/utility.hpp \
