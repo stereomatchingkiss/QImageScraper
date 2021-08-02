@@ -1,4 +1,4 @@
-#include "mainwindow.hpp"
+﻿#include "mainwindow.hpp"
 #include "ui_mainwindow.h"
 
 #include "core/adobe_stock_image_search.hpp"
@@ -123,8 +123,8 @@ void MainWindow::create_search_engine(const QString &target)
         QLOG_INFO()<<__func__<<":create shutter stock engine";
         img_search_ = new shutter_stock_image_search(*ui->webView->page(), this);
     }else{
-        QLOG_INFO()<<__func__<<":create google engine";
-        img_search_ = new google_image_search(*ui->webView->page(), this);
+        QLOG_INFO()<<__func__<<":create bing engine";
+        img_search_ = new bing_image_search(*ui->webView->page(), this);
     }
 
     connect(img_search_, &image_search::go_to_search_page_done, this, &MainWindow::process_go_to_search_page);
