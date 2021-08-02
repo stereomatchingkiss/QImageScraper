@@ -16,6 +16,7 @@ class MainWindow;
 }
 
 class general_settings;
+class info_dialog;
 class image_downloader;
 class image_search;
 class settings_manager;
@@ -76,6 +77,7 @@ private:
     QSize default_min_size_;    
     image_downloader *img_downloader_;            
     image_search *img_search_;
+    std::unique_ptr<info_dialog> info_dialog_;
     settings_manager *settings_manager_;
 };
 

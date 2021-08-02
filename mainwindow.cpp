@@ -41,6 +41,7 @@ MainWindow::MainWindow(QWidget *parent) :
     default_min_size_{minimumSize()},
     img_downloader_{new image_downloader{this}},
     img_search_{nullptr},
+    info_dialog_(std::make_unique<info_dialog>()),
     settings_manager_{new settings_manager{this}}
 {    
     ui->setupUi(this);
@@ -170,6 +171,16 @@ void MainWindow::init_connection()
     {
         if(img_search_){
             img_search_->load(url);
+        }
+    });
+
+    connect(info_dialog_.get(), &info_dialog::check_link_could_found, [this]()
+    {
+        if(img_search_){
+            img_search_->get_search_image_size([this](size_t img_size)
+            {
+                QMessageBox::information(this, tr("Links info"), tr("Can find links = %1").arg(img_size));
+            });
         }
     });
 }
@@ -384,7 +395,7 @@ void MainWindow::on_actionHome_triggered()
 
 void MainWindow::on_actionInfo_triggered()
 {
-    info_dialog().exec();
+    info_dialog_->exec();
 }
 
 void MainWindow::on_actionStop_triggered()
