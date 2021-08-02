@@ -7,33 +7,53 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>131</height>
+    <height>219</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Information</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
     <widget class="QPushButton" name="pushButtonQt">
      <property name="text">
       <string>Qt</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="0">
+   <item>
     <widget class="QPushButton" name="pushButtonFatCow">
      <property name="text">
       <string>FatCow</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="0">
+   <item>
     <widget class="QPushButton" name="pushButtonAuthor">
      <property name="text">
       <string>Author</string>
      </property>
     </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="pushButtonLinkCouldFound">
+     <property name="text">
+      <string>Link could found</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>82</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>

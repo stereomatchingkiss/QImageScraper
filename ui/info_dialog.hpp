@@ -1,4 +1,4 @@
-#ifndef INFO_DIALOG_HPP
+﻿#ifndef INFO_DIALOG_HPP
 #define INFO_DIALOG_HPP
 
 #include <QDialog>
@@ -15,6 +15,9 @@ public:
     explicit info_dialog(QWidget *parent = nullptr);
     ~info_dialog();
 
+signals:
+    void check_link_could_found();
+
 private slots:
     void on_pushButtonQt_clicked();
 
@@ -22,7 +25,9 @@ private slots:
 
     void on_pushButtonAuthor_clicked();
 
-private:    
+    void on_pushButtonLinkCouldFound_clicked();
+
+private:
     void create_text_browser(QString const &contents);    
 
     Ui::info_dialog *ui;    

@@ -1,4 +1,4 @@
-#include "info_dialog.hpp"
+﻿#include "info_dialog.hpp"
 #include "ui_info_dialog.h"
 
 #include <QDesktopServices>
@@ -59,4 +59,9 @@ void info_dialog::on_pushButtonAuthor_clicked()
                         "if you have any trouble, please contact me by </br>"
                         "the email <font color=\"blue\">thamngapwei@gmail.com</font> or "
                         "go to the project <a href=\"https://github.com/stereomatchingkiss/QImageScraper\">website</a>");
+}
+
+void info_dialog::on_pushButtonLinkCouldFound_clicked()
+{
+    emit check_link_could_found();
 }
