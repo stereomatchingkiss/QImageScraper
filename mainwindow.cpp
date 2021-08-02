@@ -7,6 +7,7 @@
 #include "core/dream_time_image_search.hpp"
 #include "core/google_image_search.hpp"
 #include "core/image_downloader.hpp"
+#include "core/pexels_image_search.hpp"
 #include "core/shutter_stock_image_search.hpp"
 #include "core/yahoo_image_search.hpp"
 #include "core/global_constant.hpp"
@@ -122,6 +123,8 @@ void MainWindow::create_search_engine(const QString &target)
     }else if(search_engine == global_constant::shutter_stock_name()){
         QLOG_INFO()<<__func__<<":create shutter stock engine";
         img_search_ = new shutter_stock_image_search(*ui->webView->page(), this);
+    }else if(search_engine == global_constant::pexels_search_name()){
+        img_search_ = new pexels_image_search(*ui->webView->page(), this);
     }else{
         QLOG_INFO()<<__func__<<":create bing engine";
         img_search_ = new bing_image_search(*ui->webView->page(), this);
@@ -336,13 +339,16 @@ void MainWindow::on_actionDownload_triggered()
 {
     set_enabled_main_window_except_stop(false);
     ui->actionStop->setEnabled(false);
-    img_search_->get_imgs_link_from_gallery_page([this](QStringList const &big_img_link, QStringList const &small_img_link)
+    img_search_->get_imgs_link_from_gallery_page([this](QStringList const &big_img_link,
+                                                 QStringList const &small_img_link)
     {
         auto const total_download_ = std::min(static_cast<size_t>(big_img_link.size()),
                                               static_cast<size_t>(settings_manager_->get_general_settings().
                                                                   get_max_download_img()));
         QLOG_INFO()<<"big img links size:"<<big_img_link.size()<<",max download size:"
                   <<settings_manager_->get_general_settings().get_max_download_img();
+        //QLOG_INFO()<<big_img_link;
+        //setEnabled(true);
         ui->labelProgress->setVisible(true);
         ui->progressBar->setVisible(true);
         ui->progressBar->setRange(0, static_cast<int>(total_download_));
@@ -357,7 +363,7 @@ void MainWindow::on_actionDownload_triggered()
         img_downloader_->set_proxy_state(static_cast<int>(pstate));
         img_downloader_->set_download_request(big_img_link, small_img_link, total_download_,
                                               settings_manager_->get_general_settings().get_save_at());
-        img_downloader_->download_next_image();
+        img_downloader_->download_next_image();//*/
     });
 }
 
