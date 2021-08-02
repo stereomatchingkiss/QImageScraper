@@ -117,18 +117,10 @@ void pexels_image_search::
 get_imgs_link_from_gallery_page(std::function<void(const QStringList &, const QStringList &)> callback)
 {
     state_ = state::get_img_link_from_gallery_page;
-    get_web_page().toHtml([callback](QString const &contents)
+    get_web_page().toHtml([callback, this](QString const &contents)
     {
-        //><img srcset="https://images.pexels.com/photos/2709388/pexels-photo-2709388.jpeg?auto=compress
-        QRegularExpression const reg("><img srcset=\"(https://images.pexels.com/photos/\\d+/[^?]*)");
-        auto iter = reg.globalMatch(contents);
-        QStringList big_img, small_img;
-        while(iter.hasNext()){
-            QRegularExpressionMatch const match = iter.next();
-            QLOG_INFO()<<"parse_imgs_link_from_second_page:"<<match.captured(1);
-            big_img.push_back(match.captured(1));
-        }
-        small_img = big_img;
+        auto big_img = parse_page_link(contents);
+        auto small_img = big_img;
         QLOG_INFO()<<__func__<<" big img size = "<<big_img.size()<<", small img url = "<<small_img.size();
         callback(big_img, small_img);
     });
@@ -192,19 +184,15 @@ void pexels_image_search::scroll_web_page()
 
 QStringList pexels_image_search::parse_page_link(const QString &contents)
 {
-    QRegularExpression const reg("(search\\?view=detailV2[^\"]*)");
+    //><img srcset="https://images.pexels.com/photos/2709388/pexels-photo-2709388.jpeg?auto=compress
+    QRegularExpression const reg("><img srcset=\"(https://images.pexels.com/photos/\\d+/[^?]*)");
     auto iter = reg.globalMatch(contents);
-    QStringList links;
+    QStringList big_img;
     while(iter.hasNext()){
         QRegularExpressionMatch const match = iter.next();
-        if(match.captured(1).right(20) != "ipm=vs#enterinsights"){
-            QString url = QUrl("https://www.bing.com/images/" + match.captured(1)).toString();
-            url.replace("&amp;", "&");
-            links.push_back(url);
-        }
+        QLOG_INFO()<<"parse_imgs_link_from_second_page:"<<match.captured(1);
+        big_img.push_back(match.captured(1));
     }
-    links.removeDuplicates();
-    QLOG_INFO()<<"total match link:"<<links.size();
 
-    return links;
+    return big_img;
 }
