@@ -1,4 +1,4 @@
-#include "general_settings.hpp"
+﻿#include "general_settings.hpp"
 #include "ui_general_settings.h"
 
 #include "../core/global_constant.hpp"
@@ -38,7 +38,8 @@ general_settings::general_settings(QWidget *parent) :
     ui->comboBoxSearchBy->addItem(global_constant::dream_time_name());
     ui->comboBoxSearchBy->addItem(global_constant::google_search_name());
     ui->comboBoxSearchBy->addItem(global_constant::shutter_stock_name());
-    ui->comboBoxSearchBy->addItem(global_constant::yahoo_search_name());    
+    ui->comboBoxSearchBy->addItem(global_constant::yahoo_search_name());
+    ui->comboBoxSearchBy->addItem(global_constant::pexels_search_name());
 
     QSettings settings;
     if(settings.contains(setting_keys::general_save_at)){

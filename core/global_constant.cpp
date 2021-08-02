@@ -1,4 +1,4 @@
-#include "global_constant.hpp"
+﻿#include "global_constant.hpp"
 
 #include <QObject>
 
@@ -25,6 +25,11 @@ QString global_constant::bing_search_name()
 QString global_constant::google_search_name()
 {
     return QObject::tr("Google");
+}
+
+QString global_constant::pexels_search_name()
+{
+    return QObject::tr("Pexels");
 }
 
 QString global_constant::shutter_stock_name()
