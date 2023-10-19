@@ -11,7 +11,6 @@
 #include "core/shutter_stock_image_search.hpp"
 #include "core/yahoo_image_search.hpp"
 #include "core/global_constant.hpp"
-#include "core/utility.hpp"
 
 #include "ui/info_dialog.hpp"
 #include "ui/general_settings.hpp"
@@ -29,6 +28,7 @@
 #include <QImageReader>
 #include <QMessageBox>
 #include <QNetworkRequest>
+#include  <QRandomGenerator>
 #include <QSettings>
 #include <QSizeGrip>
 
@@ -58,9 +58,7 @@ MainWindow::MainWindow(QWidget *parent) :
     if(settings.contains("geometry")){
         restoreGeometry(settings.value("geometry").toByteArray());
     }
-    settings.setValue("version", "1.4");
-
-    qsrand(std::time(nullptr));
+    settings.setValue("version", "1.4");    
 
     init_connection();
     check_new_version();
@@ -239,8 +237,8 @@ void MainWindow::process_image_search_error(image_search_error::error error)
 {
     if(error == image_search_error::error::load_page_error){
         if(!is_download_finished()){
-            QLOG_INFO()<<"reload small img";
-            QTimer::singleShot(qrand() % 4000 + 2000,
+            QLOG_INFO()<<"reload small img";            
+            QTimer::singleShot(QRandomGenerator::global()->bounded(4000) + 2000,
                                [this](){ img_search_->reload(); });
         }else{
             img_search_->go_to_search_page();

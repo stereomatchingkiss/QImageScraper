@@ -20,7 +20,7 @@ CONFIG += c++17
 DEFINES += QT_DEPRECATED_WARNINGS
 
 INCLUDEPATH += ..
-INCLUDEPATH += ../3rdLibs/qslog
+INCLUDEPATH += ../3rdLibs/QsLog
 #Without this include path, Qt cannot find web_view.hpp
 INCLUDEPATH += ui
 

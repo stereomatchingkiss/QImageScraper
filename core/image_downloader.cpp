@@ -12,6 +12,7 @@
 #include <QFileInfo>
 #include <QImageReader>
 #include <QNetworkProxy>
+#include <QRandomGenerator>
 
 image_downloader::image_downloader(QObject *parent) :
     QObject(parent),
@@ -35,8 +36,7 @@ void image_downloader::set_download_request(QStringList big_image_links, QString
     img_links_map_.clear();
     save_at_ = save_at;
     statistic_.total_download_ = std::min(static_cast<size_t>(big_img_links_.size()),
-                                          max_download);
-    downloader_->reset_file_index();
+                                          max_download);    
 }
 
 void image_downloader::set_manual_proxy(const std::vector<QNetworkProxy> &proxy)
@@ -105,8 +105,8 @@ void image_downloader::download_finished(image_downloader::download_img_task tas
 void image_downloader::download_image(image_downloader::img_links_map_value info)
 {    
     proxy_settings::proxy_state const pstate = static_cast<proxy_settings::proxy_state>(proxy_state_);
-    if(pstate == proxy_settings::proxy_state::manual_proxy && info.retry_num_ != 0 && !proxy_list_.empty()){
-        auto const proxy = proxy_list_[static_cast<size_t>(qrand() % static_cast<int>(proxy_list_.size()))];
+    if(pstate == proxy_settings::proxy_state::manual_proxy && info.retry_num_ != 0 && !proxy_list_.empty()){        
+        auto const proxy = proxy_list_[QRandomGenerator::global()->bounded(proxy_list_.size())];
         QLOG_INFO()<<__func__<<":manual proxy:"<<proxy;
         downloader_->set_proxy(proxy);
     }else if(pstate == proxy_settings::proxy_state::no_proxy){
@@ -145,7 +145,7 @@ QString image_downloader::get_valid_image_name(QString const &save_as, QString c
                 file_info.completeBaseName() + "." + img_format;
         QFileInfo const new_info(new_name);
         return new_info.absolutePath() + "/" +
-                qte::utils::unique_file_name(new_info.absolutePath(), new_info.fileName(), 0);
+                qte::utils::unique_file_name(new_info.absolutePath(), new_info.fileName());
     }else{
         return save_as;
     }
@@ -207,8 +207,8 @@ void image_downloader::spawn_download_request(image_downloader::img_links_map_va
     QNetworkRequest const request = create_img_download_request(img_link);
     auto const unique_id = downloader_->append(request, save_at_,
                                                global_constant::network_reply_timeout());
-    img_links_map_.emplace(unique_id, std::move(info));
-    QTimer::singleShot(qrand() % 1000 + 500, [this, unique_id](){downloader_->start_download_task(unique_id);});
+    img_links_map_.emplace(unique_id, std::move(info));    
+    QTimer::singleShot(QRandomGenerator::global()->bounded(1000) + 500, [this, unique_id](){downloader_->start_download_task(unique_id);});
 }
 
 void image_downloader::start_download(const QString &big_img_link, const QString &small_img_link)

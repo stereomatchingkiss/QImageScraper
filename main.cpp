@@ -21,9 +21,9 @@ int main(int argc, char *argv[])
     const QString sLogPath(QDir(a.applicationDirPath()).filePath("log.txt"));
 
     // 2. add two destinations
-    DestinationPtrU fileDestination(DestinationFactory::MakeFileDestination(
+    DestinationPtr fileDestination(DestinationFactory::MakeFileDestination(
                                         sLogPath, LogRotationOption::EnableLogRotation, MaxSizeBytes(1024*1024*2), MaxOldLogCount(2)));
-    DestinationPtrU debugDestination(DestinationFactory::MakeDebugOutputDestination());    
+    DestinationPtr debugDestination(DestinationFactory::MakeDebugOutputDestination());
     logger.addDestination(std::move(debugDestination));
     logger.addDestination(std::move(fileDestination));    
 

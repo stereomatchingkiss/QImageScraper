@@ -58,7 +58,6 @@ To build QImageScraper from source you will need
 - [Qt5.6.2](https://www.qt.io/download-open-source/) (>= 5.6.2, recommended version is Qt5.6.x , x >= 2), and
 - [QsLog](https://bitbucket.org/codeimproved/qslog) (Use git to clone it, do no need to build, include the .pri is enough).
 - [qt_enhance](https://github.com/stereomatchingkiss/qt_enhance) (Do not need to compile, just put it at the same directory of QImageScraper)
-- [icons](https://www.dropbox.com/s/lrtu3abv90d4j3f/icons.7z?dl=0) (Unzip it in the folder QImageScraper/icons)
 
 Bug Reporting
 -------------
